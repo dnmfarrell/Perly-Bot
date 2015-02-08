@@ -1,0 +1,15 @@
+=encoding utf8
+
+=head1 Perly-Bot
+
+A Perl script that tracks Perl blogs and posts them on L</r/perl|http://reddit/r/perl>
+
+=head2 Author
+
+© David Farrell, 2015
+
+=head2 License
+
+FreeBSD, see LICENSE
+
+=cut
