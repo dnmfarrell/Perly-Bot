@@ -166,4 +166,4 @@ sub post_reddit_link
     sleep(1);
 }
 
-END { DumpFile( 'cached_urls.yml', $cache ) }
+END { DumpFile( 'logs/cached_urls.yml', $cache ) }
