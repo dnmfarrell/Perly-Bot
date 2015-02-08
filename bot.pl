@@ -142,7 +142,7 @@ sub post_reddit_link
     return if url_is_cached($url);
     cache_url($url);
 
-    my $session_file = 'session_data.json';
+    my $session_file = 'logs/session_data.json';
     my $reddit       = Reddit::Client->new(
         session_file => $session_file,
         user_agent   => $agent_string,
