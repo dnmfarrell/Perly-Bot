@@ -62,8 +62,8 @@ for my $feed ( @{$feeds} ) {
                             $looks_perly )
                         {
                             post_reddit_link(
-                                 $i->query('link')->text_content,
                                  $i->query('title')->text_content,
+                                 $i->query('link')->text_content,
                             );
                         }
                     }
@@ -88,10 +88,8 @@ for my $feed ( @{$feeds} ) {
                             or $post->summary =~ $looks_perly )
                         {
                             post_reddit_link(
-                                {
-                                    url   => $post->link->href,
-                                    title => $post->title,
-                                }
+                                    $post->title,
+                                    $post->link->href,
                             );
                         }
                     }
