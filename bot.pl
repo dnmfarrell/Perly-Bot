@@ -81,6 +81,8 @@ for my $feed ( @{$feeds} ) {
         }
         elsif ( $feed->{type} eq 'atom' )
         {
+            # accessors are generated from the available tags in the atom feed
+            # the tags can have different names, so we store the tag name in feeds.yml
             no strict 'refs';
             my $posts = XML::Atom::Feed->new( Stream => \$response->{content} );
             foreach my $post ( $posts->entries )
