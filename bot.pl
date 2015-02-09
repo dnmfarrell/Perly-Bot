@@ -20,11 +20,14 @@ my $agent_string = "Perly_Bot/v$VERSION";
 my $looks_perly = qr/\b(?:perl|cpan|cpanminus|moose|metacpan|modules?)\b/i;
 
 my $datetime_now = localtime;
-my $AGE_THRESHOLD= ONE_DAY;
+my $age_threshold= ONE_DAY;
 my $ua           = HTTP::Tiny->new( agent => $agent_string );
 my $rss          = XML::RSS::Parser->new;
-my $feeds        = LoadFile('feeds.yml');
-my $cache        = LoadFile('logs/cached_urls.yml');
+my $feeds_path   = 'feeds.yml';
+my $feeds        = LoadFile($feeds_path);
+my $cache_path   = 'logs/cached_urls.yml';
+my $cache        = LoadFile($cache_path);
+my $session_path = 'logs/session_data.json';
 
 open my $ERROR_LOG, '>>', 'logs/error.log' or die $!;
 
@@ -62,7 +65,7 @@ for my $feed ( @{$feeds} ) {
                     my $datetime_post =
                       Time::Piece->strptime( $datetime, $date_format );
 
-                    if ( $datetime_post > $datetime_now - $AGE_THRESHOLD ) {
+                    if ( $datetime_post > $datetime_now - $age_threshold ) {
                         if (   $i->query('title')->text_content =~ $looks_perly
                             or $i->query('description')->text_content =~
                             $looks_perly )
@@ -94,7 +97,7 @@ for my $feed ( @{$feeds} ) {
                     my $datetime_post =
                       Time::Piece->strptime( $datetime, $date_format );
 
-                    if ( $datetime_post > $datetime_now - $AGE_THRESHOLD ) {
+                    if ( $datetime_post > $datetime_now - $age_threshold ) {
                         if (   $post->title =~ $looks_perly
                             or $post->summary =~ $looks_perly )
                         {
@@ -144,7 +147,7 @@ sub refresh_cache
     @$cache = grep {
         my $url_date =
           Time::Piece->strptime( $_->{datetime}, "%Y-%m-%dT%H:%M:%S" );
-        $url_date > $datetime_now - $AGE_THRESHOLD ? 1 : 0;
+        $url_date > $datetime_now - $age_threshold ? 1 : 0;
     } @$cache;
 }
 
@@ -156,7 +159,7 @@ sub post_reddit_link
     return if url_is_cached($url);
     cache_url($url);
 
-    my $session_file = 'logs/session_data.json';
+    my $session_file = $session_path;
     my $reddit       = Reddit::Client->new(
         session_file => $session_file,
         user_agent   => $agent_string,
@@ -180,4 +183,4 @@ sub post_reddit_link
     sleep(2); # throttle requests to avoid exceeding API limit
 }
 
-END { DumpFile( 'logs/cached_urls.yml', $cache ) }
+END { DumpFile( $cache_path, $cache ) }
