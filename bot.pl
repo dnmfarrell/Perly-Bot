@@ -70,6 +70,7 @@ for my $feed ( @{$feeds} ) {
                             post_reddit_link(
                                  $i->query('title')->text_content,
                                  $i->query('link')->text_content,
+                                 'perl'
                             );
                         }
                     }
@@ -98,8 +99,9 @@ for my $feed ( @{$feeds} ) {
                             or $post->summary =~ $looks_perly )
                         {
                             post_reddit_link(
-                                    $post->title,
-                                    $post->link->href,
+                                 $post->title,
+                                 $post->link->href,
+                                 'perl'
                             );
                         }
                     }
