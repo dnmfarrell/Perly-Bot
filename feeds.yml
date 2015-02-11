@@ -60,7 +60,6 @@
     pubDateName: dc:date
     pubDateFormat: '%Y-%m-%dT%H:%M:%S'
     active: 1
-    # feedburner links refer to feedproxy.google.com sub domain which is banned by Reddit
     proxy: 1
 - 
     url: http://blog.twoshortplanks.com/feed/
@@ -168,7 +167,13 @@
     pubDateFormat: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 1
-    # feedburner links refer to feedproxy.google.com sub domain which is banned by Reddit
+- 
+    url: http://www.wumpus-cave.net/feed/
+    type: rss
+    pubDateName: pubDate
+    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    active: 1
+    proxy: 0
 - 
     url: http://feeds.feedburner.com/PerlHacks
     type: rss
@@ -176,5 +181,4 @@
     pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 1
-    # feedburner links refer to feedproxy.google.com sub domain which is banned by Reddit
 
