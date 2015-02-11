@@ -11,6 +11,7 @@ use Time::Piece;
 use Time::Seconds;
 use Try::Tiny;
 use List::Util 'any';
+use URI;
 
 # Globals - these can be put in a config file
 our $VERSION      = 0.01;
@@ -70,9 +71,17 @@ for my $feed ( @{$feeds} ) {
                             or $i->query('description')->text_content =~
                             $looks_perly )
                         {
+                            my $url = $i->query('link')->text_content;
+
+                            if ($feed->{proxy})
+                            {
+                                $url = get_url_behind_proxy($url);
+                                next unless $url;
+                            }
+
                             post_reddit_link(
                                  $i->query('title')->text_content,
-                                 $i->query('link')->text_content,
+                                 $url,
                                  'perl'
                             );
                         }
@@ -101,9 +110,16 @@ for my $feed ( @{$feeds} ) {
                         if (   $post->title =~ $looks_perly
                             or $post->summary =~ $looks_perly )
                         {
+                            my $url = $post->link->href;
+
+                            if ($feed->{proxy})
+                            {
+                                $url = get_url_behind_proxy($url);
+                                next unless $url;
+                            }
                             post_reddit_link(
                                  $post->title,
-                                 $post->link->href,
+                                 $url,
                                  'perl'
                             );
                         }
@@ -151,6 +167,12 @@ sub refresh_cache
     } @$cache;
 }
 
+=head2 post_reddit_link
+
+Posts a link to a subreddit, requires the title, url and subreddit.
+
+=cut
+
 sub post_reddit_link
 {
     my ($title, $url, $subreddit) = @_;
@@ -181,6 +203,32 @@ sub post_reddit_link
         log_error("Error posting $title $url $_");
     };
     sleep(2); # throttle requests to avoid exceeding API limit
+}
+
+=head2 get_url_behind_proxy
+
+Requests a proxy URL and returns the ultimate location the URL redirects to. Requires a url as an argument.
+
+=cut
+
+sub get_url_behind_proxy
+{
+    my $url = shift;
+    my $response = HTTP::Tiny->new->get($url);
+
+    if ($response->{success})
+    {
+        # parse the URL of the article removing the query
+        # this reduces the risk of posting a duplicate URL
+        # with a different ending
+        my $uri = URI->new( $response->{url} );
+        return $uri->scheme . '://' . $uri->host . $uri->path;
+    }
+    else
+    {
+        log_error("Error requesting proxy $url. $response->{status} $response->{reason}");
+    }
+    undef;
 }
 
 END { DumpFile( $cache_path, $cache ) }
