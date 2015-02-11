@@ -81,7 +81,7 @@ for my $feed ( @{$feeds} ) {
 
                             post_reddit_link(
                                  $i->query('title')->text_content,
-                                 $url,
+                                 clean_url($url),
                                  'perl'
                             );
                         }
@@ -119,7 +119,7 @@ for my $feed ( @{$feeds} ) {
                             }
                             post_reddit_link(
                                  $post->title,
-                                 $url,
+                                 clean_url($url),
                                  'perl'
                             );
                         }
@@ -205,6 +205,20 @@ sub post_reddit_link
     sleep(2); # throttle requests to avoid exceeding API limit
 }
 
+=head2 clean_url
+
+Remove the query component of the url. This is to reduce the risk of posting duplicate urls with different query parameters.
+
+=cut
+
+sub clean_url
+{
+    my $url_to_clean = shift;
+    my $uri = URI->new( $url_to_clean );
+    return $uri->scheme . '://' . $uri->host . $uri->path;
+}
+
+
 =head2 get_url_behind_proxy
 
 Requests a proxy URL and returns the ultimate location the URL redirects to. Requires a url as an argument.
@@ -218,11 +232,7 @@ sub get_url_behind_proxy
 
     if ($response->{success})
     {
-        # parse the URL of the article removing the query
-        # this reduces the risk of posting a duplicate URL
-        # with a different ending
-        my $uri = URI->new( $response->{url} );
-        return $uri->scheme . '://' . $uri->host . $uri->path;
+        return $response->{url};
     }
     else
     {
