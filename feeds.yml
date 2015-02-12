@@ -81,17 +81,15 @@
     type: rss
     pubDateName: pubDate
     pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
-    active: 0
+    active: 1
     proxy: 0
-    # blocks linode
 - 
     url: https://p6weekly.wordpress.com/feed/
     type: rss
     pubDateName: pubDate
     pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
-    active: 0
+    active: 1
     proxy: 0
-    # blocks linode
 - 
     url: http://perlmaven.com/atom
     type: atom
@@ -105,7 +103,7 @@
     type: atom
     pubDateName: published
     pubDateFormat: '%Y-%m-%dT%H:%M:%SZ'
-    active: 0
+    active: 1
     proxy: 0
     # deactivated becase rejects user agent with 406
 - 
@@ -135,17 +133,15 @@
     type: atom
     pubDateName: published
     pubDateFormat: '%Y-%m-%dT%H:%M:%SZ'
-    active: 0
+    active: 1
     proxy: 0
-    # blocks linode
 - 
     url: https://blog.afoolishmanifesto.com/index.xml
     type: rss
     pubDateName: pubDate
     pubDateFormat: '%a, %d %b %Y %H:%M:%S'
-    active: 0
+    active: 1
     proxy: 0
-    # blocks linode
 - 
     url: http://blogs.perl.org/atom.xml
     type: atom
@@ -158,9 +154,8 @@
     type: rss
     pubDateName: pubDate
     pubDateFormat: '%Y-%m-%dT%H:%M:%S %z'
-    active: 0
+    active: 1
     proxy: 0
-    # blocks linode
 - 
     url: http://feeds.feedburner.com/nu42/yYVb?format=xml
     type: atom
@@ -182,11 +177,4 @@
     pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 1
-- 
-    url: https://p6weekly.wordpress.com/feed/
-    type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
-    active: 1
-    proxy: 0
 
