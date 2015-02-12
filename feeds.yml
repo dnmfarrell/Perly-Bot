@@ -1,3 +1,4 @@
+# this is a collection of Perl blog feeds Perly-Bot scans for new material
 - 
     url: http://cpanpr.tumblr.com/rss
     type: rss
@@ -181,4 +182,11 @@
     pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 1
+- 
+    url: https://p6weekly.wordpress.com/feed/
+    type: rss
+    pubDateName: pubDate
+    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    active: 1
+    proxy: 0
 
