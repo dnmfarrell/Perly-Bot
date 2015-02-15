@@ -2,7 +2,11 @@
 
 =head1 Perly-Bot
 
-A Perl script that tracks Perl blogs and posts them on L</r/perl|http://reddit/r/perl>
+A Perl modulino class that tracks Perl blogs and posts them on social media.
+
+=head2 SYNOPSIS
+
+  $ perl -Ilib lib/Perly/Bot.pm
 
 =head2 Author
 
@@ -13,3 +17,4 @@ A Perl script that tracks Perl blogs and posts them on L</r/perl|http://reddit/r
 FreeBSD, see LICENSE
 
 =cut
+
