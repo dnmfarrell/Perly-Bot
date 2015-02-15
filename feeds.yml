@@ -1,180 +1,203 @@
-# this is a collection of Perl blog feeds Perly-Bot scans for new material
+# this is a collection of Perl blog feeds that Perly-Bot scans for new material
 - 
     url: http://cpanpr.tumblr.com/rss
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://rjbs.manxome.org/rubric/entries/user/rjbs/has_body/1?format=rss
     type: rss
-    pubDateName: dc:date
-    pubDateFormat: '%Y-%m-%dT%H:%M:%S'
+    date_name: dc:date
+    date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://www.dagolden.com/index.php/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://www.learning-perl.com/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://www.intermediateperl.com/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://www.masteringperl.org/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://www.effectiveperlprogramming.com/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://perltricks.com/feed/rss
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%Y-%m-%dT%H:%M:%S'
+    date_name: pubDate
+    date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
+    social_media_targets: [reddit]
 - 
     url: http://feeds.feedburner.com/szabgab?format=xml
     type: rss
-    pubDateName: dc:date
-    pubDateFormat: '%Y-%m-%dT%H:%M:%S'
+    date_name: dc:date
+    date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 1
+    social_media_targets: [twitter, reddit]
 - 
     url: http://blog.twoshortplanks.com/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://blog.laufeyjarson.com/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: https://andreeapirvulescu.wordpress.com/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: https://p6weekly.wordpress.com/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://perlmaven.com/atom
     type: atom
-    pubDateName: updated
-    pubDateFormat: '%Y-%m-%dT%H:%M:%SZ'
-    active: 0
+    date_name: updated
+    date_format: '%Y-%m-%dT%H:%M:%SZ'
+    active: 0 # deactivated includes links to articles behind a paywall: Maven Pro
     proxy: 0
-    # deactivated includes links to articles behind a paywall: Maven Pro
+    social_media_targets: [twitter, reddit]
 - 
     url: http://neilb.org/atom.xml
     type: atom
-    pubDateName: published
-    pubDateFormat: '%Y-%m-%dT%H:%M:%SZ'
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
-    # deactivated becase rejects user agent with 406
+    social_media_targets: [twitter, reddit]
 - 
     url: http://jjnapiorkowski.typepad.com/modern-perl/atom.xml
     type: atom
-    pubDateName: published
-    pubDateFormat: '%Y-%m-%dT%H:%M:%S'
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://perl.bearcircle.net/feeds/posts/default
     type: atom
-    pubDateName: published
-    pubDateFormat: '%Y-%m-%dT%H:%M:%S'
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://reneeb-perlblog.blogspot.com/atom.xml
     type: atom
-    pubDateName: published
-    pubDateFormat: '%Y-%m-%dT%H:%M:%S'
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%S'
     active: 0
     proxy: 0
+    social_media_targets: [twitter, reddit]
     # deactivated because sometimes in German
 - 
     url: https://andreeapirvulescu.wordpress.com/feed/atom/
     type: atom
-    pubDateName: published
-    pubDateFormat: '%Y-%m-%dT%H:%M:%SZ'
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%SZ'
     active: 1
+    social_media_targets: [twitter, reddit]
     proxy: 0
 - 
     url: https://blog.afoolishmanifesto.com/index.xml
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S'
     active: 1
+    social_media_targets: [twitter, reddit]
     proxy: 0
 - 
     url: http://blogs.perl.org/atom.xml
     type: atom
-    pubDateName: published
-    pubDateFormat: '%Y-%m-%dT%H:%M:%SZ'
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%SZ'
     active: 1
+    social_media_targets: [twitter, reddit]
     proxy: 0
 - 
     url: https://perlancar.wordpress.com/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
+    social_media_targets: [twitter, reddit]
     proxy: 0
 - 
     url: http://feeds.feedburner.com/nu42/yYVb?format=xml
     type: atom
-    pubDateName: published
-    pubDateFormat: '%Y-%m-%dT%H:%M:%S'
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
+    social_media_targets: [twitter, reddit]
     proxy: 1
 - 
     url: http://www.wumpus-cave.net/feed/
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
+    social_media_targets: [twitter, reddit]
 - 
     url: http://feeds.feedburner.com/PerlHacks
     type: rss
-    pubDateName: pubDate
-    pubDateFormat: '%a, %d %b %Y %H:%M:%S %z'
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 1
+    social_media_targets: [twitter, reddit]
 
