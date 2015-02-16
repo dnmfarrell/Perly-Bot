@@ -126,11 +126,11 @@ sub cache_url
 sub refresh_cache
 {
     my $cache = shift;
-    grep {
+    [ grep {
         my $url_date =
           Time::Piece->strptime( $_->{datetime}, "%Y-%m-%dT%H:%M:%S" );
         $url_date > $datetime_now - $age_threshold ? 1 : 0;
-    } @$cache;
+    } @$cache ];
 }
 
 =head2 post_reddit_link
