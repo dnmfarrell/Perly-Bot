@@ -1,6 +1,6 @@
 package Perly::Bot;
-use 5.10.3;
 use warnings;
+use strict;
 use Reddit::Client;
 use HTTP::Tiny;
 use YAML::XS qw/LoadFile DumpFile/;
