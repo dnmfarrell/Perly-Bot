@@ -56,7 +56,7 @@ sub run
                && any { /$looks_perly/ } $post->title, $post->description )
           {
             # do something
-            post_link($post, $feed->social_media_targets);
+            post_link($post, $feed->social_media_targets, $cache);
           }
         }
       }
@@ -77,7 +77,7 @@ sub run
 
 sub post_link
 {
-  my ($post, $social_media_targets) = @_;
+  my ($post, $social_media_targets, $cache) = @_;
 
   unless (url_is_cached($cache, $post->root_url))
   {
@@ -87,11 +87,13 @@ sub post_link
     {
       if ($media =~ /twitter/)
       {
-        tweet_link($post, '#perl_community');
+	print "posting $post->{url} to twitter\n";
+        #tweet_link($post, '#perl_community');
       }
       elsif ($media =~ /reddit/)
       {
-        post_reddit_link($post, 'perl');
+	print "posting $post->{url} to reddit\n";
+        #post_reddit_link($post, 'perl');
       }
       else
       {
