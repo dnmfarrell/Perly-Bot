@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 package Perly::Bot;
 use 5.10.3;
 use warnings;
