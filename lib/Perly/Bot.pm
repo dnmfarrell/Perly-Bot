@@ -87,13 +87,11 @@ sub post_link
     {
       if ($media =~ /twitter/)
       {
-	print "posting $post->{url} to twitter\n";
-        #tweet_link($post, '#perl_community');
+        tweet_link($post, '#perl_community');
       }
       elsif ($media =~ /reddit/)
       {
-	print "posting $post->{url} to reddit\n";
-        #post_reddit_link($post, 'perl');
+        post_reddit_link($post, 'perl');
       }
       else
       {
