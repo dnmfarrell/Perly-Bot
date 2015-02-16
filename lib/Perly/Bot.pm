@@ -15,19 +15,15 @@ use Carp;
 use Perly::Bot::Feed;
 
 # Globals - these can be put in a config file
-our $VERSION      = 0.02;
+our $VERSION      = 0.03;
 my $agent_string = "Perly_Bot/v$VERSION";
 # posts must mention a Perl keyword to be considered relevant
 my $looks_perly = qr/\b(?:perl|cpan|cpanminus|moose|metacpan|modules?)\b/i;
 my $datetime_now = localtime;
 my $age_threshold= ONE_DAY;
-my $ua           = HTTP::Tiny->new( agent => $agent_string );
 my $feeds_path   = 'feeds.yml';
-my $feeds        = LoadFile($feeds_path);
 my $cache_path   = 'logs/cached_urls.yml';
-my $cache        = LoadFile($cache_path);
 my $session_path = 'logs/session_data.json';
-open my $ERROR_LOG, '>>', 'logs/error.log' or die $!;
 # end globals
 
 # modulino pattern
@@ -35,6 +31,10 @@ __PACKAGE__->run() unless caller();
 
 sub run
 {
+  my $ua           = HTTP::Tiny->new( agent => $agent_string );
+  my $cache        = LoadFile($cache_path);
+  my $feeds        = LoadFile($feeds_path);
+
   # Loop through feeds, check for new posts
   for my $feed_args ( @{$feeds} )
   {
@@ -72,21 +72,24 @@ sub run
       log_error("Error processing $feed_args->{url} $_");
     };
   }
+  # update the cache on exit
+  $cache = refresh_cache($cache);
+  DumpFile( $cache_path, $cache )
 }
 
 sub post_link
 {
   my ($post, $social_media_targets) = @_;
 
-  unless (url_is_cached($post->root_url))
+  unless (url_is_cached($cache, $post->root_url))
   {
-    cache_url($post->root_url);
+    cache_url($cache, $post->root_url);
 
     foreach my $media (@$social_media_targets)
     {
       if ($media =~ /twitter/)
       {
-        tweet($post, '#perl_community');
+        tweet_link($post, '#perl_community');
       }
       elsif ($media =~ /reddit/)
       {
@@ -102,8 +105,9 @@ sub post_link
 
 sub log_error
 {
+    open my $error_log, '>>', 'logs/error.log' or die $!;
     my $timestamp = localtime;
-    say $ERROR_LOG $timestamp->datetime . "\t$_[0]";
+    say $error_log $timestamp->datetime . "\t$_[0]";
 }
 
 sub url_is_cached
@@ -219,9 +223,4 @@ sub tweet_link
   };
 }
 
-# update the cache on exit
-END {
-  $cache = refresh_cache($cache);
-  DumpFile( $cache_path, $cache )
-};
 
