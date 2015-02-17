@@ -19,6 +19,7 @@ my $agent_string = "Perly_Bot/v$VERSION";
 my $looks_perly = qr/\b(?:perl|cpan|cpanminus|moose|metacpan|modules?)\b/i;
 my $datetime_now = localtime;
 my $age_threshold= ONE_DAY;
+my $cache_age    = ONE_WEEK;
 my $feeds_path   = 'feeds.yml';
 my $cache_path   = 'logs/cached_urls.yml';
 my $session_path = 'logs/session_data.json';
@@ -127,7 +128,7 @@ sub refresh_cache
     [ grep {
         my $url_date =
           Time::Piece->strptime( $_->{datetime}, "%Y-%m-%dT%H:%M:%S" );
-        $url_date > $datetime_now - $age_threshold ? 1 : 0;
+        $url_date > $datetime_now - $cache_age ? 1 : 0;
     } @$cache ];
 }
 
@@ -179,18 +180,17 @@ sub tweet_link
   # build tweet, max 140 chars
   my $tweet;
 
-  if (length($blog_post->decoded_title) <= 117)
+  if (length($blog_post->decoded_title) < 118)
   {
     $tweet = $blog_post->decoded_title . ' ' . $blog_post->root_url;
+    if (length($blog_post->decoded_title . ' ' . $hashtag) < 118)
+    {
+      $tweet .= $hashtag;
+    }
   }
   else
   {
     $tweet = substr($blog_post->decoded_title, 0, 113) . "... " . $blog_post->root_url;
-  }
-
-  if (length($tweet . $hashtag) < 139) # allow for a space char
-  {
-      $tweet .= " $hashtag";
   }
 
   unless ($ENV{TWITTER_CONSUMER_KEY}
