@@ -185,7 +185,7 @@ sub tweet_link
     $tweet = $blog_post->decoded_title . ' ' . $blog_post->root_url;
     if (length($blog_post->decoded_title . ' ' . $hashtag) < 118)
     {
-      $tweet .= $hashtag;
+      $tweet .= " $hashtag";
     }
   }
   else
