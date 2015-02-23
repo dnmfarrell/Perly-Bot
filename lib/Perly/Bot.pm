@@ -88,7 +88,7 @@ sub post_link
     {
       if ($media =~ /twitter/)
       {
-        tweet_link($post, '#perl_community');
+        tweet_link($post, '#perl');
       }
       elsif ($media =~ /reddit/)
       {
