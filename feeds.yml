@@ -181,7 +181,7 @@
     type: atom
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%S'
-    active: 1
+    active: 0 #blog is migrating to new location
     social_media_targets: [twitter, reddit]
     proxy: 1
 - 
