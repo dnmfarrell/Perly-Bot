@@ -7,6 +7,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://rjbs.manxome.org/rubric/entries/user/rjbs/has_body/1?format=rss
     type: rss
@@ -15,6 +16,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://www.dagolden.com/index.php/feed/
     type: rss
@@ -23,6 +25,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://www.learning-perl.com/feed/
     type: rss
@@ -31,6 +34,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://www.intermediateperl.com/feed/
     type: rss
@@ -39,6 +43,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://www.masteringperl.org/feed/
     type: rss
@@ -47,6 +52,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://www.effectiveperlprogramming.com/feed/
     type: rss
@@ -55,6 +61,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://perltricks.com/feed/rss
     type: rss
@@ -63,6 +70,7 @@
     active: 1
     proxy: 0
     social_media_targets: [reddit]
+    delay_seconds: 0
 - 
     url: http://feeds.feedburner.com/szabgab?format=xml
     type: rss
@@ -71,6 +79,7 @@
     active: 1
     proxy: 1
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://blog.twoshortplanks.com/feed/
     type: rss
@@ -79,6 +88,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://blog.laufeyjarson.com/feed/
     type: rss
@@ -87,6 +97,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: https://andreeapirvulescu.wordpress.com/feed/
     type: rss
@@ -95,6 +106,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: https://p6weekly.wordpress.com/feed/
     type: rss
@@ -103,6 +115,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://perlmaven.com/atom
     type: atom
@@ -111,6 +124,7 @@
     active: 0 # deactivated includes links to articles behind a paywall: Maven Pro
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://neilb.org/atom.xml
     type: atom
@@ -119,6 +133,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://jjnapiorkowski.typepad.com/modern-perl/atom.xml
     type: atom
@@ -127,6 +142,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://perl.bearcircle.net/feeds/posts/default
     type: atom
@@ -135,6 +151,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://reneeb-perlblog.blogspot.com/atom.xml
     type: atom
@@ -143,6 +160,7 @@
     active: 0
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
     # deactivated because sometimes in German
 - 
     url: https://andreeapirvulescu.wordpress.com/feed/atom/
@@ -152,6 +170,7 @@
     active: 1
     social_media_targets: [twitter, reddit]
     proxy: 0
+    delay_seconds: 21600
 - 
     url: https://blog.afoolishmanifesto.com/index.xml
     type: rss
@@ -160,6 +179,7 @@
     active: 1
     social_media_targets: [twitter, reddit]
     proxy: 0
+    delay_seconds: 21600
 - 
     url: http://blogs.perl.org/atom.xml
     type: atom
@@ -168,6 +188,7 @@
     active: 1
     social_media_targets: [twitter, reddit]
     proxy: 0
+    delay_seconds: 21600
 - 
     url: https://perlancar.wordpress.com/feed/
     type: rss
@@ -176,6 +197,7 @@
     active: 1
     social_media_targets: [twitter, reddit]
     proxy: 0
+    delay_seconds: 21600
 - 
     url: http://feeds.feedburner.com/nu42/yYVb?format=xml
     type: atom
@@ -184,6 +206,7 @@
     active: 0 #blog is migrating to new location
     social_media_targets: [twitter, reddit]
     proxy: 1
+    delay_seconds: 21600
 - 
     url: http://www.wumpus-cave.net/feed/
     type: rss
@@ -192,6 +215,7 @@
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 - 
     url: http://feeds.feedburner.com/PerlHacks
     type: rss
@@ -200,4 +224,5 @@
     active: 1
     proxy: 1
     social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 

@@ -2,13 +2,14 @@ package Perly::Bot::Feed;
 use strict;
 use warnings;
 use Time::Piece;
+use Time::Seconds;
 use Carp;
 use Perly::Bot::Feed::Post;
 use XML::RSS::Parser;
 use XML::Atom::Client;
 
 use base 'Class::Accessor';
-Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy social_media_targets/);
+Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy social_media_targets delay_seconds/);
 
 =head2 get_posts ($xml)
 
@@ -36,6 +37,7 @@ sub get_posts
           Time::Piece->strptime( $datetime_raw, $self->date_format );
 
         push @posts, Perly::Bot::Feed::Post->new({
+          delay_seconds => $self->delay_seconds,
           description => $i->query('description')->text_content,
           datetime => $datetime,
           title => $i->query('title')->text_content,

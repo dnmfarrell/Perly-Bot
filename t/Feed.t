@@ -18,6 +18,7 @@ for (@$feeds)
   ok $feed->social_media_targets;
   like $feed->active, qr/^[01]$/;
   like $feed->proxy, qr/^[01]$/;
+  like $feed->delay_seconds, qr/^[0-9]+$/;
   like ($_, $allowed_social_media) for @{$feed->social_media_targets};
 }
 

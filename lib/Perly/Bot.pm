@@ -13,17 +13,16 @@ use Carp;
 use Perly::Bot::Feed;
 
 # Globals - these can be put in a config file
-our $VERSION      = 0.03;
+our $VERSION      = 0.04;
 my $agent_string = "Perly_Bot/v$VERSION";
 # posts must mention a Perl keyword to be considered relevant
-my $looks_perly = qr/\b(?:perl|cpan|cpanminus|moose|metacpan|modules?)\b/i;
+my $looks_perly = qr/\b(?:perl|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
 my $datetime_now = localtime;
 my $age_threshold= ONE_DAY;
 my $cache_age    = ONE_WEEK;
 my $feeds_path   = 'feeds.yml';
 my $cache_path   = 'logs/cached_urls.yml';
 my $session_path = 'logs/session_data.json';
-# end globals
 
 # modulino pattern
 __PACKAGE__->run() unless caller();
@@ -53,10 +52,15 @@ sub run
 
         foreach my $post (@$blog_posts)
         {
+          # if the post is recent
+          # not too new to exceed the delay (to allow authors to post their own links)
+          # it looks Perl-related and is not already posted
           if ( $post->datetime > $datetime_now - $age_threshold
-               && any { /$looks_perly/ } $post->title, $post->description )
+               && $datetime_now - $post->datetime > $post->delay_seconds
+               && any { /$looks_perly/ } $post->title, $post->description
+               && !url_is_cached($cache, $post->root_url)
+             )
           {
-            # do something
             post_link($post, $feed->social_media_targets, $cache);
           }
         }
@@ -80,24 +84,21 @@ sub post_link
 {
   my ($post, $social_media_targets, $cache) = @_;
 
-  unless (url_is_cached($cache, $post->root_url))
-  {
-    cache_url($cache, $post->root_url);
+  cache_url($cache, $post->root_url);
 
-    foreach my $media (@$social_media_targets)
+  foreach my $media (@$social_media_targets)
+  {
+    if ($media eq 'twitter')
     {
-      if ($media =~ /twitter/)
-      {
-        tweet_link($post, '#perl');
-      }
-      elsif ($media =~ /reddit/)
-      {
-        post_reddit_link($post, 'perl');
-      }
-      else
-      {
-        log_error("post_link() didn't recognize $media");
-      }
+      tweet_link($post, '#perl');
+    }
+    elsif ($media =~ 'reddit')
+    {
+      post_reddit_link($post, 'perl');
+    }
+    else
+    {
+      log_error("post_link() didn't recognize $media");
     }
   }
 }
@@ -220,5 +221,4 @@ sub tweet_link
     croak("Error tweeting $blog_post->{url} $blog_post->{title} " . $_->code . " " . $_->message . " " . $_->error);
   };
 }
-
 
