@@ -199,13 +199,13 @@
     proxy: 0
     delay_seconds: 21600
 - 
-    url: http://feeds.feedburner.com/nu42/yYVb?format=xml
+    url: http://www.nu42.com/nu42.atom.xml
     type: atom
-    date_name: published
+    date_name: updated
     date_format: '%Y-%m-%dT%H:%M:%S'
-    active: 0 #blog is migrating to new location
+    active: 1
     social_media_targets: [twitter, reddit]
-    proxy: 1
+    proxy: 0
     delay_seconds: 21600
 - 
     url: http://www.wumpus-cave.net/feed/
