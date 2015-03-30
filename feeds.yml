@@ -226,10 +226,10 @@
     social_media_targets: [twitter, reddit]
     delay_seconds: 21600
 - 
-    url: http://techblog.babyl.ca/feed/rss
-    type: rss
-    date_name: pubDate
-    date_format: '%a, %d %b %Y %H:%M:%S %z'
+    url: http://techblog.babyl.ca/feed/atom
+    type: atom
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
     social_media_targets: [twitter, reddit]
