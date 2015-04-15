@@ -13,7 +13,7 @@ use Carp;
 use Perly::Bot::Feed;
 
 # Globals - these can be put in a config file
-our $VERSION      = 0.04;
+our $VERSION      = 0.05;
 my $agent_string = "Perly_Bot/v$VERSION";
 # posts must mention a Perl keyword to be considered relevant
 my $looks_perly = qr/\b(?:perl|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
@@ -57,8 +57,8 @@ sub run
           # it looks Perl-related and is not already posted
           if ( $post->datetime > $datetime_now - $age_threshold
                && $datetime_now - $post->datetime > $post->delay_seconds
-               && any { /$looks_perly/ } $post->title, $post->description
                && !url_is_cached($cache, $post->root_url)
+               && any { /$looks_perly/ } $post->title, $post->description
              )
           {
             post_link($post, $feed->social_media_targets, $cache);
@@ -85,6 +85,12 @@ sub post_link
   my ($post, $social_media_targets, $cache) = @_;
 
   cache_url($cache, $post->root_url);
+
+  if ($ENV{PERLY_BOT_DEBUG})
+  {
+    printf STDERR "Not posting %s as program is in debug mode\n", $post->root_url;
+    return;
+  }
 
   foreach my $media (@$social_media_targets)
   {
