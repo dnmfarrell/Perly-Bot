@@ -234,4 +234,13 @@
     proxy: 0
     social_media_targets: [twitter, reddit]
     delay_seconds: 21600
+- 
+    url: http://blog.plover.com/index.atom
+    type: atom
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%SZ'
+    active: 1
+    proxy: 0
+    social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 
