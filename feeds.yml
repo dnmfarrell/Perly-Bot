@@ -243,4 +243,13 @@
     proxy: 0
     social_media_targets: [twitter, reddit]
     delay_seconds: 21600
+- 
+    url: http://blog.urth.org/feed/
+    type: rss
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
+    active: 1
+    proxy: 0
+    social_media_targets: [twitter, reddit]
+    delay_seconds: 21600
 
