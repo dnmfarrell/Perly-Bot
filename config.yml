@@ -1,0 +1,6 @@
+# this is the config file
+agent_string: 'Perly_Bot/v0.06'
+feeds_path: 'feeds.yml'
+cache_path: 'logs/cached_urls.yml'
+session_path: 'logs/session_data.json'
+error_log_path: 'logs/error_log'
