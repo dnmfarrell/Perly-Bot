@@ -1,6 +1,7 @@
 package Perly::Bot;
 use warnings;
 use strict;
+use 5.10.1;
 use Reddit::Client;
 use HTTP::Tiny;
 use YAML::XS qw/LoadFile DumpFile/;
@@ -11,76 +12,119 @@ use List::Util 'any';
 use Net::Twitter::Lite::WithAPIv1_1;
 use Carp;
 use Perly::Bot::Feed;
+use Encode 'encode';
 
 # Globals - these can be put in a config file
-our $VERSION      = 0.05;
-my $agent_string = "Perly_Bot/v$VERSION";
-# posts must mention a Perl keyword to be considered relevant
-my $looks_perly = qr/\b(?:perl|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
-my $datetime_now = localtime;
-my $age_threshold= ONE_DAY;
-my $cache_age    = ONE_WEEK;
-my $feeds_path   = 'feeds.yml';
-my $cache_path   = 'logs/cached_urls.yml';
-my $session_path = 'logs/session_data.json';
+our $VERSION     = 0.06;
+my $AGENT_STRING = "Perly_Bot/v$VERSION";
+my $DATETIME_NOW = localtime;
+my $AGE_THRESHOLD= ONE_DAY;
+my $CACHE_AGE    = ONE_WEEK;
+my $FEEDS_PATH   = 'feeds.yml';
+my $CACHE_PATH   = 'logs/cached_urls.yml';
+my $SESSION_PATH = 'logs/session_data.json';
 
 # modulino pattern
-__PACKAGE__->run() unless caller();
+__PACKAGE__->run($CACHE_PATH, $FEEDS_PATH) unless caller();
+
+=head2 run
+
+The main routine, trawls blog feeds for new posts.
+
+=cut
 
 sub run
 {
-  my $ua           = HTTP::Tiny->new( agent => $agent_string );
-  my $cache        = LoadFile($cache_path);
-  my $feeds        = LoadFile($feeds_path);
+  my ($package, $cache_path, $feeds_path) = @_;
+
+  my $cache = LoadFile($cache_path);
+  my $feeds = LoadFile($feeds_path);
 
   # Loop through feeds, check for new posts
   for my $feed_args ( @{$feeds} )
   {
     try
     {
-      my $feed = Perly::Bot::Feed->new($feed_args);
-
-      next unless $feed->active;
-
-      my $date_format = $feed->date_format;
-      my $date_name   = $feed->date_name;
-
-      my $response = $ua->get( $feed->url );
-      if ( $response->{success} )
-      {
-        my $blog_posts = $feed->get_posts($response->{content});
-
-        foreach my $post (@$blog_posts)
-        {
-          # if the post is recent
-          # not too new to exceed the delay (to allow authors to post their own links)
-          # it looks Perl-related and is not already posted
-          if ( $post->datetime > $datetime_now - $age_threshold
-               && $datetime_now - $post->datetime > $post->delay_seconds
-               && !url_is_cached($cache, $post->root_url)
-               && any { /$looks_perly/ } $post->title, $post->description
-             )
-          {
-            post_link($post, $feed->social_media_targets, $cache);
-          }
-        }
-      }
-      else
-      {
-        log_error("Error requesting $response->{url}. $response->{status} $response->{reason}");
-      }
+      trawl_blog($feed_args, $cache);
     }
-    catch # something went wrong, log it
+    catch
     {
       log_error("Error processing $feed_args->{url} $_");
     };
   }
+
   # update the cache on exit
   $cache = refresh_cache($cache);
   DumpFile( $cache_path, $cache )
 }
 
-sub post_link
+=head2 trawl_blog
+
+Walks through an arrayref of C<Perly::Bot::Feed::Post> objects and decides to post them
+or not.
+
+=cut
+
+sub trawl_blog
+{
+  my ($feed_args, $cache) = @_;
+
+  my $feed = Perly::Bot::Feed->new($feed_args);
+  state $ua = HTTP::Tiny->new( agent => $AGENT_STRING );
+  my $response = $ua->get( $feed->url );
+
+  if ( $response->{success} )
+  {
+    # coerce to utf8, some pages contain utf8 but fail to declare the encoding as utf8
+    my $utf8_content = encode('UTF-8', $response->{content});
+    my $blog_posts = $feed->get_posts($utf8_content);
+
+    foreach my $post (@$blog_posts)
+    {
+      if ( should_post($post, $cache) )
+      {
+        post($post, $feed->social_media_targets, $cache);
+      }
+    }
+  }
+  else
+  {
+    log_error("Error requesting $response->{url}. $response->{status} $response->{reason}");
+  }
+}
+
+=head2 should_post
+
+The logic to decide if a blog post should be posted or not. This is:
+
+- if the post is recent
+- not too new to exceed the delay (to allow authors to post their own links)
+- it looks Perl-related and is not already posted
+
+Feel free to subclass this module and override this logic with your own needs!
+
+=cut
+
+sub should_post
+{
+  my ($post, $cache) = @_;
+
+  # posts must mention a Perl keyword to be considered relevant
+  state $looks_perly = qr/\b(?:perl|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
+
+  $post->datetime > $DATETIME_NOW - $AGE_THRESHOLD
+  && $DATETIME_NOW - $post->datetime > $post->delay_seconds
+  && !url_is_cached($cache, $post->root_url)
+  && any { /$looks_perly/ } $post->title, $post->description
+}
+
+=head2 post
+
+Sends the blog post to outward channels like Twitter and Reddit.
+
+=cut
+
+sub post
 {
   my ($post, $social_media_targets, $cache) = @_;
 
@@ -104,7 +148,7 @@ sub post_link
     }
     else
     {
-      log_error("post_link() didn't recognize $media");
+      log_error("post() didn't recognize $media");
     }
   }
 }
@@ -125,7 +169,7 @@ sub url_is_cached
 sub cache_url
 {
     my ($cache, $url) = @_;
-    push @$cache, { url => $url, datetime => $datetime_now->datetime };
+    push @$cache, { url => $url, datetime => $DATETIME_NOW->datetime };
 }
 
 # sieves out stale urls
@@ -135,7 +179,7 @@ sub refresh_cache
     [ grep {
         my $url_date =
           Time::Piece->strptime( $_->{datetime}, "%Y-%m-%dT%H:%M:%S" );
-        $url_date > $datetime_now - $cache_age ? 1 : 0;
+        $url_date > $DATETIME_NOW - $CACHE_AGE ? 1 : 0;
     } @$cache ];
 }
 
@@ -149,10 +193,10 @@ sub post_reddit_link
 {
   my ($blog_post, $subreddit) = @_;
 
-  my $session_file = $session_path;
+  my $session_file = $SESSION_PATH;
   my $reddit       = Reddit::Client->new(
     session_file => $session_file,
-    user_agent   => $agent_string,
+    user_agent   => $AGENT_STRING,
   );
 
   unless ( $reddit->is_logged_in )
@@ -217,7 +261,7 @@ sub tweet_link
           access_token        => $ENV{TWITTER_ACCESS_TOKEN},
           access_token_secret => $ENV{TWITTER_ACCESS_SECRET},
           ssl                 => 1,
-          user_agent          => $agent_string,
+          user_agent          => $AGENT_STRING,
     );
 
     $twitter->update($tweet);
