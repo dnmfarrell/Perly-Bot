@@ -47,6 +47,7 @@ sub new
           && $config->{twitter}{access_token}
           && $config->{twitter}{access_secret})
   {
+    print Dumper($config);use Data::Dumper;
     croak 'config is missing required variables for ' . __PACKAGE__;
   }
 

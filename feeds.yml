@@ -103,7 +103,7 @@
     type: rss
     date_name: pubDate
     date_format: '%a, %d %b %Y %H:%M:%S %z'
-    active: 1
+    active: 0 # deactivated as blog is marked as private
     proxy: 0
     social_media_targets: [twitter, reddit]
     delay_seconds: 21600

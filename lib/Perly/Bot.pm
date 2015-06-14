@@ -51,7 +51,7 @@ sub load_config
     }
     $config->{media}{reddit} = Perly::Bot::Media::Reddit->new($config);
 
-    unless (defined $config->{reddit})
+    unless (defined $config->{twitter})
     {
       $config->{twitter} = {
         consumer_key     => $ENV{TWITTER_CONSUMER_KEY},
@@ -59,7 +59,6 @@ sub load_config
         access_token     => $ENV{TWITTER_ACCESS_TOKEN},
         access_secret    => $ENV{TWITTER_ACCESS_SECRET},
         hashtag          => '#perl',
-        session_filepath => 'logs/reddit_session_data.json',
       };
     }
     $config->{media}{twitter} = Perly::Bot::Media::Twitter->new($config);
@@ -95,7 +94,7 @@ sub run
     }
     catch
     {
-      log_error("Error processing $feed_args->{url} $_");
+      log_error("Error processing $feed_args->{url} $_", $config->{error_log_path});
     };
   }
 
@@ -135,7 +134,9 @@ sub trawl_blog
   }
   else
   {
-    log_error("Error requesting $response->{url}. $response->{status} $response->{reason}");
+    log_error(
+      "Error requesting $response->{url}. $response->{status} $response->{reason}",
+      $config->{error_log_path});
   }
 }
 
@@ -156,12 +157,12 @@ sub should_emit
   my ($post, $cache, $config) = @_;
 
   # posts must mention a Perl keyword to be considered relevant
-  state $looks_perly = qr/\b(?:perl|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
+  my $looks_perly = qr/\b(?:perl|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
 
   $post->datetime > $config->{datetime_now} - $config->{age_threshold}
   && $config->{datetime_now} - $post->datetime > $post->delay_seconds
   && !url_is_cached($cache, $post->root_url)
-  && any { /$looks_perly/ } $post->title, $post->description
+  && any { $_ // '' =~ /$looks_perly/ } $post->title, $post->description
 }
 
 =head2 emit
@@ -174,7 +175,7 @@ sub emit
 {
   my ($post, $social_media_targets, $cache, $config) = @_;
 
-  cache_url($cache, $post->root_url);
+  cache_url($cache, $post->root_url, $config);
 
   if ($config->{debug})
   {
@@ -190,7 +191,7 @@ sub emit
     }
     else
     {
-      log_error("post() didn't recognize $media");
+      log_error("post() didn't recognize $media", $config->{error_log_path});
     }
   }
 }
