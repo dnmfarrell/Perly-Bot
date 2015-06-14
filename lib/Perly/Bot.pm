@@ -10,7 +10,6 @@ use List::Util 'any';
 use Encode 'encode';
 use Perly::Bot::Cache;
 use Perly::Bot::Feed;
-use Module::Loader;
 use Path::Tiny;
 
 our $VERSION = 0.07;
