@@ -13,6 +13,7 @@ use Perly::Bot::Feed;
 use Encode 'encode';
 use Perly::Bot::Media::Twitter;
 use Perly::Bot::Media::Reddit;
+use Perly::Bot::Cache;
 
 # modulino pattern
 __PACKAGE__->run( load_config('config.yml') ) unless caller();
@@ -34,9 +35,14 @@ sub load_config
   {
     $config->{datetime_now}  = gmtime;
     $config->{age_threshold} = ONE_DAY;
-    $config->{cache_age}     = ONE_WEEK;
-
     $config->{debug} = 1 if $ENV{PERLY_BOT_DEBUG};
+
+    # init cache
+    my $cache = Perly::Bot::Cache->new(
+      $config->{cache}{path},
+      $config->{cache}{expiry_secs}
+    );
+    $config->{cache} = $cache;
 
     # load media objects
     # fallback on ENV vars if not present in config file
@@ -82,7 +88,7 @@ sub run
 {
   my ($package, $config) = @_;
 
-  my $cache = LoadFile($config->{cache_path});
+  my $cache = $config->{cache};
   my $feeds = LoadFile($config->{feeds_path});
 
   # Loop through feeds, check for new posts
@@ -97,10 +103,6 @@ sub run
       log_error("Error processing $feed_args->{url} $_", $config->{error_log_path});
     };
   }
-
-  # update the cache on exit
-  $cache = refresh_cache($cache, $config);
-  DumpFile($config->{cache_path}, $cache);
 }
 
 =head2 trawl_blog
@@ -161,7 +163,7 @@ sub should_emit
 
   $post->datetime > $config->{datetime_now} - $config->{age_threshold}
   && $config->{datetime_now} - $post->datetime > $post->delay_seconds
-  && !url_is_cached($cache, $post->root_url)
+  && !$cache->has_posted($post)
   && any { $_ // '' =~ /$looks_perly/ } $post->title, $post->description
 }
 
@@ -175,7 +177,7 @@ sub emit
 {
   my ($post, $social_media_targets, $cache, $config) = @_;
 
-  cache_url($cache, $post->root_url, $config);
+  $cache->save_post($post);
 
   if ($config->{debug})
   {
@@ -202,29 +204,6 @@ sub log_error
   open my $error_log, '>>', $error_log_path or die $!;
   my $timestamp = gmtime;
   say $error_log $timestamp->datetime . "\t$error";
-}
-
-sub url_is_cached
-{
-  my ($cache, $url) = @_;
-  any { $url eq $_->{url} } @$cache;
-}
-
-sub cache_url
-{
-  my ($cache, $url, $config) = @_;
-  push @$cache, { url => $url, datetime => $config->{datetime_now}->datetime };
-}
-
-# sieves out stale urls
-sub refresh_cache
-{
-  my ($cache, $config) = @_;
-  [ grep {
-      my $url_date =
-        Time::Piece->strptime( $_->{datetime}, "%Y-%m-%dT%H:%M:%S" );
-      $url_date > $config->{datetime_now} - $config->{cache_age} ? 1 : 0;
-  } @$cache ];
 }
 
 1;

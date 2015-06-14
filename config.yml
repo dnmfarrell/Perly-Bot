@@ -4,3 +4,6 @@ feeds_path: 'feeds.yml'
 cache_path: 'logs/cached_urls.yml'
 session_path: 'logs/session_data.json'
 error_log_path: 'logs/errors.log'
+cache:
+  - expiry_secs: 604800
+  - path: 'logs/cache'
