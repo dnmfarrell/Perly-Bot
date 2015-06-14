@@ -6,7 +6,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://rjbs.manxome.org/rubric/entries/user/rjbs/has_body/1?format=rss
@@ -15,7 +15,7 @@
     date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://www.dagolden.com/index.php/feed/
@@ -24,7 +24,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://www.learning-perl.com/feed/
@@ -33,7 +33,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://www.intermediateperl.com/feed/
@@ -42,7 +42,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://www.masteringperl.org/feed/
@@ -51,7 +51,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://www.effectiveperlprogramming.com/feed/
@@ -60,7 +60,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://perltricks.com/feed/rss
@@ -69,7 +69,7 @@
     date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
-    social_media_targets: [reddit]
+    media_targets: ['Perly::Bot::Media::Reddit']
     delay_seconds: 0
 - 
     url: http://feeds.feedburner.com/szabgab?format=xml
@@ -78,7 +78,7 @@
     date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 1
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://blog.twoshortplanks.com/feed/
@@ -87,7 +87,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://blog.laufeyjarson.com/feed/
@@ -96,7 +96,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: https://andreeapirvulescu.wordpress.com/feed/
@@ -105,7 +105,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 0 # deactivated as blog is marked as private
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: https://p6weekly.wordpress.com/feed/
@@ -114,7 +114,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://perlmaven.com/atom
@@ -123,7 +123,7 @@
     date_format: '%Y-%m-%dT%H:%M:%SZ'
     active: 0 # deactivated includes links to articles behind a paywall: Maven Pro
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://neilb.org/atom.xml
@@ -132,7 +132,7 @@
     date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://jjnapiorkowski.typepad.com/modern-perl/atom.xml
@@ -141,7 +141,7 @@
     date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://perl.bearcircle.net/feeds/posts/default
@@ -150,7 +150,7 @@
     date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://reneeb-perlblog.blogspot.com/atom.xml
@@ -159,7 +159,7 @@
     date_format: '%Y-%m-%dT%H:%M:%S'
     active: 0
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
     # deactivated because sometimes in German
 - 
@@ -168,7 +168,7 @@
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%SZ'
     active: 1
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     proxy: 0
     delay_seconds: 21600
 - 
@@ -177,7 +177,7 @@
     date_name: pubDate
     date_format: '%a, %d %b %Y %H:%M:%S'
     active: 1
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     proxy: 0
     delay_seconds: 21600
 - 
@@ -186,7 +186,7 @@
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%SZ'
     active: 1
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     proxy: 0
     delay_seconds: 21600
 - 
@@ -195,7 +195,7 @@
     date_name: pubDate
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     proxy: 0
     delay_seconds: 21600
 - 
@@ -204,7 +204,7 @@
     date_name: updated
     date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     proxy: 0
     delay_seconds: 21600
 - 
@@ -214,7 +214,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://feeds.feedburner.com/PerlHacks
@@ -223,7 +223,7 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 1
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://techblog.babyl.ca/feed/atom
@@ -232,7 +232,7 @@
     date_format: '%Y-%m-%dT%H:%M:%S'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://blog.plover.com/index.atom
@@ -241,7 +241,7 @@
     date_format: '%Y-%m-%dT%H:%M:%SZ'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
     url: http://blog.urth.org/feed/
@@ -250,6 +250,6 @@
     date_format: '%a, %d %b %Y %H:%M:%S %z'
     active: 1
     proxy: 0
-    social_media_targets: [twitter, reddit]
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 

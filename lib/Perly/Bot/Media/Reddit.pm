@@ -12,7 +12,7 @@ This class is for posting to Reddit
 
 =cut
 
-=head2 new ($config)
+=head2 new ($args)
 
 Constructor, returns a new C<Perly::Bot::Media::Reddit> object.
 
@@ -40,33 +40,33 @@ karama (it's a bot filter).
 
 sub new
 {
-  my ($class, $config) = @_;
+  my ($class, $args) = @_;
 
-  unless ($config->{agent_string}
-          && $config->{reddit}{username}
-          && $config->{reddit}{password}
-          && $config->{reddit}{session_filepath}
-          && $config->{reddit}{subreddit})
+  unless ($args->{agent_string}
+          && $args->{username}
+          && $args->{password}
+          && $args->{session_filepath}
+          && $args->{subreddit})
   {
-    croak 'config is missing required variables for ' . __PACKAGE__;
+    croak 'args is missing required variables for ' . __PACKAGE__;
   }
 
   try
   {
     my $reddit = Reddit::Client->new(
-      session_file => $config->{reddit}{session_filepath},
-      user_agent   => $config->{agent_string},
+      session_file => $args->{session_filepath},
+      user_agent   => $args->{agent_string},
     );
 
     unless ($reddit->is_logged_in)
     {
-        $reddit->login($config->{reddit}{username}, $config->{reddit}{password});
+        $reddit->login($args->{username}, $args->{password});
         $reddit->save_session();
     }
 
     return bless {
       reddit_api => $reddit,
-      subreddit  => $config->{reddit}{subreddit},
+      subreddit  => $args->{subreddit},
     }, $class;
   }
   catch

@@ -7,9 +7,24 @@ use Carp;
 use Perly::Bot::Feed::Post;
 use XML::RSS::Parser;
 use XML::Atom::Client;
+use Role::Tiny;
 
 use base 'Class::Accessor';
-Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy social_media_targets delay_seconds/);
+Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy media delay_seconds/);
+
+# check the required media targets are loaded
+around new => sub {
+  my ($new, $class, $args) = @_;
+
+  for (@{$args->{media_targets}})
+  {
+    die "Media target $_ is not loaded" unless defined $args->{media}{$_};
+  }
+  delete $args->{media_targets};
+
+  $new->($class, $args);
+};
+
 
 =head2 get_posts ($xml)
 

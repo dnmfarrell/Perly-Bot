@@ -12,20 +12,18 @@ This class is for posting to Twitter
 
 =cut
 
-=head2 new ($config)
+=head2 new ($args)
 
 Constructor, returns a new C<Perly::Bot::Media::Twitter> object.
 
 Requires hashref containing these key values:
 
-  agent_string => '...',
-  twitter => {
-    consumer_key    => '...',
-    consumer_secret => '...',
-    access_token    => '...',
-    access_secret   => '...',
-    hashtag         => '...', # optional
-  }
+  agent_string    => '...',
+  consumer_key    => '...',
+  consumer_secret => '...',
+  access_token    => '...',
+  access_secret   => '...',
+  hashtag         => '...', # optional
 
 C<agent_string> can be any string you like, it will be sent to Twitter when tweeting.
 
@@ -39,32 +37,31 @@ is not enough chars left (e.g. if the blog post title is extremely long). This i
 
 sub new
 {
-  my ($class, $config) = @_;
+  my ($class, $args) = @_;
 
-  unless ($config->{agent_string}
-          && $config->{twitter}{consumer_key}
-          && $config->{twitter}{consumer_secret}
-          && $config->{twitter}{access_token}
-          && $config->{twitter}{access_secret})
+  unless ($args->{agent_string}
+          && $args->{consumer_key}
+          && $args->{consumer_secret}
+          && $args->{access_token}
+          && $args->{access_secret})
   {
-    print Dumper($config);use Data::Dumper;
-    croak 'config is missing required variables for ' . __PACKAGE__;
+    croak 'args is missing required variables for ' . __PACKAGE__;
   }
 
   try
   {
     my $twitter = Net::Twitter::Lite::WithAPIv1_1->new(
-          consumer_key        => $config->{twitter}{consumer_key},
-          consumer_secret     => $config->{twitter}{consumer_secret},
-          access_token        => $config->{twitter}{access_token},
-          access_token_secret => $config->{twitter}{access_secret},
+          consumer_key        => $args->{consumer_key},
+          consumer_secret     => $args->{consumer_secret},
+          access_token        => $args->{access_token},
+          access_token_secret => $args->{access_secret},
+          user_agent          => $args->{agent_string},
           ssl                 => 1,
-          user_agent          => $config->{agent_string},
     );
 
     return bless {
       twitter_api => $twitter,
-      hashtag     => ($config->{twitter}{hashtag} || ''),
+      hashtag     => ($args->{hashtag} || ''),
     }, $class;
   }
   catch

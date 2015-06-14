@@ -3,20 +3,21 @@ use warnings;
 use strict;
 use 5.10.1;
 use HTTP::Tiny;
-use YAML::XS qw/LoadFile DumpFile/;
+use YAML::XS qw/LoadFile/;
 use Time::Piece;
-use Time::Seconds;
 use Try::Tiny;
 use List::Util 'any';
-use Carp;
-use Perly::Bot::Feed;
 use Encode 'encode';
-use Perly::Bot::Media::Twitter;
-use Perly::Bot::Media::Reddit;
 use Perly::Bot::Cache;
+use Perly::Bot::Feed;
+use Module::Loader;
+use Path::Tiny;
+
+our $VERSION = 0.07;
+my $DEBUG = 0;
 
 # modulino pattern
-__PACKAGE__->run( load_config('config.yml') ) unless caller();
+__PACKAGE__->run( load_config() ) unless caller();
 
 =head1 FUNCTIONS
 
@@ -29,13 +30,19 @@ required variables.
 
 sub load_config
 {
-  my $config = LoadFile(shift);
+  # use local config or fallback on user config file
+  my $config_path = -e 'config.yml'
+    ? 'config.yml'
+    : "$ENV{HOME}.perlybot/config.yml";
+
+  # use canonpath for cross platform support
+  my $config = LoadFile(Path::Tiny->new($config_path)->canonpath);
 
   try
   {
-    $config->{datetime_now}  = gmtime;
-    $config->{age_threshold} = ONE_DAY;
-    $config->{debug} = 1 if $ENV{PERLY_BOT_DEBUG};
+    $DEBUG = $ENV{PERLY_BOT_DEBUG} // $config->{debug};
+
+    $config->{agent_string} = $config->{agent_string} . $VERSION;
 
     # init cache
     my $cache = Perly::Bot::Cache->new(
@@ -45,35 +52,21 @@ sub load_config
     $config->{cache} = $cache;
 
     # load media objects
-    # fallback on ENV vars if not present in config file
-    unless (defined $config->{reddit})
+    for my $module_name (keys %{$config->{media}})
     {
-      $config->{reddit} = {
-        username         => $ENV{REDDIT_USERNAME},
-        password         => $ENV{REDDIT_PASSWORD},
-        subreddit        => 'perl',
-        session_filepath => 'logs/reddit_session_data.json',
-      };
+      eval "require $module_name";
+      my $config_path = $config->{media}{$module_name}{config_path};
+      my $args = LoadFile($config_path);
+      $config->{media}{$module_name} =  $module_name->new($args);
     }
-    $config->{media}{reddit} = Perly::Bot::Media::Reddit->new($config);
-
-    unless (defined $config->{twitter})
-    {
-      $config->{twitter} = {
-        consumer_key     => $ENV{TWITTER_CONSUMER_KEY},
-        consumer_secret  => $ENV{TWITTER_CONSUMER_SECRET},
-        access_token     => $ENV{TWITTER_ACCESS_TOKEN},
-        access_secret    => $ENV{TWITTER_ACCESS_SECRET},
-        hashtag          => '#perl',
-      };
-    }
-    $config->{media}{twitter} = Perly::Bot::Media::Twitter->new($config);
 
     return $config;
   }
   catch
   {
-    log_error("load_config encountered an error: $_", $config->{error_log_path});
+    open my $error_log, '>>', $config->{error_log_path} or die $!;
+    my $timestamp = gmtime;
+    say $error_log $timestamp->datetime . "\tload_config encountered an error: $_";
     exit 0;
   };
 }
@@ -96,11 +89,20 @@ sub run
   {
     try
     {
-      trawl_blog($feed_args, $cache, $config);
+      # inject the loaded media into feed_args
+      $feed_args->{media} = $config->{media};
+
+      trawl_blog($feed_args,
+        $cache,
+        $config->{agent_string},
+        $config->{should_emit}{age_threshold_secs},
+      );
     }
     catch
     {
-      log_error("Error processing $feed_args->{url} $_", $config->{error_log_path});
+      open my $error_log, '>>', $config->{error_log_path} or die $!;
+      my $timestamp = gmtime;
+      say $error_log $timestamp->datetime . "\tError processing $feed_args->{url} $_";
     };
   }
 }
@@ -114,10 +116,10 @@ or not.
 
 sub trawl_blog
 {
-  my ($feed_args, $cache, $config) = @_;
+  my ($feed_args, $cache, $agent_string, $age_threshold_secs) = @_;
 
   my $feed = Perly::Bot::Feed->new($feed_args);
-  state $ua = HTTP::Tiny->new( agent => $config->{agent_string} );
+  state $ua = HTTP::Tiny->new( agent => $agent_string);
   my $response = $ua->get($feed->url);
 
   if ($response->{success})
@@ -128,17 +130,18 @@ sub trawl_blog
 
     foreach my $post (@$blog_posts)
     {
-      if ( should_emit($post, $cache, $config) )
+      if ( should_emit($post, $cache, $age_threshold_secs) )
       {
-        emit($post, $feed->social_media_targets, $cache, $config);
+        if ( emit($post, $feed) )
+        {
+          $cache->save_post($post);
+        }
       }
     }
   }
   else
   {
-    log_error(
-      "Error requesting $response->{url}. $response->{status} $response->{reason}",
-      $config->{error_log_path});
+    die "Error requesting $response->{url}. $response->{status} $response->{reason}";
   }
 }
 
@@ -156,13 +159,15 @@ Feel free to subclass and override this logic with your own needs!
 
 sub should_emit
 {
-  my ($post, $cache, $config) = @_;
+  my ($post, $cache, $age_threshold) = @_;
 
   # posts must mention a Perl keyword to be considered relevant
   my $looks_perly = qr/\b(?:perl|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
 
-  $post->datetime > $config->{datetime_now} - $config->{age_threshold}
-  && $config->{datetime_now} - $post->datetime > $post->delay_seconds
+  my $time_now = gmtime;
+
+  $post->datetime > $time_now - $age_threshold
+  && $time_now - $post->datetime > $post->delay_seconds
   && !$cache->has_posted($post)
   && any { $_ // '' =~ /$looks_perly/ } $post->title, $post->description
 }
@@ -175,35 +180,15 @@ Sends the blog post to C<Perly::Bot::Media> objects for posting.
 
 sub emit
 {
-  my ($post, $social_media_targets, $cache, $config) = @_;
+  my ($post, $feed) = @_;
 
-  $cache->save_post($post);
-
-  if ($config->{debug})
+  if ($DEBUG)
   {
     printf STDOUT "Not posting %s as program is in debug mode\n", $post->root_url;
-    return;
+    return 0;
   }
-
-  foreach my $media (@$social_media_targets)
-  {
-    if (my $media = $config->{media}{$media})
-    {
-      $media->send($post);
-    }
-    else
-    {
-      log_error("post() didn't recognize $media", $config->{error_log_path});
-    }
-  }
-}
-
-sub log_error
-{
-  my ($error, $error_log_path) = @_;
-  open my $error_log, '>>', $error_log_path or die $!;
-  my $timestamp = gmtime;
-  say $error_log $timestamp->datetime . "\t$error";
+  $_->send($post) for @{$feed->media};
+  return 1;
 }
 
 1;
