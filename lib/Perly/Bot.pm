@@ -2,17 +2,18 @@ package Perly::Bot;
 use warnings;
 use strict;
 use 5.10.1;
-use HTTP::Tiny;
-use YAML::XS qw/LoadFile/;
-use Time::Piece;
-use Try::Tiny;
-use List::Util 'any';
 use Encode 'encode';
+use HTTP::Tiny;
+use List::Util 'any';
+use Path::Tiny;
 use Perly::Bot::Cache;
 use Perly::Bot::Feed;
-use Path::Tiny;
+use Time::Piece;
+use Time::Seconds;
+use Try::Tiny;
+use YAML::XS qw/LoadFile/;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 my $DEBUG = 0;
 
 # modulino pattern
@@ -131,12 +132,22 @@ sub trawl_blog
 
     foreach my $post (@$blog_posts)
     {
-      if ( should_emit($post, $cache, $age_threshold_secs) )
+      try
       {
-        if ( emit($post, $feed) )
+        if ( should_emit($post, $cache, $age_threshold_secs)
+             && emit($post, $feed) )
         {
           $cache->save_post($post);
         }
+      }
+      catch
+      {
+        # exception thrown, cache the post so we don't
+        # try to emit it again
+        $cache->save_post($post);
+
+        # rethrow the exception
+        die $_;
       }
     }
   }
@@ -160,16 +171,23 @@ Feel free to subclass and override this logic with your own needs!
 
 sub should_emit
 {
-  my ($post, $cache, $age_threshold) = @_;
+  my ($post, $cache, $age_threshold_secs) = @_;
 
   # posts must mention a Perl keyword to be considered relevant
   my $looks_perly = qr/\b(?:perl|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
 
   my $time_now = gmtime;
 
-  $post->datetime > $time_now - $age_threshold
+  # is the post fresh enough?
+  $post->datetime > $time_now - $age_threshold_secs
+
+  # have we delayed posting enough for the owner to post themselves?
   && $time_now - $post->datetime > $post->delay_seconds
+
+  # is the post cached?
   && !$cache->has_posted($post)
+
+  # does it looks Perl related?
   && any { $_ // '' =~ /$looks_perly/ } $post->title, $post->description
 }
 

@@ -48,8 +48,7 @@ sub get_posts
       {
         # extract the post date
         my $datetime_raw = $i->query($self->date_name)->text_content =~ s/ UTC| GMT//gr;
-        my $datetime =
-          Time::Piece->strptime( $datetime_raw, $self->date_format );
+        my $datetime = Time::Piece->strptime($datetime_raw, $self->date_format);
 
         push @posts, Perly::Bot::Feed::Post->new({
           delay_seconds => $self->delay_seconds,
