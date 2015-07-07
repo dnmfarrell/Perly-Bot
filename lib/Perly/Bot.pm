@@ -13,7 +13,7 @@ use Time::Seconds;
 use Try::Tiny;
 use YAML::XS qw/LoadFile/;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 my $DEBUG = 0;
 
 # modulino pattern
