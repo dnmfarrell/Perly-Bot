@@ -87,7 +87,7 @@ sub run
   printf "Checking %s feeds\n", scalar @$feeds if $DEBUG;
 
   # Loop through feeds, check for new posts
-  for my $feed_args ( @{$feeds} )
+  for my $feed_args ( @$feeds )
   {
     try
     {
