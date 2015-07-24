@@ -84,13 +84,18 @@ sub run
   my $cache = $config->{cache};
   my $feeds = LoadFile($config->{feeds_path});
 
+  printf "Checking %s feeds\n", scalar @$feeds if $DEBUG;
+
   # Loop through feeds, check for new posts
-  for my $feed_args ( @{$feeds} )
+  for my $feed_args ( @$feeds )
   {
     try
     {
-      # inject the loaded media into feed_args
-      $feed_args->{media} = $config->{media};
+      # inject the loaded media objects into feed_args
+      for (keys %{$feed_args->{media}})
+      {
+        $feed_args->{media}{$_}= $config->{media}{$_};
+      }
 
       trawl_blog($feed_args,
         $cache,
