@@ -243,4 +243,13 @@
     proxy: 0
     media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
+- 
+    url: https://6guts.wordpress.com/feed/
+    type: rss
+    date_name: pubDate
+    date_format: '%a, %d %b %Y %H:%M:%S %z'
+    active: 1
+    proxy: 0
+    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
+    delay_seconds: 21600
 
