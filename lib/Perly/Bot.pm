@@ -125,11 +125,13 @@ sub trawl_blog
 
   my $feed = Perly::Bot::Feed->new($feed_args);
 
-  state $ua = HTTP::Tiny->new( agent => $agent_string);
+  my $ua = HTTP::Tiny->new( agent => $agent_string);
   my $response = $ua->get($feed->url);
 
   if ($response->{success})
   {
+    print "Checking $feed->{url}\n" if $DEBUG;
+
     # coerce to utf8, some pages contain utf8 but fail to declare the encoding as utf8
     my $utf8_content = encode('UTF-8', $response->{content});
     my $blog_posts = $feed->get_posts($utf8_content);
@@ -178,7 +180,7 @@ sub should_emit
   my ($post, $cache, $age_threshold_secs) = @_;
 
   # posts must mention a Perl keyword to be considered relevant
-  my $looks_perly = qr/\b(?:perl|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
+  my $looks_perly = qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
 
   my $time_now = gmtime;
 
