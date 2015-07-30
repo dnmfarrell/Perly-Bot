@@ -131,11 +131,13 @@ sub trawl_blog
 
   if ($response->{success})
   {
-    print "Checking $feed->{url}\n" if $DEBUG;
+    print "Checking $feed->{url} ... " if $DEBUG;
 
     # coerce to utf8, some pages contain utf8 but fail to declare the encoding as utf8
     my $utf8_content = encode('UTF-8', $response->{content});
     my $blog_posts = $feed->get_posts($utf8_content);
+
+    say scalar @$blog_posts . ' posts found';
 
     foreach my $post (@$blog_posts)
     {

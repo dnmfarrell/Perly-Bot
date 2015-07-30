@@ -5,9 +5,9 @@ use Perly::Bot;
 
 my $config = Perly::Bot::load_config();
 
+print "Cache contains:\n";
+
 for ($config->{cache}{chi}->get_keys())
 {
   print "$_\n";
 }
-
-1;
