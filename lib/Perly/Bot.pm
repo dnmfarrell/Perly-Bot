@@ -124,6 +124,7 @@ sub trawl_blog
   my ($feed_args, $cache, $agent_string, $age_threshold_secs) = @_;
 
   my $feed = Perly::Bot::Feed->new($feed_args);
+  return unless $feed->active;
 
   my $ua = HTTP::Tiny->new( agent => $agent_string);
   my $response = $ua->get($feed->url);
@@ -212,7 +213,7 @@ sub emit
     printf STDOUT "Not posting %s as program is in debug mode\n", $post->root_url;
     return 0;
   }
-  $_->send($post) for @{$feed->media};
+  $_->send($post) for values %{$feed->media};
   return 1;
 }
 

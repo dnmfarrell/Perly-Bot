@@ -163,15 +163,6 @@
     delay_seconds: 21600
     # deactivated because sometimes in German
 - 
-    url: https://andreeapirvulescu.wordpress.com/feed/atom/
-    type: atom
-    date_name: published
-    date_format: '%Y-%m-%dT%H:%M:%SZ'
-    active: 1
-    media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
-    proxy: 0
-    delay_seconds: 21600
-- 
     url: https://blog.afoolishmanifesto.com/index.xml
     type: rss
     date_name: pubDate
