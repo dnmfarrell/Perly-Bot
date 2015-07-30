@@ -18,7 +18,7 @@ around new => sub {
 
   for (@{$args->{media_targets}})
   {
-    die "Media target $_ is not loaded" unless defined $args->{media}{$_};
+    die "Media target $_ is not loaded" unless exists $args->{media}{$_};
   }
   delete $args->{media_targets};
 

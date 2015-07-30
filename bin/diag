@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Perly::Bot;
+use Data::Dumper;
 
 my $config = Perly::Bot::load_config();
 
@@ -11,3 +12,6 @@ for ($config->{cache}{chi}->get_keys())
 {
   print "$_\n";
 }
+
+print "Config Media objects loaded:\n";
+print Dumper($config->{media});

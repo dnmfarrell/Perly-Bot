@@ -57,10 +57,8 @@ sub load_config
       eval "require $module_name";
       my $config_path = $config->{media}{$module_name}{config_path};
       my $args = LoadFile($config_path);
-      $config->{media}{$module_name} =  $module_name->new($args);
+      $config->{media}{$module_name} = $module_name->new($args);
     }
-
-    return $config;
   }
   catch
   {
@@ -69,6 +67,7 @@ sub load_config
     say $error_log $timestamp->datetime . "\tload_config encountered an error: $_";
     exit 0;
   };
+  return $config;
 }
 
 =head2 run ($package, $config)
@@ -92,9 +91,9 @@ sub run
     try
     {
       # inject the loaded media objects into feed_args
-      for (keys %{$feed_args->{media}})
+      for (@{$feed_args->{media_targets}})
       {
-        $feed_args->{media}{$_}= $config->{media}{$_};
+        $feed_args->{media}{$_} = $config->{media}{$_};
       }
 
       trawl_blog($feed_args,
@@ -137,7 +136,7 @@ sub trawl_blog
     my $utf8_content = encode('UTF-8', $response->{content});
     my $blog_posts = $feed->get_posts($utf8_content);
 
-    say scalar @$blog_posts . ' posts found';
+    say scalar @$blog_posts . ' posts found' if $DEBUG;
 
     foreach my $post (@$blog_posts)
     {
@@ -213,6 +212,7 @@ sub emit
   if ($DEBUG)
   {
     printf STDOUT "Not posting %s as program is in debug mode\n", $post->root_url;
+    print Dumper($feed->media);use Data::Dumper;
     return 0;
   }
   $_->send($post) for values %{$feed->media};
