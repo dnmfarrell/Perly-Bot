@@ -12,20 +12,6 @@ use Role::Tiny;
 use base 'Class::Accessor';
 Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy media delay_seconds/);
 
-# check the required media targets are loaded
-around new => sub {
-  my ($new, $class, $args) = @_;
-
-  for (@{$args->{media_targets}})
-  {
-    die "Media target $_ is not loaded" unless exists $args->{media}{$_};
-  }
-  delete $args->{media_targets};
-
-  $new->($class, $args);
-};
-
-
 =head2 get_posts ($xml)
 
 This method requires an xml string of the blog feed and returns an arrayref of L<Perl::Bot::Feed::Blog> objects.
