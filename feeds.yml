@@ -226,7 +226,7 @@
     media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
-    url: http://blog.plover.com/index.atom
+    url: http://blog.plover.com/prog/index.atom
     type: atom
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%SZ'

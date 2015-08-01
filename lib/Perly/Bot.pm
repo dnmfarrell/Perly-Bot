@@ -2,7 +2,7 @@ package Perly::Bot;
 use warnings;
 use strict;
 use 5.10.1;
-use Encode 'encode';
+use Encode qw/encode decode/;
 use HTTP::Tiny;
 use List::Util 'any';
 use Path::Tiny;
@@ -15,6 +15,7 @@ use YAML::XS qw/LoadFile/;
 
 our $VERSION = 0.08;
 my $DEBUG = 0;
+binmode STDOUT, ':encoding(UTF-8)';
 
 # modulino pattern
 __PACKAGE__->run( load_config() ) unless caller();
@@ -132,9 +133,10 @@ sub trawl_blog
   {
     print "Checking $feed->{url} ... " if $DEBUG;
 
-    # coerce to utf8, some pages contain utf8 but fail to declare the encoding as utf8
-    my $utf8_content = encode('UTF-8', $response->{content});
-    my $blog_posts = $feed->get_posts($utf8_content);
+    # decode the HTML and re-encode it, to avoid double-encoding
+    my $decoded_response = decode('UTF-8', $response->{content});
+    $decoded_response = encode('UTF-8', $decoded_response);
+    my $blog_posts = $feed->get_posts($decoded_response);
 
     say scalar @$blog_posts . ' posts found' if $DEBUG;
 
@@ -142,6 +144,8 @@ sub trawl_blog
     {
       try
       {
+        printf "Testing %s\n", $post->title if $DEBUG;
+
         if ( should_emit($post, $cache, $age_threshold_secs)
              && emit($post, $feed) )
         {
@@ -212,7 +216,6 @@ sub emit
   if ($DEBUG)
   {
     printf STDOUT "Not posting %s as program is in debug mode\n", $post->root_url;
-    print Dumper($feed->media);use Data::Dumper;
     return 0;
   }
   $_->send($post) for values %{$feed->media};

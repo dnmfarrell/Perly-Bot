@@ -1,6 +1,7 @@
 package Perly::Bot::Feed;
 use strict;
 use warnings;
+#use utf8;
 use Time::Piece;
 use Time::Seconds;
 use Carp;
@@ -11,20 +12,6 @@ use Role::Tiny;
 
 use base 'Class::Accessor';
 Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy media delay_seconds/);
-
-# check the required media targets are loaded
-around new => sub {
-  my ($new, $class, $args) = @_;
-
-  for (@{$args->{media_targets}})
-  {
-    die "Media target $_ is not loaded" unless exists $args->{media}{$_};
-  }
-  delete $args->{media_targets};
-
-  $new->($class, $args);
-};
-
 
 =head2 get_posts ($xml)
 
@@ -52,11 +39,11 @@ sub get_posts
 
         push @posts, Perly::Bot::Feed::Post->new({
           delay_seconds => $self->delay_seconds,
-          description => $i->query('description')->text_content,
-          datetime => $datetime,
-          title => $i->query('title')->text_content,
-          url   => $i->query('link')->text_content,
-          proxy => $self->proxy,
+          description   => $i->query('description')->text_content,
+          datetime      => $datetime,
+          title         => $i->query('title')->text_content,
+          url           => $i->query('link')->text_content,
+          proxy         => $self->proxy,
         });
       }
   }
@@ -75,10 +62,11 @@ sub get_posts
 
         push @posts, Perly::Bot::Feed::Post->new({
           description => $i->summary,
-          datetime => $datetime,
-          title => $i->title,
-          url   => $i->link->href,
-          proxy => $self->proxy,
+          datetime    => $datetime,
+          #title       => encode('utf8', decode('utf8', $i->title)),
+          title       => $i->title,
+          url         => $i->link->href,
+          proxy       => $self->proxy,
         });
     }
   }
