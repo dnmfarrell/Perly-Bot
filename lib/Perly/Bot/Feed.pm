@@ -1,6 +1,7 @@
 package Perly::Bot::Feed;
 use strict;
 use warnings;
+#use utf8;
 use Time::Piece;
 use Time::Seconds;
 use Carp;
@@ -38,11 +39,11 @@ sub get_posts
 
         push @posts, Perly::Bot::Feed::Post->new({
           delay_seconds => $self->delay_seconds,
-          description => $i->query('description')->text_content,
-          datetime => $datetime,
-          title => $i->query('title')->text_content,
-          url   => $i->query('link')->text_content,
-          proxy => $self->proxy,
+          description   => $i->query('description')->text_content,
+          datetime      => $datetime,
+          title         => $i->query('title')->text_content,
+          url           => $i->query('link')->text_content,
+          proxy         => $self->proxy,
         });
       }
   }
@@ -61,10 +62,11 @@ sub get_posts
 
         push @posts, Perly::Bot::Feed::Post->new({
           description => $i->summary,
-          datetime => $datetime,
-          title => $i->title,
-          url   => $i->link->href,
-          proxy => $self->proxy,
+          datetime    => $datetime,
+          #title       => encode('utf8', decode('utf8', $i->title)),
+          title       => $i->title,
+          url         => $i->link->href,
+          proxy       => $self->proxy,
         });
     }
   }
