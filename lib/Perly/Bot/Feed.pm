@@ -11,7 +11,7 @@ use XML::Atom::Client;
 use Role::Tiny;
 
 use base 'Class::Accessor';
-Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy media delay_seconds/);
+Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy media delay_seconds twitter/);
 
 =head2 get_posts ($xml)
 
@@ -44,6 +44,7 @@ sub get_posts
           title         => $i->query('title')->text_content,
           url           => $i->query('link')->text_content,
           proxy         => $self->proxy,
+          twitter       => $self->twitter,
         });
       }
   }

@@ -1,4 +1,6 @@
 package Perly::Bot::Media::Reddit;
+use strict;
+use warnings;
 use Carp;
 use Try::Tiny;
 use Reddit::Client;
