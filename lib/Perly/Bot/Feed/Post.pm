@@ -7,7 +7,7 @@ use HTML::Entities;
 use Carp;
 use base 'Class::Accessor';
 
-Perly::Bot::Feed::Post->mk_accessors(qw/url title description datetime proxy delay_seconds/);
+Perly::Bot::Feed::Post->mk_accessors(qw/url title description datetime proxy delay_seconds twitter/);
 
 =head2 clean_url
 

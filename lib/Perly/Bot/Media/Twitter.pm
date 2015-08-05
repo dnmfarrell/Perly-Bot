@@ -1,4 +1,6 @@
 package Perly::Bot::Media::Twitter;
+use strict;
+use warnings;
 use Carp;
 use Try::Tiny;
 use Net::Twitter::Lite::WithAPIv1_1;
@@ -70,29 +72,43 @@ sub new
   };
 }
 
+sub _build_tweet
+{
+  my ($self, $blog_post) = @_;
+
+  my $title   = $blog_post->decoded_title;
+  my $url     = $blog_post->root_url;
+  my $via     = $blog_post->twitter ? 'via ' . $blog_post->twitter : '';
+  my $hashtag = $self->{hashtag};
+
+  my $char_count = 140;
+  $char_count -= $url =~ /^https/ ? 23 : 22;
+
+  if (length(join ' ', $title, $via, $hashtag) < $char_count)
+  {
+    return join ' ', $title, $via, $hashtag, $url;
+  }
+  elsif (length(join ' ', $title, $via) < $char_count)
+  {
+    return join ' ', $title, $via, $url;
+  }
+  elsif (length($title) < $char_count)
+  {
+    return join ' ', $title, $url;
+  }
+  else
+  {
+    return substr($title, 0, $char_count - 4) . "... " . $url;
+  }
+}
+
 sub send
 {
   my ($self, $blog_post) = @_;
 
-  # build tweet, max 140 chars
-  my $tweet;
-  my $hashtag = $self->{hashtag};
-
-  if (length($blog_post->decoded_title) < 118)
-  {
-    $tweet = $blog_post->decoded_title . ' ' . $blog_post->root_url;
-    if (length($blog_post->decoded_title . ' ' . $hashtag) < 118)
-    {
-      $tweet .= " $hashtag";
-    }
-  }
-  else
-  {
-    $tweet = substr($blog_post->decoded_title, 0, 113) . "... " . $blog_post->root_url;
-  }
   try
   {
-    $self->{twitter_api}->update($tweet);
+    $self->{twitter_api}->update( $self->_build_tweet($blog_post) );
   }
   catch
   {
