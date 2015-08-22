@@ -43,6 +43,9 @@ subtest build_tweets => sub
 
   cmp_ok length($mock_twitter->_build_tweet($mock_post)), '<=', 140, 'tweet is less within twitter limits';
 
+  $mock_post->twitter(undef);
+  $mock_post->title('blah de blah');
+  print $mock_twitter->_build_tweet($mock_post) . "\n";
 };
 
 

@@ -1,0 +1,2202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>blogs.perl.org</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/" />
+    <link rel="self" type="application/atom+xml" href="http://blogs.perl.org/atom.xml" />
+    <id>tag:blogs.perl.org,2009-10-07://1</id>
+    <updated></updated>
+    <subtitle>There&apos;s more than one way to blog it.</subtitle>
+    <generator uri="http://www.sixapart.com/movabletype/">Movable Type Pro 4.38</generator>
+
+<entry>
+    <title>Getting big without getting fat, in perl</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/dean/2015/08/getting-big-without-getting-fat-in-perl.html" />
+    <id>tag:blogs.perl.org,2015:/users/dean//558.6989</id>
+
+    <published>2015-08-19T01:33:42Z</published>
+    <updated>2015-08-19T01:48:43Z</updated>
+
+    <summary>I presented this talk last night at Sydney PM to a crowd of 12 enthusiastic mongers. Thanks to Catalyst-IT for hosting us, and for shouting free pizza and drinks! Getting big without getting fat, in perl from Dean Hamstead We...</summary>
+    <author>
+        <name>Dean</name>
+        <uri>http://bytefoundry.com.au</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/dean/">
+        <![CDATA[<p>I presented this talk last night at <a href="https://www.facebook.com/sydneypm">Sydney PM</a> to a crowd of 12 enthusiastic mongers. Thanks to <a href="http://www.catalyst-au.net/">Catalyst-IT</a> for hosting us, and for shouting free pizza and drinks!</p>
+
+<p><iframe src="//www.slideshare.net/slideshow/embed_code/key/ELzIvVyjyqCjFr" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/djzort/getting-big-without-getting-fat-in-perl" title="Getting big without getting fat, in perl" target="_blank">Getting big without getting fat, in perl</a> </strong> from <strong><a href="//www.slideshare.net/djzort" target="_blank">Dean Hamstead</a></strong> </div></p>
+
+<p>We got stuck for a while explaining to people what mix-ins and roles are... thankfully this is a slide pack so you dont have to endure the endless attempts to find useful metaphors. Also my typo of Role::Tony seemed to endlessly amuse, so I have left that in place.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>File::Slurp is broken and wrong</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/leon_timmermans/2015/08/fileslurp-is-broken-and-wrong.html" />
+    <id>tag:blogs.perl.org,2015:/users/leon_timmermans//150.6984</id>
+
+    <published>2015-08-18T11:54:05Z</published>
+    <updated>2015-08-18T12:49:57Z</updated>
+
+    <summary>If you are using File::Slurp, you should possibly reconsider. Basically, there are three reasons to do so; It is wrong in a lot of cases. File::Slurp predates IO layers, and as such doesn&apos;t take them into account well. A few...</summary>
+    <author>
+        <name>Leon Timmermans</name>
+        <uri>http://codespeaks.blogspot.com/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/leon_timmermans/">
+        <![CDATA[<p>If you are using File::Slurp, you should possibly reconsider. Basically, there are three reasons to do so;</p>
+
+<h1>It is wrong in a lot of cases.</h1>
+
+<p>File::Slurp predates IO layers, and as such doesn't take them into account well. A few years ago, after some complaints, an attempt was done to make it handle encodings. This was nothing short of being wrong.</p>
+
+<p>The best known bug in this area is <a href="https://rt.cpan.org/Ticket/Display.html?id=83126">#83126</a>, which means that <code>:encoding()</code> layers are always interpreted as <code>:utf8</code>. This not only means that UTF-8 encoded text is not validated (which can be a security risk), but also that files in other encodings (such as UTF-16) will be read as UTF-8, which surely will give an incorrect result.</p>
+
+<p>Likewise it's not handling <code>:crlf</code> correctly, in particular explicitly asking for <code>:crlf</code> will always disable it, even on Windows.</p>
+
+<p>Basically, it's doing all binmodes wrong except the one you shouldn't be using anyway (<code>:utf8</code>), and you should pretty much always be using a binmode, so there's no way to win really.</p>
+
+<h1>The interface is poorly huffmanized.</h1>
+
+<p>Huffmanization is the process of making commonly used operations shorter. File::Slurp is failing to huffmanize in the unicode world of 2015. Text files are usually UTF-8 nowadays, which in File::Slurp would typically be <code>read_file($filename, binmode =&gt; ':raw:utf8')</code>. The shortest option, <code>read_file($filename)</code>, does something that most people don't really want anymore: latin-1 encoded files with platforms specific line-endings.</p>
+
+<p>This is mainly the fault of perl itself (backwards compatibility is a PITA), but a library can work around this to make the programmers life easier.</p>
+
+<h1>It is poorly maintained</h1>
+
+<p>The critical bug mentioned above has been known for about two years, yet the author hasn't even bothered to respond to it, let alone fix it. There hasn't been a release in 4 years despite an increasingly long <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurp">list of issues</a>. Worst yet, this isn't the first time such a thing happens; before his last maintenance surge in the spring of 2011 the author was also missing-in-action for years. This negligence is inexcusable for a module that is so commonly depended upon.</p>
+
+<h1>Recommendations</h1>
+
+<p>Instead of File::Slurp, I recommend you use one of these modules depending on your needs:</p>
+
+<p>If your needs are minimal, I'd recommend my <a href="https://metacpan.org/pod/File::Slurper">File::Slurper</a>. It provides correct, fast and easy to use slurping and spewing functions.</p>
+
+<p>If your needs are average (which is the case for most people), I'd recommend <a href="https://metacpan.org/pod/Path::Tiny">Path::Tiny</a>. This provides a well-balanced set of functions for dealing with file paths and contents.</p>
+
+<p>If you want to go for maximal overkill, try <a href="https://metacpan.org/pod/IO::All">IO::All</a>. It will do everything you can imagine and more. </p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>Last Minute Hotel Rooms @ Swiss Perl Workshop</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/swiss_perl_workshop/2015/08/last-minute-hotel-rooms-swiss-perl-workshop.html" />
+    <id>tag:blogs.perl.org,2015:/users/swiss_perl_workshop//1551.6987</id>
+
+    <published>2015-08-18T05:07:55Z</published>
+    <updated>2015-08-18T06:51:05Z</updated>
+
+    <summary>The organisers of the Swiss Perl Workshop would like to inform you that they are freeing some hotel rooms by tomorrow, Wednesday 19 August, 18 CET. The rooms are in the hotels Amaris and Oltnerhof, both within 5 minutes on...</summary>
+    <author>
+        <name>Swiss Perl Workshop</name>
+        <uri>http://www.perl-workshop.ch/</uri>
+    </author>
+    
+    <category term="spwperl6hotelroom" label="spw perl6 hotelroom" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/swiss_perl_workshop/">
+        <![CDATA[<p>The organisers of the Swiss Perl Workshop would like to inform you that they are freeing some hotel rooms by tomorrow, Wednesday 19 August, 18 CET.<br />
+The rooms are in the hotels <a href="http://www.hotelamaris.ch/">Amaris</a> and <a href="http://hotel-oltnerhof.ch/">Oltnerhof</a>, both within 5 minutes on foot from the venue.<br />
+Reservations were made for the duration of the workshop, Perl 6 hackathon included (Wednesday 26 August - Sunday 30 August)<br />
+</p>]]>
+        <![CDATA[<p>Our sponsors:<br />
+<a href="https://www.bloonix.de/"><img alt="bloonix.png" src="http://blogs.perl.org/users/swiss_perl_workshop/sponsors/bloonix.png" width="200" height="50" class="mt-image-none" style="" /></a><a href="http://www.booking.com/"><img alt="booking.png" src="http://blogs.perl.org/users/swiss_perl_workshop/booking.png" width="200" height="34" class="mt-image-none" style="" /></a><a href="http://www.eventrix.ch/"><img alt="eventrix.jpg" src="http://blogs.perl.org/users/swiss_perl_workshop/eventrix.jpg" width="200" height="55" class="mt-image-none" style="" /></a><a href="http://www.gfu.net/"><img alt="gfu.png" src="http://blogs.perl.org/users/swiss_perl_workshop/gfu.png" width="200" height="67" class="mt-image-none" style="" /></a><a href="http://www.open.ch/"><img alt="open-systems.png" src="http://blogs.perl.org/users/swiss_perl_workshop/open-systems.png" width="115" height="114" class="mt-image-none" style="" /></a><a href="http://www.oetiker.ch/"><img alt="op-logo-200.png" src="http://blogs.perl.org/users/swiss_perl_workshop/op-logo-200.png" width="200" height="104" class="mt-image-none" style="" /></a><a href="http://www.perl-academy.de/"><img alt="pa-logo.jpg" src="http://blogs.perl.org/users/swiss_perl_workshop/pa-logo.jpg" width="200" height="99" class="mt-image-none" style="" /></a><a href="http://www.plusw.de/"><img alt="plusw" src="http://blogs.perl.org/users/swiss_perl_workshop/plusw.jpg" width="200" class="mt-image-none" style="" /></a><a href="http://www.getdigital.de/"><img alt="getdigital.png" src="http://blogs.perl.org/users/swiss_perl_workshop/getdigital.png" width="200" height="69" class="mt-image-none" style="" /></a><a href="http://www.oreilly.de/"><img alt="oreilly.gif" src="http://blogs.perl.org/users/swiss_perl_workshop/oreilly.gif" width="149" height="38" class="mt-image-none" style="" /></a><a href="http://www.wsiwlt.com/"><img alt="wsiwlt-logo.png" src="http://blogs.perl.org/users/swiss_perl_workshop/wsiwlt-logo.png" width="200" height="129" class="mt-image-none" style="" /></a><a href="http://www.perl6.org/"><img alt="camelia-logo.png" src="http://blogs.perl.org/users/swiss_perl_workshop/camelia-logo.png" width="200" height="186" class="mt-image-none" style="" /></a></p>]]>
+    </content>
+</entry>
+
+<entry>
+    <title>Perlito - reviewing some older code</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/flavio_s_glock/2015/08/perlito---reviewing-some-older-code.html" />
+    <id>tag:blogs.perl.org,2015:/users/flavio_s_glock//524.6985</id>
+
+    <published>2015-08-18T01:12:01Z</published>
+    <updated>2015-08-18T01:46:45Z</updated>
+
+    <summary>Today I&apos;ve finally updated the Perlito compiler ChangeLog, this covers a little more than a year of commits. The most significant update was the new Perlito5-to-Java backend, which is work-in-progress. It covers a lot of ground, but there is a...</summary>
+    <author>
+        <name>Flávio S. Glock</name>
+        
+    </author>
+    
+        <category term="Java" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Perl 6" scheme="http://www.sixapart.com/ns/types#category" />
+    
+        <category term="Perlito" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    <category term="java" label="java" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perlito" label="perlito" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perlito5" label="perlito5" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perlito6" label="perlito6" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="python" label="python" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/flavio_s_glock/">
+        <![CDATA[<p>Today I've finally updated the Perlito compiler <a href="https://github.com/fglock/Perlito/blob/master/ChangeLog">ChangeLog</a>, this covers a little more than a year of commits.</p>
+
+<p>The most significant update was the new Perlito5-to-Java backend, which is work-in-progress. It covers a lot of ground, but there is a lot more.</p>
+
+<p>There were also some interesting new Perlito5-to-Javascript features, such as regex /e modifier, and file operators support in nodejs.</p>
+
+<p>The Perl6 backends have not been updated, but things still work.</p>
+
+<p>While reviewing the <a href="https://github.com/fglock/Perlito/blob/master/README-perlito6">README-perlito6</a> file, I've found some interesting stuff that I haven't touched in a while - here is a piece of generated code that goes through 3 different languages:</p>
+]]>
+        <![CDATA[<p>This is a snippet generated by "make build-6py" - it is the bootstrapped Perlito6-to-Python code that compiles Perlito6-to-Lisp. The source code for this is <a href="https://github.com/fglock/Perlito/blob/master/src6/lib/Perlito6/Lisp/Emitter.pm#L181">here</a>.</p>
+
+<pre><code>def f_emit_lisp_program(v_comp_units=mp6_Scalar()):
+    try:
+        v_str = mp6_Scalar()
+        Hash_unit_seen = mp6_Hash({})
+        List_tmp_comp_unit = mp6_Array([])
+        v_str.f_set(u'')
+        Hash_unit_seen
+        List_tmp_comp_unit
+        def f__anon_28(v_comp_unit):
+            v_name = mp6_Scalar()
+            v_name.f_set(v_comp_unit.f_name())
+            if mp6_to_bool(Hash_unit_seen.f_lookup(v_name)):
+                for v_stmt in ((v_comp_unit.f_body())):
+                    (Hash_unit_seen.f_lookup(v_name)).f_body().f_push(v_stmt)
+            else:
+                Hash_unit_seen.f_lookup(v_name).f_set(v_comp_unit)
+                return List_tmp_comp_unit.f_push(v_comp_unit)
+[snip]
+</code></pre>
+
+<p>Perlito6 needs some serious update work - the Perl6 specification changed in significant ways since this code was written.</p>
+]]>
+    </content>
+</entry>
+
+<entry>
+    <title>CPAN is 20!</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/neilb/2015/08/cpan-is-20.html" />
+    <id>tag:blogs.perl.org,2015:/users/neilb//846.6983</id>
+
+    <published>2015-08-17T02:25:00Z</published>
+    <updated>2015-08-17T02:25:07Z</updated>
+
+    <summary><![CDATA[Perl hackers have now, as of today the 16th August 2015, been uploading Perl modules onto CPAN via PAUSE for 20 years. Andreas K&ouml;nig, who did that first upload, is still releasing to CPAN, and as I write this his...]]></summary>
+    <author>
+        <name>Neil Bowers</name>
+        <uri>http://neilb.org/reviews</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/neilb/">
+        <![CDATA[<p>Perl hackers have now, as of today the 16th August 2015,
+been uploading Perl modules onto <a href="http://www.cpan.org">CPAN</a>
+via <a href="https://pause.perl.org/pause/query">PAUSE</a>
+for 20 years.
+Andreas K&ouml;nig, who did that first upload, is still releasing to CPAN,
+and as I write this <a href="https://metacpan.org/author/ANDK?sort=[[2,1]]">his most recent upload</a>
+is the same module that was first released to CPAN.</p>
+
+<p>This post is a brief summary of <a href="https://github.com/neilbowers/history-of-cpan/blob/master/history.md">CPAN's history</a>.</p>
+]]>
+        <![CDATA[<h2>The Perl Packrats</h2>
+
+<p>Before CPAN there were various Perl ftp sites spread around the internet,
+each with their own curator. In late 1993, Bill Middleton formed the <em>packrats</em>
+mailing list for people who were archiving Perl things.</p>
+
+<p>Also in late 1993, <a href="http://jared.wordzoo.com/">Jared Rhine</a> emailed the list saying
+"I propose that we cooperate to create a unified structure, much like the CTAN project".</p>
+
+<p>The idea was kicked around, people got distracted, Perl 5 was released, and people
+started sharing Perl 5 modules.</p>
+
+<h2>Let's do this CPAN Thing!</h2>
+
+<p>In February 1995, <a href="https://metacpan.org/author/JHI">Jarkko Hietaniemi</a> proposed
+an initial directory structure and said he was going to get on with it.</p>
+
+<p>In April of that year, <a href="https://metacpan.org/author/ANDK">Andreas K&ouml;nig</a>
+proposed a "MASTER site for modules", where the set of modules would be just
+one part of CPAN. These days most people consider the set of modules and CPAN synonymous.
+Initially Andreas wasn't thinking about an upload capability.</p>
+
+<p>On the 1st August 1995, Jarkko announced a "private showing" of CPAN,
+for the packrats to check out and comment on.</p>
+
+<h2>How will everyone upload stuff?</h2>
+
+<p>On 15th August, Andreas emailed that he'd rethought the master site for modules
+and upload capability. He invited comments, but said people better be quick,
+as he was hacking away, and on a roll. He was creating what would become
+<a href="https://pause.perl.org/pause/query">PAUSE</a>,
+the Perl Authors Upload SErver.</p>
+
+<p>The next day, while still working on it, he uploaded what is now time-stamped
+as the first CPAN upload. The module was <code>Symdump</code>,
+which has since been renamed <a href="https://metacpan.org/pod/Devel::Symdump">Devel::Symdump</a>.
+You can see the release in
+<a href="https://metacpan.org/changes/distribution/Devel-Symdump#L194">Devel::Symdump's Changes file</a>.</p>
+
+<p>Jarkko <a href="https://groups.google.com/forum/#!msg/comp.lang.perl.announce/1qlLHdviZlY/hU90ubJHrf4J">officially announced CPAN</a> on 26th October 1995,
+and the rest, as they say, is <a href="https://github.com/neilbowers/history-of-cpan/blob/master/history.md">history</a>.</p>
+
+<h2>CPAN Day</h2>
+
+<p>CPAN Day only became a thing in 2014,
+when various people (initially prompted by <a href="https://metacpan.org/author/BOOK">Philippe Bruhat</a>)
+decided to use the date of the first upload
+as an excuse to
+<a href="http://blogs.perl.org/users/neilb/2014/08/the-19th-cpan-day-and-the-1st.html">celebrate CPAN</a>.</p>
+
+<p>Not long after CPAN celebrates its 20th birthday,
+we'll all be enjoying the first public release of <a href="http://perl6.org/">Perl 6</a>.</p>
+]]>
+    </content>
+</entry>
+
+<entry>
+    <title>Happy CPAN Day!</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/lajandy/2015/08/happy-cpan-day.html" />
+    <id>tag:blogs.perl.org,2015:/users/lajandy//149.6982</id>
+
+    <published>2015-08-17T01:12:46Z</published>
+    <updated>2015-08-17T01:35:34Z</updated>
+
+    <summary>Can you believe CPAN has been around for 20 years today? Two decades is a long time! Yet, I cannot imagine my workday without it. My contributions to the CPAN Day celebration: Helios 2.83 is a minor release of the...</summary>
+    <author>
+        <name>lajandy</name>
+        <uri>http://www.logicalhelion.com</uri>
+    </author>
+    
+    <category term="cpanday" label="cpan day" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="helios" label="helios" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/lajandy/">
+        <![CDATA[<p>Can you believe CPAN has been around for 20 years today?  Two decades is a long time!  Yet, I cannot imagine my workday without it.  </p>
+
+<p>My contributions to the CPAN Day celebration:</p>
+
+<p><a href="https://metacpan.org/release/LHELION/Helios-2.83">Helios 2.83</a> is a minor release of the Helios distributed job processing framework.  It contains official SQLite support for the first time, better schema DDL for Oracle databases, and some cleanup of some files with mixed-format line endings.</p>
+
+<p><a href="https://metacpan.org/release/LHELION/HeliosX-Logger-HiRes-1.00">Helios::Logger::HiRes 1.00</a> is the first stable release of a plugin module<br />
+providing enhanced logging features to the Helios framework, including<br />
+sub-second timestamp precision (provided by Perl's Time::HiRes) and a<br />
+command line log searching tool.</p>
+
+<p>Thank you to everyone who contributes to CPAN, both package contributors and those that maintain CPAN itself.  Happy CPAN Day everyone!</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>The newly-released Regexp::Assemble V 0.36</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/ron_savage/2015/08/the-newly-released-regexpassemble-v-036.html" />
+    <id>tag:blogs.perl.org,2015:/users/ron_savage//297.6981</id>
+
+    <published>2015-08-16T09:02:57Z</published>
+    <updated>2015-08-16T09:13:11Z</updated>
+
+    <summary>I&apos;m now co-maint of Regexp::Assemble. V 0.36 has been uploaded to CPAN....</summary>
+    <author>
+        <name>Ron Savage</name>
+        <uri>http://savage.net.au/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/ron_savage/">
+        <![CDATA[<p>I'm now co-maint of Regexp::Assemble. V 0.36 has been uploaded to CPAN.<br />
+</p>]]>
+        <![CDATA[<p>Changes for V 0.36:</p>
+
+<p>0.36 2015-08-16T11:34:00<br />
+	- Ron Savage is now co-maint.<br />
+	- Move eg/ to examples/.<br />
+	- Many thanx to the various parties who logged issues on RT. Some have been fixed, see below.<br />
+	- Add examples/failure.01.pl, downloaded, and noted in docs, from<br />
+		https://rt.cpan.org/Public/Bug/Display.html?id=104897<br />
+	- Move pod tests into xt/author/pod.t by cutting them out of t/00_basic.t.<br />
+		See https://rt.cpan.org/Public/Bug/Display.html?id=85686<br />
+		and https://rt.cpan.org/Public/Bug/Display.html?id=85209<br />
+	- Add repository https://github.com/ronsavage/Regexp-Assemble.git.<br />
+		Note: github does not list Perl as one of the licence options, so the auto-generated<br />
+		LICENSE (sic) file is not included in the distro.<br />
+		See https://rt.cpan.org/Public/Bug/Display.html?id=103856.<br />
+	- Fix some spelling errors in the pod.<br />
+		See https://rt.cpan.org/Public/Bug/Display.html?id=84336<br />
+	- Move ./Assemble.pm into lib/Regexp/.<br />
+	- Move the contents of the TODO file into the docs, and delete that file.<br />
+	- Rearrange pod, but not be running this module over it :-). Actually, put pod at end of file.<br />
+	- Update Makefile.PL.<br />
+	- Add Changelog.ini.<br />
+	- Update MANIFEST.SKIP.</p>]]>
+    </content>
+</entry>
+
+<entry>
+    <title>Perl開発の助成金プログラムについて</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/makoto_nozaki/2015/08/perljapanese.html" />
+    <id>tag:blogs.perl.org,2015:/users/makoto_nozaki//393.6980</id>
+
+    <published>2015-08-15T03:00:00Z</published>
+    <updated>2015-08-15T04:31:10Z</updated>
+
+    <summary>This is a Japanese summary of Grants Committee Charter, How to write a proposal and Grant Benefits. YAPC::Asiaが目の前に迫ってきました。日本のPerl使いの皆様向けにThe Perl Foundation内のGrants Committeeの活動を紹介します。 以前Grants Committee委員の牧から案内がありましたように、Grants CommitteeはPerlの開発に貢献する個人に1万ドルを上限として助成金の交付を行っています。もちろん日本の皆さんも対象で、最近はmoznion氏のPerl::Lintが採択されました。以下に私たちの活動理念と助成金の応募方法を記します。少し長いですがどうぞお付き合いを。 Grants Committeeの紹介 Grants Committeeは米国非営利法人、Perl Foundation内の最大勢力を占める委員会です。 Grantは日本語に翻訳しにくいのですが、助成金委員会とでも申しましょうか。オープンソースの活動は個人が自分の時間を使って無報酬で行われることが多いものの、人間は霞を食べて生きるわけにはいかないため、Perlのプロジェクトを通してPerlの成長に貢献してくださる方にGrants Committeeが助成金を出しています。 委員長は私、野崎が務めています。委員はコミュニティの代表を世界各地から集める方針を取っており、アジア・太平洋地域からは牧大輔とKaren Pauleyが選出されています。その他北米4人、欧州の4人の委員に加え、アジア・北米・欧州からGrant Managerという役職に1名ずつついており計14人の所帯です。 助成金の申請から採択、支払いまで 流れはこのようになっています。 提案の送付（フォーム）。このようなプロジェクトををするのでこれだけの助成をされたい、という内容を送っていただきます。メールアドレスなど個人情報を除き、内容は公開されます。 奇数月の中旬にパブリックコメントを募集し、委員による投票が行われます。 賛成多数で採択。提案に沿って実行していただきます。なお月一度の進捗報告が求められます。 計画達成後、現金が支払われます。...</summary>
+    <author>
+        <name>Makoto Nozaki</name>
+        <uri>http://facebook.com/nozaki</uri>
+    </author>
+    
+    <category term="grants" label="Grants" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="japanese" label="Japanese" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/makoto_nozaki/">
+        <![CDATA[<p>This is a Japanese summary of <a href="http://www.perlfoundation.org/grants_committee_charter">Grants Committee Charter</a>, <a href="http://www.perlfoundation.org/how_to_write_a_proposal">How to write a proposal</a> and <a href="http://www.perlfoundation.org/grant_benefits">Grant Benefits</a>. </p>
+
+<p>YAPC::Asiaが目の前に迫ってきました。日本のPerl使いの皆様向けに<a href="http://www.perlfoundation.org/">The Perl Foundation</a>内のGrants Committeeの活動を紹介します。</p>
+
+<p>以前Grants Committee委員の牧から<a href="http://lestrrat.ldblog.jp/archives/34612250.html">案内がありました</a>ように、Grants CommitteeはPerlの開発に貢献する個人に1万ドルを上限として助成金の交付を行っています。もちろん日本の皆さんも対象で、最近はmoznion氏の<a href="http://news.perlfoundation.org/2014/03/grant-proposal-perllint---yet.html">Perl::Lint</a>が採択されました。以下に私たちの活動理念と助成金の応募方法を記します。少し長いですがどうぞお付き合いを。</p>
+
+<h2>Grants Committeeの紹介</h2>
+
+<p>Grants Committeeは米国非営利法人、Perl Foundation内の最大勢力を占める委員会です。</p>
+
+<p>Grantは日本語に翻訳しにくいのですが、助成金委員会とでも申しましょうか。オープンソースの活動は個人が自分の時間を使って無報酬で行われることが多いものの、人間は霞を食べて生きるわけにはいかないため、Perlのプロジェクトを通してPerlの成長に貢献してくださる方にGrants Committeeが助成金を出しています。</p>
+
+<p>委員長は私、野崎が務めています。委員はコミュニティの代表を世界各地から集める方針を取っており、アジア・太平洋地域からは牧大輔とKaren Pauleyが選出されています。その他北米4人、欧州の4人の委員に加え、アジア・北米・欧州からGrant Managerという役職に1名ずつついており計14人の所帯です。</p>
+
+<h2>助成金の申請から採択、支払いまで</h2>
+
+<p>流れはこのようになっています。</p>
+
+<ul>
+<li>提案の送付（<a href="https://docs.google.com/forms/d/16seYhrMjz8rgsau9e1MtwYY0fHB81mVKm-0SD6Ynty0/viewform">フォーム</a>）。このようなプロジェクトををするのでこれだけの助成をされたい、という内容を送っていただきます。メールアドレスなど個人情報を除き、内容は公開されます。</li>
+<li>奇数月の中旬にパブリックコメントを募集し、委員による投票が行われます。</li>
+<li>賛成多数で採択。提案に沿って実行していただきます。なお月一度の進捗報告が求められます。</li>
+<li>計画達成後、現金が支払われます。</li>
+</ul>
+
+<h2>参加する利点</h2>
+
+<p>採択されると助成金に加えてこのような利点があります。</p>
+
+<ul>
+<li>専属マネージャーが割り当てられ、進捗管理とTPF間の仲介をしてくれます。</li>
+<li>TPFお墨付きのプロジェクトになり、世界中から注目が得られます。</li>
+</ul>
+
+<h2>FAQ的なもの</h2>
+
+<h3>英語は必要か？</h3>
+
+<p>英作文が必要になるのは以下の場合です。</p>
+
+<ul>
+<li>提案の作成、質問への返答</li>
+<li>進捗報告</li>
+<li>支払い手続きなど事務的なやりとり</li>
+</ul>
+
+<p>READMEを書く手間プラスαくらいでしょうか。牧によると「英語が問題ならば多少のお手伝いはできます」そうですよ！</p>
+
+<h3>申請額はどうやって決めたらよい？</h3>
+
+<p>上限が1万米ドルという以外、特にガイドラインは設けていません。<a href="http://www.perlfoundation.org/completed_grants">過去の申請額</a>を参考にするのがよいかと思います。なお2014年2月までは上限が3000ドルでした。</p>
+
+<p>寄付金で成り立っているプログラムのため、時給換算ではさほど多くの額は望んでいただけないことをご承知ください。</p>
+
+<h3>支払いは？</h3>
+
+<p>計画達成後、委員会が確認したあとに米ドル建ての小切手が郵送されます。小切手はシティバンク銀行などで換金できます。銀行振り込みもできないことはないのですが、国際送金手数料の負担をお願いしています。</p>
+
+<p>ちなみに円安の今がチャンスです。</p>
+
+<h3>財源は？</h3>
+
+<p>TPFに寄付をしてくださった皆様のおかげです。末筆ながらTPFに寄付をしてくださった法人・個人の皆様に感謝いたします。</p>
+
+<h2>お問い合わせ</h2>
+
+<p>tpf-grants-secretary at perl-foundation.orgへどうぞ。</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>Converting glob patterns to regular expressions</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/mauke/2015/08/converting-glob-patterns-to-regular-expressions.html" />
+    <id>tag:blogs.perl.org,2015:/users/mauke//343.6979</id>
+
+    <published>2015-08-14T11:42:38Z</published>
+    <updated>2015-08-14T12:26:52Z</updated>
+
+    <summary>Let&apos;s say you have a glob pattern with shell-style wildcards from a config file or user input, where ? matches any character and * matches any string (0 or more characters). You want to convert it to a regex, maybe...</summary>
+    <author>
+        <name>mauke</name>
+        
+    </author>
+    
+    <category term="glob" label="glob" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="regex" label="regex" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/mauke/">
+        <![CDATA[<p>Let's say you have a glob pattern with shell-style wildcards from a config file or user input, where <code>?</code> matches any character and <code>*</code> matches any string (0 or more characters). You want to convert it to a regex, maybe because you just want to match it (and Perl already supports regexes) or because you want to embed it as part of a bigger regex.</p>
+
+<p>You might start with a naive replacement:</p>
+
+<pre><code>s/\?/./g;   # ? -&gt; .
+s/\*/.*/g;  # * -&gt; .*
+</code></pre>
+
+<p>Unfortunately this is broken: It leaves all other characters untouched, including those that have a special meaning in regexes, such as <code>(</code>, <code>+</code>, <code>|</code>, etc.</p>
+
+<p>Let's revise it:</p>
+
+<pre><code>s{(\W)}{
+    $1 eq '?' ? '.' :
+    $1 eq '*' ? '.*' :
+    '\\' . $1
+}eg;
+</code></pre>
+
+<p>Now we match and replace every non-word character. If it's <code>?</code> or <code>*</code>, we turn it into its regex equivalent; otherwise we backslash-escape it just like <a href="http://perldoc.perl.org/functions/quotemeta.html"><code>quotemeta</code></a> would do.</p>
+
+<p>But what if the input is something like <code>a***b</code>? This would turn into <code>a.*.*.*b</code>, which when run on a long target string without <code>b</code>s by a backtracking engine can be very inefficient (barring extra optimizations). A missing <code>b</code> would make the match fail at the end, which would cause the engine to go through all possible ways <code>.*.*.*</code> could subdivide the string amongst themselves before giving up. In general this takes O(n<sup>k</sup>) time (where n is the length of the target string and k is the number of stars in the pattern).</p>
+
+<p>We can do better than that by realizing <code>**</code> is equivalent to <code>*</code>, which means that any sequence of stars is equivalent to a single <code>*</code>, and preprocessing the pattern:</p>
+
+<pre><code>tr,*,,s;  # ***...* -&gt; *
+</code></pre>
+
+<p>This still doesn't fix everything, though: <code>*?*?*</code> doesn't contain any repeated <code>*</code>s but still allows for exponential backtracking. One way to work around this is to normalize the pattern even further: Because <code>*?</code> is equivalent to <code>?*</code>, we can move all the <code>?</code>s to the front:</p>
+
+<pre><code># "*?*?*"
+1 while s/\*\?/?*/g;
+# "?*?**"  (after 1 iteration)
+# "??***"  (after 2 iterations)
+tr,*,,s;
+# "??*"
+s{(\W)}{
+    $1 eq '?' ? '.' :
+    $1 eq '*' ? '.*' :
+    '\\' . $1
+}eg;
+# "...*"
+</code></pre>
+
+<p>However, I don't like that the transformation is spread out over two regex substitutions and one transliteration, when there is a way to do it all in a single substitution:</p>
+
+<pre><code>s{
+    ( [?*]+ )  # a run of ? or * characters
+|
+    (\W)       # any other non-word character
+}{
+    defined $1
+        ? '.{' . ($1 =~ tr,?,,) . (index($1, '*') &gt;= 0 ? ',' : '') . '}'
+        : '\\' . $2
+}xeg;
+</code></pre>
+
+<p>That is, we turn each run of <code>?</code> or <code>*</code> characters into <code>.{N}</code> (if there was no <code>*</code>) or <code>.{N,}</code> (if there was at least one <code>*</code>) where <code>N</code> is the number of <code>?</code>s in the run.</p>
+
+<p>Given an input of <code>*?*?*</code>, this would generate <code>.{2,}</code> ("match 2 or more of any character").</p>
+
+<p>And finally, if we wanted the user to be able to escape characters with a backslash to match them literally:</p>
+
+<pre><code>s{
+    ( [?*]+ )  # a run of ? or * characters
+|
+    \\ (.)     # backslash escape
+|
+    (\W)       # any other non-word character
+}{
+    defined $1
+        ? '.{' . ($1 =~ tr,?,,) . (index($1, '*') &gt;= 0 ? ',' : '') . '}'
+        : quotemeta $+
+}xeg;
+</code></pre>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>Raise hell, or bugs, on CPAN Day!</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/neilb/2015/08/raise-hell-or-bugs-on-cpan-day.html" />
+    <id>tag:blogs.perl.org,2015:/users/neilb//846.6978</id>
+
+    <published>2015-08-14T03:28:43Z</published>
+    <updated>2015-08-14T03:28:15Z</updated>
+
+    <summary>If you&apos;ve got one or more distributions on CPAN, then on CPAN Day you could go through them and see if there are any ideas you&apos;ve had which aren&apos;t listed in the issue tracker (typically RT or github issues). If...</summary>
+    <author>
+        <name>Neil Bowers</name>
+        <uri>http://neilb.org/reviews</uri>
+    </author>
+    
+    <category term="bugs" label="bugs" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="cpan" label="CPAN" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="cpanday" label="CPAN Day" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/neilb/">
+        <![CDATA[<p>If you've got one or more distributions on CPAN,
+then on CPAN Day you could go through them and see if there are
+any ideas you've had which aren't listed in the issue tracker
+(typically RT or github issues).</p>
+
+<p>If you don't have any distributions on CPAN,
+then you could go through the modules that you regularly use
+and see if there are any issues you could raise.</p>
+
+<p>I'll expand a bit on what I mean, and why it <em>might</em> be a
+good use of your time.</p>
+]]>
+        <![CDATA[<h2>Raising issues on your own distributions</h2>
+
+<p>If you're like me, then there are probably a number of things you'd
+like to do to/with your CPAN distributions, if you ever get the
+time or inclination.</p>
+
+<p>Older distributions maybe reflect the way you coded and tested (or didn't)
+back then, and some day you'd like to update things.
+Maybe you've adopted some distributions and have fixed the obvious / easy
+things, but there are more things you meant to do.</p>
+
+<p>Maybe you've ideas for new features, but never wrote them down.</p>
+
+<p>Not all authors care about getting
+<a href="http://blogs.perl.org/users/neilb/2014/08/get-cpants-clean-on-cpan-day.html">CPANTS clean</a>,
+and that's fair enough.
+But if you'd welcome that, then you could raise an issue.</p>
+
+<p>Maybe you have CPAN Testers fails on an operating system, or Perl version,
+that you don't really care about, or have access to.</p>
+
+<p>Why bother doing this?
+There are plenty of people out there who would like to contribute,
+but can't think what to do. The more ideas out there, the more likely
+it is they'll spot something and think "hey, I could do that!".</p>
+
+<p>These issues would also provide grist for the <a href="http://cpan-prc.org">Pull Request Challenge</a> mill.</p>
+
+<h2>Raising issues on distributions you use</h2>
+
+<p>If you don't have any CPAN distributions of your own,
+or yours are all perfect,
+then you could trawl through the distributions you regularly use,
+and see if there are any issues you could raise.</p>
+
+<p>Maybe there are niggles you've always wished would get addressed,
+or convenience functions that would make your life easier.
+Don't <em>demand</em> them, but suggest them, and give your reasons.</p>
+
+<p>Maybe you found a module hard to understand at first?
+You could suggest some documentation improvements,
+or the addition of example scripts to the distribution?</p>
+
+<p>Do this from a desire to improve the module though,
+not to criticise. If you don't like a certain module,
+you're always free to write your own alternative and upload
+that to CPAN.</p>
+
+<h2>Don't go overboard, Studley</h2>
+
+<p>Don't go crazy with this, and don't make it a numbers game.
+Only raise real issues: things that you truly want to see,
+for the good of the module / CPAN / users.</p>
+
+<p>And don't expect any issues you raise to be addressed over night.
+Assume that your issues will be ignored, and anything you get is a bonus.
+Maybe nothing will happen, then down the road someone will adopt the module,
+and now they have a bunch of ideas to work on.</p>
+]]>
+    </content>
+</entry>
+
+<entry>
+    <title>Seeking helpers for Net::DHCP</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/dean/2015/08/seeking-helpers-for-netdhcp.html" />
+    <id>tag:blogs.perl.org,2015:/users/dean//558.6976</id>
+
+    <published>2015-08-13T09:36:57Z</published>
+    <updated>2015-08-13T09:42:59Z</updated>
+
+    <summary>Are you sitting at home thinking &quot;I&apos;ve got all this free time, I really want to make use of it playing around with bitstrings using pack and unpack&quot; ? Your search is over! I need your help! For some time...</summary>
+    <author>
+        <name>Dean</name>
+        <uri>http://bytefoundry.com.au</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/dean/">
+        <![CDATA[<p>Are you sitting at home thinking <strong>"I've got all this free time, I really want to make use of it playing around with bitstrings using pack and unpack"</strong> ?</p>
+
+<p>Your search is over! I need your help!</p>
+
+<p>For some time now I have been chipping away at enhancements for Net::DHCP. Recently I have begun adding tests using packet captures from the real world. Naturally this has created a laundry list of possible enhancements including DHCP options which need special attention to make sense of. </p>
+
+<p>That and the tangled web of quirky clients which require dhcp options to be in certain (non-numeric) order - for no logical reason.</p>
+
+<p>I have a TODO list which is naturally just a list of ideas which some keen person with tie on their hands might like to help me with, check it out at: <a href="https://github.com/djzort/Net-DHCP/blob/master/TODO">https://github.com/djzort/Net-DHCP/blob/master/TODO</a></p>
+
+<p>Please fork and submit PR's!</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Sydney Perl Mongers August 2015</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/dean/2015/08/sydney-perl-mongers-august-2015.html" />
+    <id>tag:blogs.perl.org,2015:/users/dean//558.6975</id>
+
+    <published>2015-08-13T09:26:04Z</published>
+    <updated>2015-08-14T02:28:13Z</updated>
+
+    <summary>It&apos;s hard to believe its August already! Catalyst-IT have offered to host us this month, so I went ahead and booked their board room. What: Sydney PM Date: Tuesday, 18th August 2015 Time: 6-9:30pm Where: Catalyst, Suite 501-504, 89 York...</summary>
+    <author>
+        <name>Dean</name>
+        <uri>http://bytefoundry.com.au</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/dean/">
+        <![CDATA[<p>It's hard to believe its August already! Catalyst-IT have offered to host us this month, so I went ahead and booked their board room.</p>
+
+<p>What: Sydney PM <br />
+Date: Tuesday, 18th August 2015<br />
+Time: 6-9:30pm <br />
+Where: Catalyst, Suite 501-504, 89 York St Sydney NSW </p>
+
+<p>The building locks it's doors at 6pm, so one of their staff will let us in. The same as Broadbean, SiteSuite and others. For stragglers, a contact mobile number will be posted on the SydneyPM email list the day before.</p>
+
+<p>Please <a href="https://www.facebook.com/sydneypm">like our FB page</a> and <a href="https://www.facebook.com/events/1483083718668653/">Join our FB Event</a></p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Swat and Mojolicious </title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/melezhik/2015/08/swat-and-mojolicious.html" />
+    <id>tag:blogs.perl.org,2015:/users/melezhik//1336.6977</id>
+
+    <published>2015-08-13T14:41:00Z</published>
+    <updated>2015-08-13T18:28:44Z</updated>
+
+    <summary>Hi. I continue to share some swat news. SWAT is automation test framework written on bash/perl and providing a simple DSL to rapidly create smoke tests for web applications. Mojolicious is a ... ok ... everybody knows it :) -...</summary>
+    <author>
+        <name>melezhik</name>
+        <uri>https://github.com/melezhik</uri>
+    </author>
+    
+    <category term="mojo" label="mojo" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="mojolicious" label="Mojolicious" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="smoke" label="smoke" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="swat" label="swat" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="test" label="test" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/melezhik/">
+        <![CDATA[<p>Hi. I continue to share some swat news. <a href="https://github.com/melezhik/swat">SWAT</a> is automation test framework written on bash/perl and providing a simple DSL to rapidly create smoke tests for web applications.</p>
+
+<p><a href="http://search.cpan.org/perldoc?Mojo">Mojolicious</a> is a ... ok ... everybody knows it :) - well known web application framework.</p>
+
+<p>Recently I found it quite interesting idea of generating swat tests for existed mojo applications using routes introspection.</p>
+
+<p>So this is how I created Mojolicious::Command::swat</p>
+
+<p>This is a draft, I have not even uploaded it to CPAN, but if someone interested - may play with it - <a href="https://github.com/melezhik/Mojolicious-Command-Swat">https://github.com/melezhik/Mojolicious-Command-Swat</a> ...<br />
+</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Swiss Perl Workshop - Register (and Get Prepared) for the Perl 6 Hackathon</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/swiss_perl_workshop/2015/08/asdf.html" />
+    <id>tag:blogs.perl.org,2015:/users/swiss_perl_workshop//1551.6974</id>
+
+    <published>2015-08-13T06:42:00Z</published>
+    <updated>2015-08-18T06:48:24Z</updated>
+
+    <summary>This post is mostly geared towards Perl 6 newbies who plan to attend the Perl 6 Hackathon at the Swiss Perl Workshop 2015 in Olten, on Thursday, 27 August 2015. First and foremost: Don’t be shy and come even if...</summary>
+    <author>
+        <name>Swiss Perl Workshop</name>
+        <uri>http://www.perl-workshop.ch/</uri>
+    </author>
+    
+    <category term="perl6spw" label="perl6 spw" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/swiss_perl_workshop/">
+        <![CDATA[<p>This post is mostly geared towards Perl 6 newbies who plan to attend the <a href="http://act.perl-workshop.ch/spw2015/hackathon.html">Perl 6 Hackathon</a> at the <a href="http://perl-workshop.ch">Swiss Perl Workshop 2015</a> in Olten, on Thursday, 27 August 2015.</p>
+
+<p>First and foremost: Don’t be shy and come even if you have never contributed to the Perl 6 ecosystem. Neither have I, and I will be there. There are always tasks that do not require insights into the Perl 6 toolchain. This hackathon is pretty much a one-time opportunity for Switzerland. There will be a dozen of Perl 6 core hackers on site, and some of them will even <a href="http://act.perl-workshop.ch/spw2015/event/1797">help you get Perl 6 up and running</a>.</p>
+
+<p>Please add yourself to the <a href="http://act.perl-workshop.ch/spw2015/wiki?node=HackathonAttendees">list of attendees</a>. We will then organise a seat and food for you. On the link mentioned, you will also find extensive information and links to preparational material. (Thank you, Wendy!) Most of the text below is copied from there.</p>
+
+<p>Get prepared. Instead of showing up and asking around what to do, you should pick possible tasks in beforehand. A good hook would be to check the Perl 6 status of things you use in Perl 5 and start from there. You could even become one of the first Perl 6 module authors on the topic chosen!<br />
+If you can you could also consider some time travelling forward to the <a href="http://act.perl-workshop.ch/spw2015/schedule?day=2015-08-29">Perl 6 training sessions</a> on Saturday, then back and forth to many interesting Perl 6 talks on Friday and Saturday, and then back to the Hackathon on Thursday.</p>
+
+<p>There will be several people that help to install Perl 6. Some of the regular Perl 6 people have been doing a "Perl 6 Installation Hour" before. If you want to, you can install Perl 6 (especially Rakudo Star, the most advanced implementation of Perl 6):<br />
+<a href="http://rakudo.org/how-to-get-rakudo/">http://rakudo.org/how-to-get-rakudo/</a><br />
+For some, the best page for people using Linux/BSD/Debian, to install Perl 6 Rakudo:<br />
+<a href="https://github.com/tadzik/rakudobrew">https://github.com/tadzik/rakudobrew</a><br />
+(You should not time-travel and install some fantastic Perl 6.22 from 2042(?), because that would probably confuse some core hackers, or probably you should..)</p>
+
+<p>The core Perl 6 developers will work on core Perl 6 code. But they will be available for "less important things" and most of them really don't mind helping out with small things, like "my installation of Perl 6 does not work as expected and I have no clue where to start fixing it".<br />
+A couple of things that people can work on:<br />
+* Documentation ( <a href="http://www.perl6.org/documentation/">http://www.perl6.org/documentation/</a> ).<br />
+* Convert modules from Perl 5 to use in Perl 6 (see also <a href="http://doc.perl6.org/language/5to6">http://doc.perl6.org/language/5to6</a> ; also check Stefan Seifert's Inline::Perl5 on <a href="https://github.com/niner/Inline-Perl5">https://github.com/niner/Inline-Perl5</a> ; check David Adler's activities on <a href="http://dhaperl6.blogspot.nl/">http://dhaperl6.blogspot.nl/</a> ; check DrForr's project on <a href="http://blogs.perl.org/users/drforr/2015/07/perltoperl6-released-to-cpan.html">http://blogs.perl.org/users/drforr/2015/07/perltoperl6-released-to-cpan.html</a> and <a href="https://github.com/drforr/Perl-Mogrify">https://github.com/drforr/Perl-Mogrify</a> ).<br />
+* Check the testing system, and add more tests ( see also <a href="https://github.com/perl6/roast">https://github.com/perl6/roast</a> ).<br />
+* Add more examples to Rosetta Code (<a href="http://rosettacode.org/wiki/Category:Perl_6">http://rosettacode.org/wiki/Category:Perl_6</a> ), or maybe improve them.<br />
+* Invite people to visit #perl6 on irc.freenode.org where the people are busy, friendly and helpful (backlog is available too: <a href="http://irclog.perlgeek.de/perl6/">http://irclog.perlgeek.de/perl6/</a> ).<br />
+There are at least two important aspects that need a lot of attention for Perl 6 to become a success:<br />
+* IO<br />
+* graphics support<br />
+There is also a list of most wanted modules that need a lot of attention: <br />
+<a href="https://github.com/perl6/perl6-most-wanted/blob/master/most-wanted/modules.md">https://github.com/perl6/perl6-most-wanted/blob/master/most-wanted/modules.md</a></p>
+
+<p>So, looking forward to seeing you there!</p>]]>
+        <![CDATA[<p>Our sponsors:<br />
+<a href="https://www.bloonix.de/"><img alt="bloonix.png" src="http://blogs.perl.org/users/swiss_perl_workshop/sponsors/bloonix.png" width="200" height="50" class="mt-image-none" style="" /></a><a href="http://www.booking.com/"><img alt="booking.png" src="http://blogs.perl.org/users/swiss_perl_workshop/booking.png" width="200" height="34" class="mt-image-none" style="" /></a><a href="http://www.eventrix.ch/"><img alt="eventrix.jpg" src="http://blogs.perl.org/users/swiss_perl_workshop/eventrix.jpg" width="200" height="55" class="mt-image-none" style="" /></a><a href="http://www.gfu.net/"><img alt="gfu.png" src="http://blogs.perl.org/users/swiss_perl_workshop/gfu.png" width="200" height="67" class="mt-image-none" style="" /></a><a href="http://www.open.ch/"><img alt="open-systems.png" src="http://blogs.perl.org/users/swiss_perl_workshop/open-systems.png" width="115" height="114" class="mt-image-none" style="" /></a><a href="http://www.oetiker.ch/"><img alt="op-logo-200.png" src="http://blogs.perl.org/users/swiss_perl_workshop/op-logo-200.png" width="200" height="104" class="mt-image-none" style="" /></a><a href="http://www.perl-academy.de/"><img alt="pa-logo.jpg" src="http://blogs.perl.org/users/swiss_perl_workshop/pa-logo.jpg" width="200" height="99" class="mt-image-none" style="" /></a><a href="http://www.plusw.de/"><img alt="plusw" src="http://blogs.perl.org/users/swiss_perl_workshop/plusw.jpg" width="200" class="mt-image-none" style="" /></a><a href="http://www.getdigital.de/"><img alt="getdigital.png" src="http://blogs.perl.org/users/swiss_perl_workshop/getdigital.png" width="200" height="69" class="mt-image-none" style="" /></a><a href="http://www.oreilly.de/"><img alt="oreilly.gif" src="http://blogs.perl.org/users/swiss_perl_workshop/oreilly.gif" width="149" height="38" class="mt-image-none" style="" /></a><a href="http://www.wsiwlt.com/"><img alt="wsiwlt-logo.png" src="http://blogs.perl.org/users/swiss_perl_workshop/wsiwlt-logo.png" width="200" height="129" class="mt-image-none" style="" /></a><a href="http://www.perl6.org/"><img alt="camelia-logo.png" src="http://blogs.perl.org/users/swiss_perl_workshop/camelia-logo.png" width="200" height="186" class="mt-image-none" style="" /></a></p>]]>
+    </content>
+</entry>
+
+<entry>
+    <title>Mystery Line in Proc Input in Perl 6</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/aaron_baugher/2015/08/mystery-line-in-proc-input-in-perl-6.html" />
+    <id>tag:blogs.perl.org,2015:/users/aaron_baugher//2597.6973</id>
+
+    <published>2015-08-12T13:33:33Z</published>
+    <updated>2015-08-12T14:05:09Z</updated>
+
+    <summary>Here&apos;s something odd; not sure if it&apos;s a bug or just something I don&apos;t understand. I have a utility on my system called k8temp which reports the temperature of the CPUs. It reports it in Celsius, so I thought I&apos;d...</summary>
+    <author>
+        <name>Aaron Baugher</name>
+        <uri>http://aaron.baugher.biz/</uri>
+    </author>
+    
+    <category term="perl6" label="Perl 6" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="proc" label="Proc" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/aaron_baugher/">
+        <![CDATA[<p>Here's something odd; not sure if it's a bug or just something I don't understand.</p>
+
+<p>I have a utility on my system called <code>k8temp</code> which reports the temperature of the CPUs.  It reports it in Celsius, so I thought I'd write a little wrapper that converts the temps to Fahrenheit.  <code>k8temp</code> outputs one line per core, so on my dual-core system, the output looks like this:</p>
+
+<pre><code>abaugher@bannor&gt; k8temp
+CPU 0 Core 0 Sensor 0: 38c
+CPU 0 Core 1 Sensor 0: 38c
+abaugher@bannor&gt;
+</code></pre>
+
+<p>And piping it to a hex dump looks like this:</p>
+
+<pre><code>abaugher@bannor&gt; k8temp|hd
+00000000: 43 50 55 20, 30 20 43 6f, 72 65 20 30, 20 53 65 6e ;CPU 0 Core 0 Sen
+00000010: 73 6f 72 20, 30 3a 20 33, 39 63 0a 43, 50 55 20 30 ;sor 0: 39c.CPU 0
+00000020: 20 43 6f 72, 65 20 31 20, 53 65 6e 73, 6f 72 20 30 ; Core 1 Sensor 0
+00000030: 3a 20 33 38, 63 0a                                 ;: 38c.
+</code></pre>
+
+<p>So there are definitely just two lines there, right?  But when I run my script, I get three lines: the two expected lines and then a blank one.  Here it is:</p>
+
+<pre><code>#!/usr/bin/env perl6
+use v6;
+
+sub MAIN() {          
+    my $p = run 'k8temp', :out;
+    for $p.out.lines {
+        if / (.*?) (\d+) c / {
+            say  [~] $0, round($1*9/5+32), "°";
+        } else {
+            say 'Mystery line: ',$_;
+        }
+    }
+}
+</code></pre>
+
+<p>And the output:</p>
+
+<pre><code>abaugher@bannor&gt; ./k8temp.p6
+CPU 0 Core 0 Sensor 0: 108°
+CPU 0 Core 1 Sensor 0: 106°
+Mystery line: 
+abaugher@bannor&gt; ./k8temp.p6|hd
+00000000: 43 50 55 20, 30 20 43 6f, 72 65 20 30, 20 53 65 6e ;CPU 0 Core 0 Sen
+00000010: 73 6f 72 20, 30 3a 20 31, 30 39 c2 b0, 0a 43 50 55 ;sor 0: 109°.CPU
+00000020: 20 30 20 43, 6f 72 65 20, 31 20 53 65, 6e 73 6f 72 ; 0 Core 1 Sensor
+00000030: 20 30 3a 20, 31 30 34 c2, b0 0a 4d 79, 73 74 65 72 ; 0: 104°.Myster
+00000040: 79 20 6c 69, 6e 65 3a 20, 0a                       ;y line: .
+</code></pre>
+
+<p>So the <code>for</code> loop is running three times, even though the subprogram only outputs two lines, and the value of <code>$_</code> the third time through is the empty string.  This will require more investigation.  Am I missing something obvious here?</p>
+
+<p><strong>Update</strong>: I tried a couple things.  First, slurping the output of the process shows no third line:</p>
+
+<pre><code>#!/usr/bin/env perl6
+use v6;
+
+sub MAIN() {          
+    my $p = run 'k8temp', :out;
+    print $p.out.slurp-rest;
+}
+# results
+abaugher@bannor&gt; ./k8.p6|hd 
+00000000: 43 50 55 20, 30 20 43 6f, 72 65 20 30, 20 53 65 6e ;CPU 0 Core 0 Sen
+00000010: 73 6f 72 20, 30 3a 20 34, 31 63 0a 43, 50 55 20 30 ;sor 0: 41c.CPU 0
+00000020: 20 43 6f 72, 65 20 31 20, 53 65 6e 73, 6f 72 20 30 ; Core 1 Sensor 0
+00000030: 3a 20 33 39, 63 0a                                 ;: 39c.
+</code></pre>
+
+<p>Then using <code>.lines</code> instead:</p>
+
+<pre><code>#!/usr/bin/env perl6
+use v6;
+
+sub MAIN() {          
+    my $p = run 'k8temp', :out;
+    my @l = $p.out.lines;
+    @l.perl.say;
+}
+# results
+abaugher@bannor&gt; ./k8.p6
+["CPU 0 Core 0 Sensor 0: 42c", "CPU 0 Core 1 Sensor 0: 40c", ""]&lt;&gt;
+</code></pre>
+
+<p>So <code>.lines()</code> appears to be adding a third element.  Now to figure out why.</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>What&apos;s your favourite CPAN module?</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/neilb/2015/08/whats-your-favourite-module.html" />
+    <id>tag:blogs.perl.org,2015:/users/neilb//846.6972</id>
+
+    <published>2015-08-11T01:37:10Z</published>
+    <updated>2015-08-11T01:38:46Z</updated>
+
+    <summary>We&apos;ve probably all got one or more modules that we&apos;re very thankful for. Maybe you use it again and again. Maybe the fact that it exists saved you from having to write it yourself. Maybe it&apos;s such a well-crafted module...</summary>
+    <author>
+        <name>Neil Bowers</name>
+        <uri>http://neilb.org/reviews</uri>
+    </author>
+    
+    <category term="cpan" label="CPAN" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="cpanday" label="CPAN Day" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/neilb/">
+        <![CDATA[<p>We've probably all got one or more modules that we're very thankful for.
+Maybe you use it again and again. Maybe the fact that it exists saved
+you from having to write it yourself. Maybe it's such a well-crafted module
+that you don't need to think about it, but always have it on your tool belt.</p>
+
+<p>Maybe for/on <a href="http://blogs.perl.org/users/neilb/2015/08/do-something-for-cpan-day-2015.html">CPAN Day</a>, you could do or organise something related to
+that module, as a way to say thank you, perhaps to improve it for all of us?</p>
+
+<p>Here are some ideas.</p>
+]]>
+        <![CDATA[<h2>Tell the author</h2>
+
+<p>Email the author, either just to say "thank you for Foo::Bar",
+or if you're feeling more effusive "your module rocks!".
+Being specific is good, but the email really doesn't have to be very long.</p>
+
+<p>You might think this is a bit tree-huggy, but I can tell you that
+it's pretty damn good to get an email like that.</p>
+
+<h2>Fix a long-standing issue</h2>
+
+<p>There are plenty of distributions that have gnarly bugs or feature requests
+that have been there for a long time. Some of them we all look at and think
+"yeah, it would be good if <em>someone</em> did that."</p>
+
+<p>If your company uses the module, you could persuade your boss to let you
+organise a mini hackathon, so a group of you can work together.</p>
+
+<p>Unless it's obvious what needs doing, you should probably discuss your
+plans with the current maintainer first.</p>
+
+<h2>Improve the distribution's test coverage</h2>
+
+<p>Use <a href="https://metacpan.org/pod/Devel::Cover">Devel::Cover</a> to
+<a href="http://blogs.perl.org/users/neilb/2014/08/check-your-test-coverage-with-develcover.html">check the test coverage</a>,
+and if it's not 100%, work on the testsuite to move it closer.</p>
+
+<p>It really isn't often that authors get PRs to only add tests,
+but I bet it's a good change to get.</p>
+
+<h2>Make it faster</h2>
+
+<p>Check the performance of the module with
+<a href="https://metacpan.org/pod/Devel::NYTProf">Devel::NYTProf</a>
+and see if there are any obvious hotspots you can do something about.</p>
+
+<p>Watch <a href="http://perltv.org/v/performance-profiling-with-develnytprof">Tim's video about this</a> first, and depending on the nature of your changes,
+talk to the maintainer as well.</p>
+
+<h2>Resolve CPAN Testers failures</h2>
+
+<p>Have a look at the distribution's page on MetaCPAN, and see whether
+there are any failures reported by <a href="http://www.cpantesters.org">CPAN Testers</a>.
+There are many modules which have always worked fine for me, but
+when I look on MetaCPAN I see a notable percentage of failures.</p>
+
+<p>If you have a CPAN distribution that relies on this one, then those
+failures might represent failures for your distribution too.</p>
+
+<p><a href="http://blogs.perl.org/users/neilb/2014/08/fix-your-cpan-testers-failures.html">Addressing CPAN Testers failures</a> can sometimes be a pain, since it might need you
+to track down a machine / VM with the particular operating system.
+You spend several hours on that, and then it only takes a minute or two
+to identify the problem and fix it. You're making CPAN more reliable
+by doing this.</p>
+
+<h2>Blog about it</h2>
+
+<p>Write about why you like the module, and how you've used it.
+Maybe show a non-standard use for it, or explain when and
+why this module is a better choice than some of its competitors.</p>
+]]>
+    </content>
+</entry>
+
+<entry>
+    <title>MadMongers (Madison Perl Mongers)</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/jt_smith/2015/08/madmongers-madison-perl-mongers-2.html" />
+    <id>tag:blogs.perl.org,2015:/users/jt_smith//242.6971</id>
+
+    <published>2015-08-09T16:00:03Z</published>
+    <updated>2015-08-09T16:00:03Z</updated>
+
+    <summary>MadMongers (Madison Perl Mongers) [From my blog.]...</summary>
+    <author>
+        <name>JT Smith</name>
+        <uri>http://www.plainblack.com/</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/jt_smith/">
+        <![CDATA[<a href="http://www.meetup.com/madmongers/events/223927427/">MadMongers (Madison Perl Mongers)</a>
+
+         <p>[From <a href="http://plainblackguy.tumblr.com">my blog</a>.]</p>
+
+    ]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Accepting Input from Multiple Sources</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/tinypig/2015/08/accepting-input-from-multiple-sources.html" />
+    <id>tag:blogs.perl.org,2015:/users/tinypig//2248.6969</id>
+
+    <published>2015-08-07T23:58:50Z</published>
+    <updated>2015-08-07T23:59:17Z</updated>
+
+    <summary>One of the corners I often paint myself into when developing a tool is only accepting one type of input, usually STDIN, the standard input stream, like a pipeline (ex: cat fruit.txt | grep apple) or a redirect (ex: grep...</summary>
+    <author>
+        <name>tinypig</name>
+        <uri>http://www.tinypig.com</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/tinypig/">
+        <![CDATA[<p>One of the corners I often paint myself into when developing a tool is only accepting one type of input, usually STDIN, the standard input stream, like a pipeline (ex: <code>cat fruit.txt | grep apple</code>) or a redirect (ex: <code>grep apple &lt; fruit.txt</code>)</p>
+
+<p>What inevitably happens is I end up wanting the tool to work like any Unix tool and accept different kinds of input (filenames or arguments on the command line, for example.)</p>
+
+<p>Finally I got fed up with it and added a function called <code>multi_input()</code> to my library.  Here is how it works:</p>
+
+<p><a href="http://tinypig2.blogspot.com/2015/08/accepting-input-from-multiple-sources.html">more</a><br />
+</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Benchmarking index() and regex in Perl 6</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/aaron_baugher/2015/08/benchmarking-index-and-regex-in-perl-6.html" />
+    <id>tag:blogs.perl.org,2015:/users/aaron_baugher//2597.6970</id>
+
+    <published>2015-08-07T18:55:44Z</published>
+    <updated>2015-08-07T21:45:15Z</updated>
+
+    <summary>I noticed Perl 6 has a Benchmark module already, so I was wanting to use it, and Liz&apos;s suggestion of using index() rather than a regex in my last script gave me an excuse. The results were striking. The script...</summary>
+    <author>
+        <name>Aaron Baugher</name>
+        <uri>http://aaron.baugher.biz/</uri>
+    </author>
+    
+    <category term="benchmark" label="Benchmark" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perl6" label="Perl 6" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="regex" label="regex" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/aaron_baugher/">
+        <![CDATA[<p>I noticed Perl 6 has a Benchmark module already, so I was wanting to use it, and Liz's suggestion of using index() rather than a regex in my last script gave me an excuse.  The results were striking.</p>
+
+<p>The script and results are below.  Benchmark.pm6 doesn't have a cmpthese() routine, but timethese() does well enough.  Below is the script, then the average times required for one grep through the array of about 150 lines.  (I ran the script five times and averaged those times in the bottom row of the table.)</p>
+
+<p>What did I learn?  </p>
+
+<p>Well, for starters, index() is at least 10 times faster than the best regex solution, and 100 times better than my first attempt.  So that's the way to go, whenever possible.</p>
+
+<p>Comparing the regexes was interesting too, though, so I ended up trying several things.  Putting the regex in the grep with a bare variable (regex1) was terrible.  Replacing the variable with a constant (regex2) was much faster, but that's not usually an option in a real program.  The next thing I tried was actually regex4, creating a regex object outside the loop.  I was a little surprised that that didn't gain anything over regex1.  I guess since it can't know for sure that $string will never change, it still has to reinterpolate it every time.</p>
+
+<p>So then I tried regex5, and wasn't surprised to see it fast again with the constant.  Then I thought of regex6: putting quotes around the variable in the regex object, so it would go ahead and interpolate it.  That sped it up a lot, though not as much as the constant.  And if I print out $r6, it shows it just as it is there, so it hasn't forgotten it's a variable.</p>
+
+<p>That led me to try regex3 and discover that quoting the variable inside the grep test gains the same thing.</p>
+
+<p>So creating the rx// object in advance didn't gain anything; in fact regex{456} are slightly slower than regex{123}.  What made the difference was putting quotes around $string.  And I'm a little puzzled why that would be.  Maybe it's time to read some more of the Synopsis on regexes and see if it enlightens me.</p>
+
+<pre><code>#!/usr/bin/env perl6
+use v6;
+use Benchmark;
+
+my $p = run 'ps', 'auxww', :out; 
+my $header = $p.out.get;
+my @lines = $p.out.lines;
+
+my $string = 'xterm';
+my $r4 = rx{  $string  };
+my $r5 = rx{   xterm   };
+my $r6 = rx{ "$string" };
+
+my %h = timethese 1000, {
+    'regex1' =&gt; &amp;regex1, 'regex2' =&gt; &amp;regex2, 'regex3' =&gt; &amp;regex3,
+    'regex4' =&gt; &amp;regex4, 'regex5' =&gt; &amp;regex5, 'regex6' =&gt; &amp;regex6,
+    'index1' =&gt; &amp;index1,
+};
+say map { $_ =&gt; %h{$_}[3] }, sort keys %h;
+
+sub regex1 { my @new = grep { /  $string  /           }, @lines }
+sub regex2 { my @new = grep { /   xterm   /           }, @lines }
+sub regex3 { my @new = grep { / "$string" /           }, @lines }
+sub regex4 { my @new = grep { $r4                     }, @lines }
+sub regex5 { my @new = grep { $r5                     }, @lines }
+sub regex6 { my @new = grep { $r6                     }, @lines }
+sub index1 { my @new = grep { .index($string).defined }, @lines }
+
+# results
+| index | regex1 | regex2 | regex3 | regex4 | regex5 | regex6 |
+|-------+--------+--------+--------+--------+--------+--------|
+| 0.003 |  0.435 |  0.028 |  0.068 |  0.485 |  0.032 |  0.069 |
+| 0.008 |  0.446 |  0.029 |  0.070 |  0.517 |  0.033 |  0.072 |
+| 0.003 |  0.437 |  0.028 |  0.068 |  0.474 |  0.031 |  0.074 |
+| 0.003 |  0.449 |  0.028 |  0.070 |  0.593 |  0.034 |  0.070 |
+| 0.003 |  0.472 |  0.030 |  0.078 |  0.508 |  0.031 |  0.087 |
+|-------+--------+--------+--------+--------+--------+--------|
+| 0.004 |  0.448 |  0.029 |  0.071 |  0.515 |  0.032 |  0.074 |
+</code></pre>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>On the status of HTTP::BrowserDetect</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/olaf_alders/2015/08/on-the-status-of-httpbrowserdetect.html" />
+    <id>tag:blogs.perl.org,2015:/users/olaf_alders//280.6968</id>
+
+    <published>2015-08-07T15:56:50Z</published>
+    <updated>2015-08-07T16:00:06Z</updated>
+
+    <summary>HTTP::BrowserDetect is at least 15 years old. I&apos;ve had co-maint on it for 5 years now and I&apos;ve summarized its current state of affairs. The full story is available on my blog....</summary>
+    <author>
+        <name>Olaf Alders</name>
+        <uri>http://www.wundercounter.com</uri>
+    </author>
+    
+    <category term="browserdetect" label="browser detect" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="cpan" label="cpan" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="httpbrowserdetect" label="HTTP::BrowserDetect" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perl" label="perl" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/olaf_alders/">
+        <![CDATA[<p>HTTP::BrowserDetect is at least 15 years old.  I've had co-maint on it for 5 years now and I've summarized its current state of affairs. The full story is available <a href="http://www.olafalders.com/2015/08/07/on-the-status-of-httpbrowserdetect/">on my blog</a>.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>RFC: Perl software of the year award</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/makoto_nozaki/2015/08/rfc-perl-software-of-the-year-award.html" />
+    <id>tag:blogs.perl.org,2015:/users/makoto_nozaki//393.6967</id>
+
+    <published>2015-08-07T03:00:00Z</published>
+    <updated>2015-08-07T03:32:23Z</updated>
+
+    <summary>Earlier I wrote this blog post, which in summary says value of a Perl software project, as opposed to a Perl infrastructure project, is difficult to quantify until the software is written and used. And it often does not work...</summary>
+    <author>
+        <name>Makoto Nozaki</name>
+        <uri>http://facebook.com/nozaki</uri>
+    </author>
+    
+    <category term="grants" label="Grants" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="marketing" label="Marketing" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/makoto_nozaki/">
+        <![CDATA[<p>Earlier I wrote this <a href="http://blogs.perl.org/users/makoto_nozaki/2015/07/grants-for-applications-vs-perl-infrastructure.html">blog post</a>, which in summary says value of a Perl software project, as opposed to a Perl infrastructure project, is difficult to quantify until the software is written and used. And it often does not work nicely with our grant program where grant value has to be determined before the software exists.</p>
+
+<p>For instance, if I request a $2000 grant to improve a popular Perl module's performance by 1000 times, I imagine I'll get the money provided I can demonstrate the performance improvement with some proof-of-concept code. </p>
+
+<p>What if I propose to write face recognition software in Perl which finds your doppelgänger from images on the web? And if I request $5000? It's not hard to imagine your reaction will be "an interesting idea but how does it help the Perl community?" </p>
+
+<p>The problem is that, while I believe this unwritten software will get attention and my website will get one million hits per day, which will help Perl reputation, I have no way to prove my website's future popularity upfront. </p>
+
+<p>I'd like to propose a way to tackle with this dilemma - "Perl software of the year". By awarding successful/impactful Perl projects, we will add visibility to Perl and it'll give incentive to people to write more software in Perl. It doesn't have to be a Perl module. It can be software written in Perl or a website with Perl backend. Unlike the grant program where we have to determine the value before delivery, we can give an award after the fact without risk.</p>
+
+<p>The prize depends on the TPF budget, but it won't be a showstopper. Its initial monetary value could be as small as the White Camel award.</p>
+
+<p>Request for your comments!</p>
+
+<p>P.S. I am not trying to alter the existing grant program, which has its own value. </p>
+
+<p>(P.S. I see some people can't comment at blogs.perl.org. If you have an issue, feel free to email to me so I can publish your comments here)</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>ctags now supports Perl 6</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/dmitri/2015/08/ctags-now-supports-perl-6.html" />
+    <id>tag:blogs.perl.org,2015:/users/dmitri//2385.6966</id>
+
+    <published>2015-08-07T01:27:17Z</published>
+    <updated>2015-08-07T01:31:56Z</updated>
+
+    <summary>We added support for Perl 6 to ctags. Give it a shot: grab a copy from GitHub....</summary>
+    <author>
+        <name>Dmitri</name>
+        <uri>http://search.cpan.org/~dmitri</uri>
+    </author>
+    
+    <category term="perl6tagsctags" label="perl6 tags ctags" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/dmitri/">
+        <![CDATA[<p>We added support for Perl 6 to <a href="https://ctags.io/">ctags</a>.  Give it a shot: grab a copy from <a href="https://github.com/universal-ctags/ctags">GitHub</a>.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Connecting Perl with SAP HANA</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/radek_kotowicz/2015/08/connecting-perl-with-sap-hana.html" />
+    <id>tag:blogs.perl.org,2015:/users/radek_kotowicz//2581.6964</id>
+
+    <published>2015-08-06T12:21:15Z</published>
+    <updated>2015-08-10T10:51:45Z</updated>
+
+    <summary><![CDATA[There are already a few blog posts around (e.g. SAP Hana and r &mdash; the way of the widget), which mention that it's possible and, in fact, quite easy to connect to SAP HANA from Perl code using ODBC DBI...]]></summary>
+    <author>
+        <name>Radek Kotowicz</name>
+        
+    </author>
+    
+        <category term="Add category" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    <category term="odbc" label="ODBC" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perl" label="Perl" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="saphana" label="SAP HANA" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="tunnel" label="tunnel" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/radek_kotowicz/">
+        <![CDATA[<p>There are already a few blog posts around (e.g.<br />
+<a href="http://scn.sap.com/community/developer-center/hana/blog/2012/11/03/sap-hana-and-r-the-way-of-the-widget">SAP Hana and r &mdash; the way of the widget</a>), which mention that it's possible and, in fact, quite easy to connect to SAP HANA from Perl code using ODBC DBI drivers. As I'm planning to give a bit more specialized <a href="http://act.yapc.eu/ye2015/talk/6247">talk</a> at this year's <a href="http://act.yapc.eu/ye2015/">YAPC in Granada</a> I thought it would be useful to describe the setup in detail and provide some references. In the follow-up posts I'll draw more on the topic of my upcoming talk: how ad-hoc OLAP DBs can be conjured with <a href="https://metacpan.org/pod/ETL::Yertl">Yertl</a>. BTW, I should probably add "yet another" to the prefix to the title of my blog post, to follow the widely accepted manner of affirming the prevalence of already existing ideas ;)</p>
+
+<p><i>The setup described in this post has been tested on Win7 and Active Perl 5.16. You should be able to get the same working on any UN*X platform with the help of <a href="http://www.unixodbc.org/">unixODBC</a>, which comes with a number of helpful GUI tools, such as Data Source Admin</i></p>
+
+<p>While it is possible to run HANA behind the firewall on a number of <a href="http://global.sap.com/community/ebook/2014-09-02-hana-hardware/enEN/appliances.html">HW/SW platforms</a> my interest is focused on the cloud option because of scalability and zero setup time. </p>
+
+<p>Before we start setting up a connection, let's take a look at the cloud architecture:</p>
+
+<p><img alt="HANA netowrk architecture" src="http://blogs.perl.org/users/radek_kotowicz/hana-odbc-perl/05-Aug-15%206-13-18%20PM.jpg" width="600"  class="mt-image-left" style=""/></p>
+
+<p>Since we're connecting to the DB that is behind the firewall and we're likely behind one too we need to open a tunnel first. To do that we'll use the <i>neo</i> console client, which comes with <a href="https://tools.hana.ondemand.com/">the SDK</a>. I've got a small batch file that initiates the tunnel (through a http proxy additionally):</p>
+
+<p><code><br />
+set HTTPS_PROXY_HOST=proxy<br />
+set HTTPS_PROXY_PORT=8080<br />
+neo open-db-tunnel -h hanatrial.ondemand.com -u radoslaw.kotowicz@sap.com -a i0999999trial --id quickmove<br />
+</code></p>
+
+<p><img alt="hana_tunnel_opened.jpg" src="http://blogs.perl.org/users/radek_kotowicz/05-Aug-15%206-19-48%20PM.jpg" width="600" class="mt-image-none" style="" /></p>
+
+<p>When the tunnel opens, the client tells us what is the DB username to connect (fixed) the temporary password and the local address to connect to. Interestingly, there is just one local port open and that port is used for both JDBC and ODBC protocols. I initially suspected that the HDB ODBC driver might be a wrapper around the JDBC type 4 driver but ODBC driver is a pure C implementation, so there's apparently a socket multiplexer on the remote end of the tunnel and the ODBC/JDBC traffic is routed to the right listener.</p>
+
+<p>The next steps is to install the ODBC driver. First download the driver from <a href="http://www.sdn.sap.com/irj/scn/go/portal/prtroot/docs/webcontent/uuid/402aa158-6a7a-2f10-0195-f43595f6fe5f">SAP Community Network</a> and run the the setup tool <code>hdbsetup -a client</code> -- the wizard will take you through the installation. More details can be found <a href="http://help.sap.com/hana/SAP_HANA_Client_Installation_Update_Guide_en.pdf">here</a>. You'll need an SCN account to get the drivers but you're bound to have one already if you had enrolled for a trial cloud HANA account.</p>
+
+<p>Once the drivers have been installed we can set up a Data Source in ODBC Administrator.</p>
+
+<p><img alt="hana_adding_DS.jpg" src="http://blogs.perl.org/users/radek_kotowicz/screenie_hdb_ds.jpg" width="600" class="mt-image-none" style="" /></p>
+
+<p>Add a new DS with the desired name and provide the local server host name and port number (these can be read from the neo client when it boots up -- see screenshots above). </p>
+
+<p><img alt="hana_ds_add_2.jpg" src="http://blogs.perl.org/users/radek_kotowicz/10-Aug-15%2012-14-28%20PM.jpg" width="600" class="mt-image-none" style="" /></p>
+
+<p>We don't enter the credentials at this point - the application will authenticate itself when connecting to the data source. Let's note the following:</p>
+
+<ul>
+	<li>you could enter an authentication token if you wanted to skip the authentication on the app level</li>
+      <li>data source definition <a href="http://search.cpan.org/~mjevans/DBD-ODBC-1.52/FAQ#How_do_I_connect_without_DSN">can completely be skipped</a>, in the same way as you can skip the TNS entry when connecting to an Oracle database, but I want to have it for lucidity</li>
+</ul>
+
+<p>Now, finally some Perl:</p>
+
+<p><code><br />
+use DBI;<br />
+use Data::Dumper;</p>
+
+<p>my $dbh = DBI->connect('dbi:ODBC:DSN=your_HDB_DSN', 'your_HDB_User', 'your_Temp_Passwd');<br />
+print Dumper($dbh->selectall_arrayref(q/select * from dual/));<br />
+</code></p>
+
+<p>Coming next:</p>
+
+<ul>
+      <li>Ad-hoc OLAP DBs with YERTL and Hana</li>
+      <li>Ideas for presenting OLAP data</li>
+</ul>
+]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Refactoring Very Old Perl 5 in Perl 6</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/aaron_baugher/2015/08/refactoring-very-old-perl-5-in-perl-6.html" />
+    <id>tag:blogs.perl.org,2015:/users/aaron_baugher//2597.6965</id>
+
+    <published>2015-08-06T16:28:09Z</published>
+    <updated>2015-08-06T16:40:24Z</updated>
+
+    <summary>Back when I was first learning Perl, I&apos;d been doing Unix system administration for a couple years, and one command I ran a lot was this one: ps auxww | grep something (On some systems it was &apos;ps -ef&apos;.) That...</summary>
+    <author>
+        <name>Aaron Baugher</name>
+        <uri>http://aaron.baugher.biz/</uri>
+    </author>
+    
+    <category term="perl6" label="Perl 6" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="processes" label="processes" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="shell" label="shell" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="unix" label="Unix" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/aaron_baugher/">
+        <![CDATA[<p>Back when I was first learning Perl, I'd been doing Unix system administration for a couple years, and one command I ran a lot was this one:</p>
+
+<pre><code>ps auxww | grep something
+</code></pre>
+
+<p>(On some systems it was 'ps -ef'.)  That would get a full listing of all running processes and grep them for "something."  I soon got tired of typing all that, so I made a shell alias:</p>
+
+<pre><code>alias pst='ps auxww | grep '
+</code></pre>
+
+<p>Then I could just run <code>pst something</code>, so it saved typing.  But it still wasn't great.  It left out <code>ps</code>'s header line that showed what all the columns were, and they'd vary from one OS to another, so it wasn't always easy to tell from the data.  Also, the <code>grep</code> process itself would show up in the list, which was annoying.  (I already knew it was running, because I ran it.)  So one of the first Perl scripts I wrote was this one, which I've been using ever since because it worked, even though the code is embarrassingly bad now:</p>
+
+<pre><code>#!/usr/local/bin/perl
+
+open(IN,"ps axuww |")||die("Unable to get process listing\n");
+
+$header = &lt;IN&gt;;
+print "$header";
+
+while(&lt;IN&gt;){
+    next if ($_ !~ /$ARGV[0]/);
+    s/^\s+|\s+$//g;
+    @v=split(/\s+/);
+    next if $v[1] == $$;
+    print;
+    print "\n";
+    $trs+=$v[4];
+    $drs+=$v[5];
+    $size+=$v[6];
+    $swap+=$v[7];
+    $rss+=$v[8];
+    $shrd+=$v[9];
+    $lib+=$v[10];
+    $dt+=$v[11];
+}
+
+print("-"x80);
+print("\n$header");
+printf("Totals:%22d%6d%6d%6d%6d%6d%6d%6d\n",$trs,$drs,$size,
+       $swap,$rss,$shrd,$lib,$dt);
+</code></pre>
+
+<p>So much ugly by my standards now: no <code>warnings</code> or <code>strict</code>, unnecessary parentheses all over the place, 2-arg open with global filehandle, unnecessary $_, giving split its default argument, no <code>my</code> on variables, and more.  Worst of all, I was accumulating totals on some of the columns, and that doesn't even make sense!  Maybe it did on an OS I was using back then, but it doesn't on any I have now.</p>
+
+<p>So it was long overdue for an update, and I thought I might as well do it in Perl 6.  Here is the result, with numbered comments below:</p>
+
+<pre><code>#!/usr/bin/env perl6
+use v6;
+
+sub MAIN( $string ){                   # 1
+    my $p = run 'ps', 'auxww', :out;   # 2
+    my $header = $p.out.get;           # 3
+    say $header, '-' x 80;             # 4
+
+    for $p.out.lines {                 # 5
+        next unless m/ $string /;      # 6
+        .trim;                         # 7
+        my @v = .words;                # 8
+        next if @v[1] == $*PID;        # 9
+        .say;                          # 10
+    }
+    say '-' x 80, $header;             # 11
+}
+</code></pre>
+
+<p>I feel better just looking at it.  The accumulation of totals is gone entirely, and here are notes on the rest:</p>
+
+<p>(1) The MAIN sub handily replaces @ARGV (though I think that may still be available).  By specifying an argument for it, I automatically get in <code>$string</code> what would have been in $ARGV[0], plus perl6 automatically throws an error if I don't supply it.  So no need for a "die unless" on command line arguments anymore.</p>
+
+<p>(2) This opens a Proc object (<code>$p</code>) to a running process provided by <code>IO.run()</code>.  The <code>:out</code> adverb says I want the output of the process.  By the way, look at the Proc docs for examples of this, not IO.</p>
+
+<p>(3) Calling get() on the output stream (an IO::Handle object) returns a single line from the stream.  That grabs the line of column headers that <code>ps</code> provides.</p>
+
+<p>(4) Print out the header (which still has its newline), then a separator line of 80 hyphens.  The 'x' operator still works on strings like it did in Perl 5, but see the 'xx' operator for repeating lists.</p>
+
+<p>(5) Using IO::Handle::lines() in a <code>for</code> loop is more-or-less the equivalent of <code>while(&lt;$fd&gt;)</code> in Perl 5: it gets one line at a time until exhausted.  The line will be in <code>$_</code>, and that will be the default object for any methods called as <code>.method</code>, like <code>.trim</code> and <code>.say</code>.  Oh, and it auto-chomps, which is nice.</p>
+
+<p>(6) This looks like Perl 5, except whitespace is allowed in the regex.  Also, the string in $string will not be interpolated as it would be in Perl 5, so whatever argument I provide will be searched for literally.  If I wanted to be able to enter patterns with meta-characters and have them interpolated, I'd need to put angle brackets around it, like this: <code>&lt;$string&gt;</code>.  As I understand it, without the angle brackets, scalar values in regexes are automatically quotemeta'd.</p>
+
+<p>(7) <code>Str.trim()</code> is the equivalent of that ugly regex in my original script, which trims off whitespace from both ends.  I probably don't need that on my current systems, but I think I ran into some systems where <code>ps</code> didn't left-justify the first column.</p>
+
+<p>(8) <code>Str.split()</code> no longer has a default pattern of splitting on whitespace, but the new <code>Str.words()</code> does that now.</p>
+
+<p>(9) <code>$*PID</code> replaces the old <code>$$</code>, containing the process ID of the script itself.  I don't want that in the output, so I skip the line that has that in the PID (process ID) column.</p>
+
+<p>(10) If it reached this point, print the line with newline.</p>
+
+<p>(11) Reprint the separator and header at the bottom, so I can see them there if the top scrolls out of the terminal.</p>
+
+<p>And that's it!  Corrections, suggestions, and questions welcome.</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>Minor Issue with Perl 6 Install on CentOS 6</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/aaron_baugher/2015/08/minor-issue-with-perl-6-install-on-centos-6.html" />
+    <id>tag:blogs.perl.org,2015:/users/aaron_baugher//2597.6961</id>
+
+    <published>2015-08-04T13:40:17Z</published>
+    <updated>2015-08-06T14:19:06Z</updated>
+
+    <summary>I had a little hiccup while installing Perl 6 on a CentOS system, and thought I&apos;d leave the details here in case it happens to anyone else. [Update: This has already been fixed by one of the Perl 6 devs,...</summary>
+    <author>
+        <name>Aaron Baugher</name>
+        <uri>http://aaron.baugher.biz/</uri>
+    </author>
+    
+    <category term="centos" label="CentOS" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perl6" label="Perl 6" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="rakudo" label="Rakudo" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="rakudobrew" label="rakudobrew" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/aaron_baugher/">
+        <![CDATA[<p>I had a little hiccup while installing Perl 6 on a CentOS system, and thought I'd leave the details here in case it happens to anyone else.</p>
+
+<p>[<strong>Update</strong>: This has already been fixed by one of the Perl 6 devs, who isn't able to login here to comment. Panda installs without needing lsb_release. So my kludge is no longer needed.]</p>
+
+<p>I used <a href="https://github.com/tadzik/rakudobrew">rakudobrew</a>, and installed rakudo with moar just fine.  But <code>"rakudobrew build-panda"</code> failed with <code>"Unable to execute 'lsb_release -a 2&gt; /dev/null'"</code>.  That <code>lsb_release</code> program wasn't installed on this system, but yum said I could get it from the package redhat-lsb-core.  Unfortunately, when I tried to install that, it came up with a list of dozens of dependencies to go with it, including a lot of X stuff like ghostscript and libGL, even some sound packages.</p>
+
+<p>This is a lightweight headless system, and it needs to stay that way, so I didn't want to install all that stuff just to get this one little utility.  So I did a little research and found out what it would probably report, and created my own lsb_release that would provide what rakudo needed to see:</p>
+
+<pre><code>#!/bin/sh
+echo Distribution ID: CentOS
+echo "Description: CentOS release 6.6 (Final)"
+echo Release: 6.6
+</code></pre>
+
+<p>I created that in my ~/bin directory (which is in my $PATH), chmod'd the permissions to 755, and ran the build-panda again.  Problem solved!</p>
+
+<p>So if you found this page because you're having the same problem, you might give that a try.  Look in /etc/*-release to see what the Description should be, and pluck the Release out of that.  Or if you're working with some other Linux distro that doesn't have lsb_release or those files, look around in /etc to see what you can find, or look through the output of <code>dmesg</code>.  I don't know exactly what rakudo needs the info for, or how accurate it needs to be, but it needs to be in that format.</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>Developing virtualhost-aware PSGI applications: Plack::Middleware::MockProxyFrontend</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/aristotle/2015/08/mockproxyfrontend.html" />
+    <id>tag:blogs.perl.org,2015:/users/aristotle//15.6962</id>
+
+    <published>2015-08-04T04:23:20Z</published>
+    <updated>2015-08-04T04:28:00Z</updated>
+
+    <summary>Let’s say you work on a team that runs a web content management system for various different customers. It is hosted at ourcms.com, but each customer’s public content is published on a different domain, which is determined by a setting...</summary>
+    <author>
+        <name>Aristotle</name>
+        <uri>http://plasmasturm.org/</uri>
+    </author>
+    
+        <category term="Software Escape" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/aristotle/">
+        <![CDATA[<p>Let’s say you work on a team that runs a web content management system for various different customers. It is hosted at <code>ourcms.com</code>, but each customer’s public content is published on a different domain, which is determined by a setting in the interface, which they can change at will. When a customer is logged into <code>ourcms.com</code> they see links to their public content in various places, and some of the public content has “edit this”-type links back into <code>ourcms.com</code>. All of this runs as a single PSGI application. A not unfamiliar scenario, presumably.</p>
+
+<p>How do you spin up a development server where you can test this?</p>
+]]>
+        <![CDATA[<p>OK, let’s see. We all know that you <code>plackup</code> and then go to <code>localhost:5000</code> in your browser and then you can click around. What will that show you in this case? Most probably: what <code>ourcms.com</code> would look like. And then you log in there and click around the edit interface.</p>
+
+<p>But how do you test the linking to the customer’s site as you edit stuff?</p>
+
+<p>This is the scenario for which I wrote <a href="https://metacpan.org/pod/Plack::Middleware::MockProxyFrontend">Plack::Middleware::MockProxyFrontend</a>.</p>
+
+<p>What you do when you use it is after you <code>plackup</code>, you set <code>localhost:5000</code> as <em>the proxy</em> in your web browser configuration. Then you navigate <em>not</em> to <code>localhost:5000</code> but to <em><code>ourcms.com</code></em> – just as you would if you were going to the live site.</p>
+
+<p>That request will actually hit your local development server, since you set it as the proxy. The reason you need a middleware to do this is that it will be an HTTP proxy request rather than a regular HTTP request, which has one small but important difference. MockProxyFrontend’s job is to convert that request back to a regular HTTP request and pass it to your app. The request will then look just as it would if the browser was actually talking to <code>ourcms.com</code>. Therefore likewise, your app’s response will look just as it would if the app was actually running at that domain. And so the browser will think that that is what it’s doing.</p>
+
+<p>This even works with HTTPS. All you need to do if your site uses HTTPS is give MockProxyFrontend your SSL key and certificate(-chain), just like you would configure the production server for your site. (If your site does not use HTTPS then you need not do anything.)</p>
+
+<p>Effectively, by setting your app as your proxy and putting MockProxyFrontend in front of it (preferably as the very outermost middleware), your app becomes your browser’s entire internet. Thus, you get to click around your entire network of sites <em>on your development machine</em> as though it was the real deal.</p>
+
+<p><a href="https://metacpan.org/pod/Plack::Middleware::MockProxyFrontend">Share and enjoy</a>.</p>
+
+<p>For the interested, let me give some further background on the SSL support – because this is the real trick to the module, if anything is clever about it at all.</p>
+
+<p>Proxy requests that involve SSL are very different from regular, unencrypted proxy requests: there is an outer, unencrypted request to the proxy whose payload is effectively the real-time streaming connection to the target site – over which the actual HTTP request, wrapped inside an encrypted envelope, takes place.</p>
+
+<p>To a regular proxy the content of this connection is opaque. But for MockProxyFrontend, the app it wraps <em>is</em> the target site and there is no other HTTP server with SSL support to deal with the connection. The goal is certainly that the user won’t have to set one up. So unlike a proxy, MockProxyFrontend never connects anywhere, and again unlike a proxy, it needs to see inside the connection.</p>
+
+<p>So it must unwrap the connection’s crypto layer itself and then process the connection with a server-side HTTP protocol implementation… a <em>second</em> time, after the connection in its unencrypted phase has already been processed once before by the development server. By default MockProxyFrontend uses a local <a href="https://metacpan.org/pod/HTTP::Server::PSGI">HTTP::Server::PSGI</a> instance (not listening on any port) for that purpose.</p>
+
+<p>The upshot is that you <em>generally</em> need not do anything more than pass your key and certificate and let the middleware do the rest – except when your app needs PSGI server capabilities that HTTP::Server::PSGI does not implement. In that case, you will have to provide MockProxyFrontend with an alternative implementation which does implement those capabilities. (Consult the documentation about how. If you do have this use case, please let me know, especially if you have issues; this is an area I did not test at all.)</p>
+
+<p>Again, <a href="https://metacpan.org/pod/Plack::Middleware::MockProxyFrontend">share and enjoy</a>.</p>
+]]>
+    </content>
+</entry>
+
+<entry>
+    <title>Do something for CPAN Day 2015</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/neilb/2015/08/do-something-for-cpan-day-2015.html" />
+    <id>tag:blogs.perl.org,2015:/users/neilb//846.6960</id>
+
+    <published>2015-08-04T02:55:00Z</published>
+    <updated>2015-08-04T13:26:58Z</updated>
+
+    <summary>CPAN Day marks the date of the first upload to CPAN, on 16th August 1995. Last year was the first time we celebrated CPAN Day, and many of us did a lot of different things. Why not do something helpful...</summary>
+    <author>
+        <name>Neil Bowers</name>
+        <uri>http://neilb.org/reviews</uri>
+    </author>
+    
+    <category term="cpan" label="CPAN" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="cpanday" label="CPAN Day" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/neilb/">
+        <![CDATA[<p>CPAN Day marks the date of the first upload to CPAN, on 16th August 1995. Last year was <a href="http://blogs.perl.org/users/neilb/2014/07/cpan-day---14th-august.html">the first time we celebrated CPAN Day</a>, and many of us <a href="http://blogs.perl.org/users/neilb/2014/08/the-19th-cpan-day-and-the-1st.html">did a lot of different things</a>. Why not do something helpful for CPAN on Sunday 16th August?</p>
+]]>
+        <![CDATA[<p>Last year various people blogged about <a href="http://blogs.perl.org/users/neilb/2014/08/cpan-day---start-your-engines.html">things you could do</a> for CPAN distributions, whether yours, or someone else's.</p>
+
+<p>You could sign up for the <a href="http://cpan-prc.org">CPAN Pull Request Challenge</a> and submit a Pull Request on CPAN Day. You don't have to stay in the challenge, you could just do one for August.</p>
+
+<p>You could work on a Perl 6 version of a CPAN module.</p>
+
+<p>Maybe your local Perl Mongers group could organise a hackathon?</p>
+]]>
+    </content>
+</entry>
+
+<entry>
+    <title>Fun with Catalyst and Heroku</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/gabriele_mambrini/2015/08/fun-with-catalyst-and-heroku.html" />
+    <id>tag:blogs.perl.org,2015:/users/gabriele_mambrini//2600.6958</id>
+
+    <published>2015-08-04T00:38:38Z</published>
+    <updated>2015-08-04T13:00:30Z</updated>
+
+    <summary>For my first experiments with heroku I decided to adapt an existing Catalyst application&#8230;...</summary>
+    <author>
+        <name>Gabriele Mambrini</name>
+        <uri>http://www.github.com/gmambro</uri>
+    </author>
+    
+        <category term="catalyst" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/gabriele_mambrini/">
+        <![CDATA[<p>For my first experiments with heroku I decided to adapt an existing Catalyst application&#8230;</p>
+]]>
+        <![CDATA[<h2>Create and deploy the application</h2>
+
+<p>The first step is to create a new heroku app: since I already have a git repo I just added the heroku remote with <code>heroku git:remote --app myapp</code>.</p>
+
+<p>I decided to use <a href="https://github.com/miyagawa/heroku-buildpack-perl">Miyagawa&#8217;s buildpack</a> which runs any PSGI web application using Starman.</p>
+
+<pre><code>$ heroku buildpacks:set https://github.com/miyagawa/heroku-buildpack-perl
+</code></pre>
+
+<p>I need an app.psgi in the root of the application to use this buildpack.
+This is how my .psgi file looks like</p>
+
+<pre><code>#!/usr/bin/env perl
+use lib 'lib';
+use MyApp;
+use Plack::Builder;
+
+builder {
+    enable_if { $_[0]-&gt;{HTTP_X_FORWARDED_FOR} }
+        "Plack::Middleware::ReverseProxy";
+    MyApp-&gt;psgi_app;
+};
+</code></pre>
+
+<p>I&#8217;m using  <code>Plack::Middleware::ReverseProxy</code> here since Heroku apps run as a reverse proxy backend.</p>
+
+<p>When pushing code to heroku you can see how the buildpack detects the application and downloads the required software from CPAN.</p>
+
+<pre><code>$ git push heroku
+[snip]
+remote:
+remote: -----&gt; Fetching custom git buildpack... done
+remote: -----&gt; Perl/PSGI app detected
+remote: -----&gt; Bootstrapping cpanm
+remote:        Successfully installed ExtUtils-MakeMaker-7.04 (upgraded from 6.55_02)
+[...]
+</code></pre>
+
+<h2>Postgres database</h2>
+
+<p>A basic Posgres database can be created using <code>heroku addons:create heroku-postgresql:hobby-dev</code>: to use it I needed to install <code>DBD::Pg</code> and configure the DBI connection.</p>
+
+<p>Since my cpanfile contains an optional feature for adding Postgres support.</p>
+
+<pre><code>feature 'postgres', 'PostgreSQL support' =&gt; sub {
+   requires 'DBD::Pg';
+}
+</code></pre>
+
+<p>I  instructed the buildpack to install the optional module just by using
+<code>heroku config:set PERL_CPANM_OPT=--with-feature=postgresql</code>.</p>
+
+<p>Note:  <code>PERL_CPANM_OPT</code> can also be used to add any additional parameter to cpanm, e.g. use &#8212;mirror for a PINTO repo.</p>
+
+<p>All the parameters I needed configure the database connection are in the DATABASE_URL heroku variable, however this cannot be directly used by Catalyst.
+A nice way to pass them is to create a specific Catalyst configuration file, however in this case I didn&#8217;t want to add anything specific for heroku in my repo and I opted for to injecting them to the default configuration using environment variables.</p>
+
+<p>In my <code>MyApp.pm</code> I have added these defaults for connect_info:</p>
+
+<pre><code>__PACKAGE__-&gt;config(
+    'Model::MyApp' =&gt; {
+    connect_info =&gt; [
+        $ENV{MYAPP_DB_DSN} || 'dbi:SQLite:myapp.db',
+        $ENV{MYAPP_DB_USERNAME},
+        $ENV{MYAPP_DB_PASSWORD},
+        { AutoCommit =&gt; 1 },
+            { quote_names =&gt; 1 },
+    ],
+    });
+</code></pre>
+
+<p>The variables can be set using the heroku config:set command </p>
+
+<p><code>heroku config:set 'MYAPP_DB_DSN=dbi:Pg:dbname=xxxx;host=xyz123.amazonaws.com' MYAPP_DB_USER=aabbbccc MYAPP_DB_PASSWORD=wwwyyyzz</code></p>
+
+<p>Make sure you&#8217;re not using memory or file backend for session storage, always use your DB or other storage backend (e.g. Redis).</p>
+]]>
+    </content>
+</entry>
+
+<entry>
+    <title>From Sydney PM &quot;EVANGELIZING PERL&quot;</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/dean/2015/08/from-sydney-pm-evangelizing-perl.html" />
+    <id>tag:blogs.perl.org,2015:/users/dean//558.6955</id>
+
+    <published>2015-08-03T00:41:41Z</published>
+    <updated>2015-08-03T00:55:36Z</updated>
+
+    <summary>Stuart Cooper gave a talk at this last month&apos;s Sydney PM meeting. His talk was &quot;analog&quot; in that he gave it without slides from hand written notes with the purpose of provoking a guided discussion. The outcome was rather successful...</summary>
+    <author>
+        <name>Dean</name>
+        <uri>http://bytefoundry.com.au</uri>
+    </author>
+    
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/dean/">
+        <![CDATA[<p>Stuart Cooper gave a talk at this last month's Sydney PM meeting. His talk was "analog" in that he gave it without slides from hand written notes with the purpose of provoking a guided discussion. The outcome was rather successful with people offering thoughts and experiences, along with references to websites and books. It was very productive and enjoyable. </p>
+
+<p>He typed up and published his notes on the Sydney.PM emai llist, which are posted below with hyperlinks added for reference.</p>
+
+<p><strong>EVANGELIZING PERL</strong><br />
+<em>Talk by Stuart Cooper for Sydney.pm meeting, July 2015</em></p>
+
+<p>1) Perl advocacy?<br />
+   Not advocacy - evangelism - spread the word.<br />
+   In the early 1990s Linux had some powerful Evangelists;<br />
+   Linus himself, Jon 'Maddog' Hall etc and even one of the<br />
+   world's top supermodels - Linux Evangelista.</p>
+
+<p>   Your target audience for your evangelism is your Linux-using co-workers.<br />
+   They might be Ruby guys, DevOps guys, sysadmins, Java programmers,<br />
+   any group of intelligent Linux users.</p>
+
+<p>   Your target domain is small shell scripts and sysadmin tasks<br />
+   (cron jobs, daemon tasks, data validation programs etc. etc)<br />
+   The Manning book <a href="http://amzn.to/1UgWSuK">"Minimal Perl" by Tim Maher</a> covers precisely<br />
+   this problem domain.. Perl for Unix and Linux people.</p>
+
+<p>   Minimal Perl - no Object Orientation, few modules.<br />
+   Shell/grep/find/sed/awk replacements.<br />
+   regexps, data manipulation</p>
+
+<p>   This is the sort of Perl that's most immediately useful for Linux folk.<br />
+   <br />
+2) Be known as "The Perl Guy"<br />
+   Prominently display <a href="http://amzn.to/1SU0Sig">Programming Perl 3rd edition (or better)</a><br />
+   on your desk. In my early days of using Linux I'd wear a RedHat<br />
+   baseball cap, marking me as a Linux guy. I also occasionally wore a <br />
+   Debian shirt.</p>
+
+<p>3) Make sure you've read a fair bit of Programming Perl<br />
+   especially the useful stuff for your Linux using co-workers.<br />
+   * -f filetests/stat()<br />
+   * Bits of the functions section. localtime()/gmtime()</p>
+
+<p>   I marked up my <a href="http://amzn.to/1SU0Sig">ProgPerl 3e</a> with the perlpod* page that had the<br />
+   latest documentation on it; such as perldsc, perlop, perllol etc.<br />
+   This way I could always consult that page to get the absolutely<br />
+   latest information.</p>
+
+<p>   An Optus Perl colleague had a rain-soaked <a href="http://amzn.to/1SU0Sig">ProgPerl</a>, he said he'd<br />
+   read it at an outdoor Music Festival on a weekend before a job<br />
+   interview on the Monday.</p>
+
+<p>4) Refer to <a href="http://amzn.to/1SU0Sig">Programming Perl</a> often and frequently. There's an amazing<br />
+   amount of Unix/Linux/System call/Data Handling knowledge in there.</p>
+
+<p>   Earlier classics: <a href="http://amzn.to/1KKFIEh">The Unix Programming Environment</a> (Kernighan and Pike)<br />
+                     <a href="http://amzn.to/1KKFSvr">UNIX in a Nutshell</a>/<a href="http://amzn.to/1UgXf8C">Linux in a Nutshell</a> (O'Reilly)<br />
+		    <a href="http://amzn.to/1OJsXaW">Advanced Programming in the UNIX Environment</a> (Stevens)</p>
+
+<p>5) Avoid jargon and in-joke secret society cult stuff. Be welcoming.<br />
+   Use terminology like "I'm going to the <a href="http://sydney.pm.org">Sydney Perl User's Group</a>"<br />
+   or "Sydney Perl Meetup Group" not "I'm going to Sydney.pm"<br />
+   as new users won't get the .pm name</p>
+
+<p>6) Know some one liners to do useful tasks (see <a href="<a href="http://amzn.to/1UgWSuK">Minimal Perl</a> for some).<br />
+   Some good regular expressions. Make sure perldoc is installed on<br />
+   your system and also that it can be run as the root user.<br />
+   Know the perlfaq* pages. Know a couple of "perl is better than bash"<br />
+   arguments.</p>
+
+<p>7) Have some sample small programs floating about your own workspace.<br />
+   eg ~/perl/gitchecker.pl, ~/perl/getoptsdemo.pl</p>
+
+<p>   Add useful ones into your organization's source code repository,<br />
+   perhaps in a misc/ style project. Developer support tools and<br />
+   Operations Support tools can be super useful to your co-workers.</p>
+
+<p>8) Have some responses to Perl FUD</p>
+
+<p>   "oh you know Perl, but we won't hold that against you"</p>
+
+<p>   "Perl is old"</p>
+
+<p>   Sell Perl as the Java of UNIX/Linux:<br />
+      * removes distribution differences<br />
+      * removes GNU tools differences<br />
+      * Cross Platform</p>
+
+<p>   "Perl developers are hard to find" - but we're good and productive.</p>
+
+<p>9) Understand Linux environment and scripting issues and have<br />
+   Perl solutions to them.</p>
+
+<p>   * Issues running as a daemon<br />
+   * Issues running as a cron job<br />
+   * Am I running in the background/ Is standard output a terminal?<br />
+   * Signals, kill, Environment variables etc.</p>
+
+<p>10) Best Sunday at Optus: ensure only one instance of a daemon is running.</p>
+
+<p>   replaced /var/lock/scampspoller.pid flawed login with 4 lines of Perl<br />
+   Fcntl/flock/exclusively lock your own Source code.</p>
+
+<p>   I was able to reuse this knowledge at Telstra 3 months ago.</p>
+
+<p>11) Even though my last job was perl-less Devops I was still able to do a<br />
+    good amount of useful Perl<br />
+    * Nagios plugins, including a "check Datastore capacity in VSphere/ESX"<br />
+    * v5yaml2v6yaml transform on small yaml files that were the input<br />
+      to our "spin up servers" script<br />
+    * small developer support tools</p>
+
+<p>12) Back to evangelizing advice: keep it respectful, keep it real.</p>
+
+<p>    "I'm going to the Sydney Perl Meetup tonight"</p>
+
+<p>    "That's the sort of data manipulation job Perl's really good for"</p>
+
+<p>    "Puppet? We had something even better years ago at the Optusnet ISP,<br />
+     which we wrote ourselves in Perl, called conform".</p>
+
+<p>    Be a good example to co-workers; they come to you because they<br />
+    see you being powerful and productive.</p>
+
+<p>13) You can Google the phrase "perl advocacy" and read some ideas,<br />
+    Perl Training Australia has a good <a href="http://perltraining.com.au/whyperl.html">"Why Perl?"</a> page. Remember your audience is your co-workers.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Using Unicode in Emacs for Perl 6</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/aaron_baugher/2015/08/using-unicode-in-emacs-for-perl-6.html" />
+    <id>tag:blogs.perl.org,2015:/users/aaron_baugher//2597.6959</id>
+
+    <published>2015-08-03T14:11:38Z</published>
+    <updated>2015-08-03T20:19:55Z</updated>
+
+    <summary>I use vi/vim for quick edits and remote work, but I do most of my programming (and other work) in emacs. To enter Unicode characters in emacs, you run the &quot;insert-char&quot; command, which by default is tied to &quot;C-x 8...</summary>
+    <author>
+        <name>Aaron Baugher</name>
+        <uri>http://aaron.baugher.biz/</uri>
+    </author>
+    
+    <category term="emacs" label="Emacs" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="lisp" label="Lisp" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perl6" label="Perl 6" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="unicode" label="Unicode" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/aaron_baugher/">
+        <![CDATA[<p>I use <code>vi/vim</code> for quick edits and remote work, but I do most of my programming (and other work) in <code>emacs</code>.  To enter Unicode characters in emacs, you run the "<code>insert-char</code>" command, which by default is tied to "<code>C-x 8 [Enter]</code>", then type in the hex code for the character or its name.</p>
+
+<p>Typing at least 5 characters to get one got old very fast, now that there are some <a href="http://doc.perl6.org/language/unicode_entry">Unicode characters that can be used as Perl 6 operators</a>.  So I wrote a lisp function which asks for a single character and looks it up in an alist (kinda similar to a Perl hash).  That way I can enter any Unicode character I've put in the alist by hitting two keys: one key to run the function, then whatever key I assigned to that character.  Here's the lisp, which I put in my .emacs file:</p>
+
+<pre><code>(defun ajb/common-unicode-chars (ch)
+  "Function to map single keys to some common unicode characters.
+Run the function and then press a key.  Non-mapped keys will default to themselves."
+  (interactive "cChar: ")
+  (insert
+   (or (cdr
+        (assoc-string
+         (char-to-string ch)
+         '(("[" . ?«)
+           ("]" . ?»)
+           ("a" . ?Α)
+           ("d" . ?Δ)
+           ("g" . ?Γ)
+           ("o" . ?Ω)
+           ("p" . ?π)
+           ("&gt;" . ?⊃)
+           ("&lt;" . ?⊂)
+           ("|" . ?∪)
+           ("&amp;" . ?∩)
+           ("1" . ?⚀)
+           ("6" . ?⚅)))) ch)))
+(global-set-key (kbd "&lt;f6&gt;") 'ajb/common-unicode-chars)
+</code></pre>
+
+<p>The first two characters in the list are guillemets, which Perl 6 uses as the "hyperoperators" (more on those another time), and they can also be used as double-quotes for strings.  I keyed them to the square brackets, since they don't require the shift key.  Then I put in a few Greek letters I might want to use, a few of the Set operators, and a couple of dice faces, just to show some possibilities.  As I discover more Unicode characters that I want to use more than once in a great while, I'll pick a key for them and add them to the list.</p>
+
+<p>If you put this in your <code>.emacs</code>, it will be bound to the <code>&lt;f6&gt;</code> key in all modes.  So to get the left-pointing guillemet, you'd hit "<code>&lt;f6&gt; [</code>".  If you know lisp, the code is pretty simple.  If you don't, I think it's fairly obvious how to add more entries, but please leave a comment if you have any questions.</p>
+
+<p>Thanks to all the Unicode characters that are available, along with some other new features like "pointy blocks," you can write Perl 6 code that looks pretty strange to a Perl 5 guy, like this:</p>
+
+<pre><code>#!/usr/bin/env perl6
+use v6;
+
+my &amp;Α = -&gt; {
+    Set.new('a'..'n');
+}
+
+my &amp;Ω = -&gt; {
+    Set.new('m'..'z');
+}
+
+say [∩] Α, Ω;
+</code></pre>
+
+<p>I'll save explaining what that does for next time.</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>Simple Game in Perl 6</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/aaron_baugher/2015/08/simple-game-in-perl-6.html" />
+    <id>tag:blogs.perl.org,2015:/users/aaron_baugher//2597.6954</id>
+
+    <published>2015-08-02T21:40:52Z</published>
+    <updated>2015-08-05T23:34:37Z</updated>
+
+    <summary>Here&apos;s a little game which was a sub-game in the 1980&apos;s Commodore 64 game Legend of Blacksilver. It&apos;s a simple gambling game where you are dealt five cards in a row from a standard 52-card deck. The cards are then...</summary>
+    <author>
+        <name>Aaron Baugher</name>
+        <uri>http://aaron.baugher.biz/</uri>
+    </author>
+    
+    <category term="games" label="Games" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perl6" label="Perl 6" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="unicode" label="Unicode" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/aaron_baugher/">
+        <![CDATA[<p>Here's a little game which was a sub-game in the 1980's Commodore 64 game Legend of Blacksilver.  It's a simple gambling game where you are dealt five cards in a row from a standard 52-card deck.  The cards are then turned up one at a time.  After each card is turned up, you have to guess whether the next card will be higher or lower in rank than the last one.  Aces are high, and you lose all ties.  If you guess all four right, you win.</p>
+
+<p>[<strong>Update</strong>: There's a serious bug in this version, as pointed out by Brad in the comments, but I'm leaving it in the original so the comments make sense, since I'm writing these for learning purposes.  A fixed version can be found at <a href="https://gitlab.com/aaron-baugher/misc-perl-6-scripts/blob/master/hi-lo.p6">my GitLab account</a>.]</p>
+
+<pre><code>#!/usr/bin/env perl6
+use v6;
+
+my %v = ( 2 =&gt; 2, 3 =&gt; 3, 4 =&gt; 4, 5 =&gt; 5, 6 =&gt; 6, ### 1
+          7 =&gt; 7, 8 =&gt; 8, 9 =&gt; 9, T =&gt; 10,
+          J =&gt; 11, Q =&gt; 12, K =&gt; 13, A =&gt; 14 );
+my @deck := %v.keys X~ &lt;♠ ♡ ♢ ♣&gt;;                ### 2
+my $card = @deck.pick;                            ### 3
+my $show = "$card ";
+
+for ^4 {                                          ### 4
+    say $show;
+    my $l; repeat {                               ### 5
+        $l = prompt 'Hi or Lo? ';
+    } until $l ~~ m:i/ ( h | l ) /;
+    my $new = @deck.pick;
+    $show ~= "$new ";
+    my $nv = %v{ $new.substr(0,1)};               ### 6
+    my $cv = %v{$card.substr(0,1)};
+    if $nv == $cv or
+        ( $nv &lt; $cv and $l  ~~ m/:i h/ ) or       ### 7
+        ( $nv &gt; $cv and $l !~~ m/:i h/ ) {
+            say $show;
+            say "Sorry, you lose!";
+            exit;
+        }
+    $card = $new;
+}
+say $show;
+say 'You win!';
+</code></pre>
+
+<p>I inserted commented numbers on lines with interesting features.</p>
+
+<p>(1) I create a hash of card ranks to values, to make it easy to tell whether a card is higher or lower than another.</p>
+
+<p>(2) There's a lot of Perl 6 goodness here.  First, I bind the array with <code>:=</code> instead of assigning it with <code>=</code>.  I don't completely understand this yet, but I think that binds it like a Perl 5 reference, rather than copying the values.  The point of that, I think, is that it means the compiler doesn't have to execute the right side until more values are needed in <code>@deck</code>.  I'm not sure that actually gains me anything in this case, since all the values are probably needed in the next line, but it seems like a good habit.</p>
+
+<p>The <code>X</code> is the "cross" operator.  It takes two lists as arguments, and returns all possible combinations between them.  Following it with <code>~</code>, the Perl 6 string concatenation operator, tells it to concatenate each combination as a string.  So that combines each key from the hash with each of the four card suit symbols, resulting in 52 unique combos.</p>
+
+<p><code>%v.keys</code> shows the way that functions can run as methods now with the dot (.) operator.  I could say <code>keys %v</code> as I would have in Perl 5, but I think this makes things like precedence clearer.</p>
+
+<p>The <code>&lt;&gt;</code> operator is no longer for reading lines from a file descriptor.  Now it's shorthand for the qw// quoting operator, so it returns the four card suits (Unicode characters) as a list.</p>
+
+<p>The game doesn't actually care about the suits, by the way, so I could have left them out, but I wanted to test Unicode in my editor and terminals.</p>
+
+<p>(3) The <code>.pick</code> function randomly picks one item from the array, and will not repeat items on subsequent picks.  No more need to calculate random numbers and splice elements out of a separate array!</p>
+
+<p>(4) <code>for</code> loops have several new features, but this one doesn't use most of them.  A couple things to note: you don't need parentheses around the arguments, and if you do use them, you must have whitespace between <code>for</code> and the opening parenthesis.  I recommend not using them.  Also, the <code>^n</code> syntax means "integers from zero to n-1".  It's a handy shortcut to say "loop this many times."  If I needed the numbers 1-4 within the loop, I could still use the <code>for 1..4 {</code> method I'd use in Perl 5, and get the number in <code>$_</code>.</p>
+
+<p>(5) The <code>do/until</code> loop is now <code>repeat/until</code>.  Not much more to say about that, but check out the regex at the end of it.  There are big changes in regexes in Perl 6, and that's one area where you can't do much until you learn some of them, because even fairly basic Perl 5 regexes probably won't work like you expect.</p>
+
+<p>For one thing, whitespace is ignored by default, as if you used the /x modifier.  For another thing, you don't put modifiers at the end anymore, and some of them have changed.  Now the /i modifier goes at the beginning, as <code>:i</code>, and can go either inside or outside the delimiters.  Other than that, the regex isn't too different: it just makes sure the response contains either <code>h</code> or <code>l</code>, case-insensitive.</p>
+
+<p>One last thing there: there's now a built-in <code>prompt</code> routine that outputs a string and gets a response, so that replaces the old <code>print 'question? '; my $answer = &lt;STDIN&gt;;</code> combo.</p>
+
+<p>(6) There's not anything drastically new here, but note again how <code>substr()</code> can be used postfix, where in Perl 5 it would have been <code>substr($new,0,1)</code>.</p>
+
+<p>One thing, though: you can't use whitespace in a few places where you could in Perl 5.  One of those places is between objects and postfix functions and braces.  So to line up those two lines, I had to put a space before <code>$new</code>; putting it after <code>$new</code> before or after the dot would have broken it.  There's something called "unspace" you can use to get around that, but here it was simplest to put the space where I did.</p>
+
+<p>(7) There's nothing really special here; it's just checking to see whether you selected 'h' as your guess, and checks that against the cards.  One thing to notice, which I forgot to mention in #5: the matching operators have changed from <code>=~</code> to <code>~~</code> and from <code>!=</code> to <code>!~~</code>.</p>
+
+<p>I think that's everything that's really new, so I'll stop there.  There are a couple things about it that bug me, as if there's some refactoring that could be done, so I may come back to it later.  If you have any questions or suggestions, please leave a comment.</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>P6SGI: Perl 6 Web Service Gateway Interface</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/sterling_hanenkamp/2015/08/p6sgi-perl-6-web-service-gateway-interface.html" />
+    <id>tag:blogs.perl.org,2015:/users/sterling_hanenkamp//444.6953</id>
+
+    <published>2015-08-02T20:51:05Z</published>
+    <updated>2015-08-03T00:09:16Z</updated>
+
+    <summary>So, I have been meaning to start a Perl 6 blog for a couple of months. At that point, though, this site was having issues and I have this perverse desire to write blog software every time I think about...</summary>
+    <author>
+        <name>Sterling Hanenkamp</name>
+        <uri>http://sterling.hanenkamp.com</uri>
+    </author>
+    
+        <category term="Perl 6" scheme="http://www.sixapart.com/ns/types#category" />
+    
+    <category term="async" label="async" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="channel" label="Channel" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="p6sgi" label="P6SGI" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="perl6" label="Perl 6" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="promise" label="Promise" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="psgi" label="PSGI" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="webapp" label="webapp" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/sterling_hanenkamp/">
+        <![CDATA[<p>So, I have been meaning to start a Perl 6 blog for a couple of months. At that point, though, this site was having issues and I have this perverse desire to write blog software every time I think about blogging and so things got put off for a bit. I am now starting this here and I want to get write off and start with what I think is my most important Perl 6 contribution thus far and one I want to get your feedback on: P6SGI!</p>
+
+<p>For those that need instant gratification, here is a <a href="https://github.com/zostay/P6SGI">P6SGI</a> application:</p>
+
+<pre><code>    # Perl 6
+    sub app(%env) { 
+        (200, [ 'Content-Type' => 'text/plain' ], [ 'Hello World!' ]) 
+    }
+</code></pre>
+
+<p>That looks quite a bit like its <a href="https://metacpan.org/pod/distribution/PSGI/PSGI.pod">PSGI</a> cousin. That's not the real power of P6SGI, though. For that, you will have to bear with me for a short bit.</p>
+
+<p>I am a web application developer by day and a fan (mostly) of PSGI, the Perl Web Service Gateway Interface. PSGI is a standard that defines something akin to CGI, but is modernized and implementation agnostic. It was developed by Tatsuhiko Miyagawa after seeing the success of similar standards for Python (WSGI) and Ruby (Rack). The nice thing about PSGI is that it requires nothing but the Perl language itself to build a web application, which means it is really simple to use. The bad thing, though, is that when you need to use the advanced PSGI features, you can end up with a callback that calls a callback that calls a callback: it is hard to read and not ideal. That is not so much a weakness of PSGI, but a weakness of what is built in to Perl.</p>
+
+<p>While I have been learning Perl 6 over the past few months, I have learned that Perl 6 has a number of very useful, built-in types that could actually fix these problems. Looking at early app server implementations, I found that each had implemented support for PSGI-style apps like the one above, but none had delved into the deferred or streaming aspects of the standard. I decided, I wanted to see what could be done with this and began experimenting.</p>
+
+<p>Let us start with the simplest of these, the deferred PSGI application:</p>
+
+<pre><code>    # Perl 5
+    sub app {
+        my $env = shift;
+        return sub {
+            my $res = shift;
+
+            my $content = some_long_running_process($env);
+            $res->([ 200, [ 'Content-Type' => 'text/plain' ], [ $content ]);
+        }
+    }
+</code></pre>
+
+<p>What is going on? If your application returns a code reference, then the server is supposed to call that reference and supply to it another callback that can be called by your application when it has finished running some long running task.</p>
+
+<p>This is verbose and confusing. I did not want to use a callback that calls another callback to implement this in Perl 6. Fortunately, Perl 6 has a tool that is perfect and exactly suited to solving this problem, a <a href="http://doc.perl6.org/type/Promise">Promise</a>:</p>
+
+<pre><code>    # Perl 6
+    sub app(%env) {
+        start {
+            my $content = some-long-running-process(%env);
+            (200, [ 'Content-Type' => 'text/plain' ], [ $content ])
+        };
+    }
+</code></pre>
+
+<p>This is the equivalent to the above in P6SGI, but is much easier to read. What is going on? First, <a href="http://doc.perl6.org/type/Proc::Async#method_start">start</a> is a routine that starts an asynchronous process, this is kind of like a fork in Perl 5. Perl 6 is responsible to run that block and it returns a Promise object. The server can then wait for the Promise to be kept or broken. Perl 6 FTW.</p>
+
+<p>That takes care of deferred responses, but what about streaming? Often, you have a large file you need to return or one that returns in bits over a long period of time. For this, you want a streaming response.</p>
+
+<p>In PSGI, a streaming response looks pretty similar to a deferred response, like this:</p>
+
+<pre><code>    # Perl 5
+    sub app {
+        my $env = shift;    
+        return sub {
+            my $res = shift;
+            my $out = $res->([ 200, [ 'Content-Type' => 'text/plain' ] ]);
+
+            while (my $content = more_data($env)) {
+                $out->write($content);
+            }
+            $out->close;
+        }
+    }
+</code></pre>
+
+<p>Again, we have a callback that calls a callback, but if we call that callback with only the status and header bits, we get back a writer object, which is kind of like another callback. We can then use the <code>write</code> and <code>close</code> methods on that writer to send our content back. This works, but again requires a complicated bit of reasoning to understand the callback-callback-callback parts.</p>
+
+<p>Perl 6 comes to our rescue again with a built-in type that seems tailor made to fix this problem, <a href="http://doc.perl6.org/type/Channel">Channel</a>s:</p>
+
+<pre><code>    # Perl 6
+    sub app(%env) {
+        my $stream = Channel.new;
+        start {
+            while my $content = more_data(%env) {
+                $stream.send($content);
+            }
+            $stream.close;
+        };
+        (200, [ 'Content-Type' => 'text/plain' ], $stream)
+    }
+</code></pre>
+
+<p>A Channel is an object capable of encapsulating an asynchronous stream of data to a single recipient. If the content return is a Channel object, the server can receive data from the Channel as it arrives and send it on. There are no callbacks, just clean reactive code.</p>
+
+<p>If you need to defer and stream, you can do that too by combining a Promise with a result returning a Channel, which is probably what I will normally do since it is shorter and cleaner to write:</p>
+
+<pre><code>    # Perl 6
+    sub app(%env) {
+        start {
+            my Channel $stream = long-process-fills-a-channel(%env);
+            (200, [ 'Content-Type' => 'text/plain' ], $stream);
+        }
+    }
+</code></pre>
+
+<p>Now, you have a Promise to stream through a Channel.</p>
+
+<p>Another smaller difference in P6SGI from PSGI is the encoding of data. Most developers do not like dealing with encoding at all. When applications interact with other applications over a socket, though, they may not have that luxury. Fortunately, Perl 6 simplifies this by making a strong distinction between <a href="http://doc.perl6.org/type/Blob">encoded</a> and <a href="http://doc.perl6.org/type/Str">decoded</a> data. </p>
+
+<p>All of the P6SGI application examples here deal with strings and send them to the server without encoding them into blobs first. This puts the burden of encoding on the server. P6SGI specifies how servers should do this. However, applications that want to make sure this is always done precisely can pass the server blobs instead of strings:</p>
+
+<pre><code>    # Perl 6
+    sub app(%env) {
+        (200, [ 'Content-Type' => 'text/plain; charset=UTF-8' ], [
+            "Hello World".encode('UTF-8')
+        ]);
+    }
+</code></pre>
+
+<p>Anyway, I have <a href="https://github.com/zostay/P6SGI">written all of this up on github in full detail</a> and hope that you will give feedback. Nothing is set in stone at this point as I have not even yet gotten around to writing the reference implementation, but I am very happy with the natural improvements Perl 6 grants to PSGI through Promises, Channels, and better encoding tools.</p>
+
+<p>Please, let me know what you think and, as always, <a href="https://github.com/zostay/P6SGI/pulls">patches welcome</a>.</p>
+
+<p>Cheers.</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>Getting Started</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/aaron_baugher/2015/08/getting-started.html" />
+    <id>tag:blogs.perl.org,2015:/users/aaron_baugher//2597.6952</id>
+
+    <published>2015-08-02T02:13:43Z</published>
+    <updated>2015-08-02T03:26:28Z</updated>
+
+    <summary>I started programming in Perl in about 1995, a few years before design started on Perl 6. Over the years, I&apos;ve taken a look at Perl 6 from time to time, but never got hooked. Sometimes it appeared too hard...</summary>
+    <author>
+        <name>Aaron Baugher</name>
+        <uri>http://aaron.baugher.biz/</uri>
+    </author>
+    
+    <category term="perl6" label="Perl 6" scheme="http://www.sixapart.com/ns/types#tag" />
+    <category term="sets" label="Sets" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/aaron_baugher/">
+        <![CDATA[<p>I started programming in Perl in about 1995, a few years before design started on Perl 6.  Over the years, I've taken a look at Perl 6 from time to time, but never got hooked.  Sometimes it appeared too hard to get a working system running -- assuming you could at all.  Other times the language looked so foreign that I wasn't sure what the point was: if it didn't even look like Perl, then it might as well be a different language, so why not go learn a different language that was ready?</p>
+
+<p>Well, that finally changed this summer.  The impetus was an interview with Larry Wall wherein, with his unique style, he talked about the language (and a variety of other things) in ways that intrigued me and made me want to see what he'd created.  Hearing that a real release of Perl 6 was no more than several months away, and that a working compiler could be installed with a few commands, hooked me the rest of the way.</p>
+
+<p>So I installed radukobrew, ran a few commands, and fired up a perl6 interpreter.  Now what?  Off to look for documentation and code examples.  There's quite a bit of good stuff at <a href="http://perl6.org/">perl6.org</a>.  It's sparse in areas, but it's plenty to get started with and try to absorb.  I miss <code>perldoc</code>, though; reading docs at the command line is so much faster than clicking around for them on the web.</p>
+
+<p>The strange thing about Perl 6, I'm finding, is not having any idea what's the best way to do things.  After 20 years of programming Perl, I've gathered a pretty complete set of idioms and practices.  If you need to lookup lines in a file, for instance, we know it's faster to load them into a hash than to loop through the file each time.  Complex sorts can be sped up with the Schwartzian transform.  Files should be opened with the 3-argument open() and followed with "or die()" error-checking.  Lots and lots of little things that make you feel like your finished program is about as clean, reliable, and fast as you can make it.</p>
+
+<p>With Perl 6, I don't have any of that yet.  To compare lines in a file, should I read them into a hash like Perl 5, or put them in a Set and use the cool new Set operators?  I have no idea.  A lot more stuff is done under the hood, like error-checking, or can be left up to the compiler to work out the details -- but is that the best way?  It's unsettling, not knowing, but kind of exciting at the same time, because there's a lot to explore here.  And I get the feeling that, as we develop idioms to take advantage of some of these new operators, they're going to be very powerful.</p>
+
+<p>For instance, say you want to find all the matching lines in two files, in no particular order.  In Perl 5, you'd do something like this:</p>
+
+<pre><code>#!/usr/bin/env perl
+use 5.010; use warnings; use strict;
+
+my %filea = map { $_ =&gt; 1 } do { open my $fa, '&lt;', 'filea' or die $!; &lt;$fa&gt; };
+my %fileb = map { $_ =&gt; 1 } do { open my $fb, '&lt;', 'fileb' or die $!; &lt;$fb&gt; };
+for( keys %filea ){
+    print if $fileb{$_};
+}
+</code></pre>
+
+<p>After the standard shebang and <code>use</code> statements, the next two lines load the files into hashes as the keys.  In addition to preparing a lookup hash from one file, that gets rid of duplicates in both.  Then I loop through the keys of one hash and print them if they're found in the other.  Now here's what I can do in Perl 6:</p>
+
+<pre><code>#!/usr/bin/env perl6
+use v6;
+
+my @a := "filea".IO.lines;
+my @b := "fileb".IO.lines;
+.say for keys( @a ∩ @b );
+</code></pre>
+
+<p>Much cleaner, isn't it?  First of all, the <code>use strict; use warnings;</code> are gone, because they're the default in Perl 6.  I put the <code>use v6</code> line in because I think my editor needs it (more on the Emacs mode for Perl 6 in another post).  The first two lines read each file into an array, since I don't need them to be in hashes.  The file opening and error-checking are done under-the-hood, so I don't have to write them.  Then the last line does a set intersection with that cool Unicode symbol (U+2229) which returns all lines that are found in both arrays.</p>
+
+<p>It's much cleaner and shows more clearly what it's doing.  I suspect anyone who's studied set theory could guess what this does, even if he's never programmed a day in his life.  And there's some cool stuff going on here -- or that <em>could be</em> going on.  Because of the way Perl 6 does "lazy lists," the underlying implementation can split jobs up into different tasks that run parallel, then come back to them when it needs their results.  So in this case, the filling of <code>@a</code> and <code>@b</code> could be run at the same time.  It may even be that the set comparison could start looking for matches before those finish, though that seems less likely.  But the point is, if you have time-consuming operations that don't depend on each other, or if functionA() will be passing a list of items to functionB(), these operations may be able to run in parallel and speed things up, without you needing to do any threading or that kind of stuff.  Very cool!</p>
+
+<p>On the other hand, I don't know whether that cool stuff <em>will</em> happen in my compiler, or whether it's likely in the compilers and platforms today.  So is it really the best way to do it?  What's really happening under the hood in that Set comparison?  Are my arrays being converted to Sets, and does that eat up time and memory?  Could it be fast on one system and dog slow on another?  Could it be slow today, but the fastest way at some future date when the compilers do more parallel processing?  I don't know.  There's a lot to learn here.</p>
+
+<p>So as I learn, I'll share my discoveries, from the perspective of a long-time Perl 5 programmer who's gotten pretty set in his Perl 5 ways, but thinks some aspects of Perl 6 are just too cool to ignore.  I haven't been this excited about a new language since, well, 1995.  More to come soon.</p>
+]]>
+        
+
+    </content>
+</entry>
+
+<entry>
+    <title>Job::Machine integration</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/kaare/2015/07/jobmachine-integration.html" />
+    <id>tag:blogs.perl.org,2015:/users/kaare//194.6948</id>
+
+    <published>2015-07-31T21:24:56Z</published>
+    <updated>2015-07-31T21:24:47Z</updated>
+
+    <summary>Integrating Job::Machine into Djet....</summary>
+    <author>
+        <name>kaare</name>
+        
+    </author>
+    
+    <category term="djetcmsblog" label="djet cms blog" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/kaare/">
+        <![CDATA[<p><a href="http://www.djet.xyz/blogs/job_machine_integration">Integrating Job::Machine into Djet.</a></p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Dancer2::Plugin::Auth::Extensible Presentation</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/racke/2015/07/dancer2pluginauthextensible-presentation.html" />
+    <id>tag:blogs.perl.org,2015:/users/racke//830.6951</id>
+
+    <published>2015-07-31T18:41:31Z</published>
+    <updated>2015-07-31T19:10:20Z</updated>
+
+    <summary>Andrew Beverly is going to talk about https://metacpan.org/pod/Dancer2::Plugin::Auth::Extensible at the Perl Dancer Conference. This talk will give an overview of what&apos;s now possible with very little code, including user registration, password resets and the management of user details....</summary>
+    <author>
+        <name>Stefan Hornburg (Racke)</name>
+        <uri>http://www.linuxia.de/</uri>
+    </author>
+    
+    <category term="dancerdancer2pluginconferenceauthentication" label="Dancer Dancer2 Plugin Conference Authentication" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/racke/">
+        <![CDATA[<p>Andrew Beverly is going to talk about <a href="http://www.perl.dance/talks/6-complete-user-management-using-plugin%3A%3Aauth%3A%3Aextensible">https://metacpan.org/pod/Dancer2::Plugin::Auth::Extensible</a> at the <a href="http://www.perl.dance/">Perl Dancer Conference</a>.</p>
+
+<p>This talk will give an overview of what's now possible with very little code, including user registration, password resets and the management of user details.</p>]]>
+        
+    </content>
+</entry>
+
+<entry>
+    <title>Parallels Between Anti-Sweatshop Campaigns and Consumer Advocacy for Animals</title>
+    <link rel="alternate" type="text/html" href="http://blogs.perl.org/users/racke/2015/07/dancer2pluginauthextensible-presentation.html" />
+    <id>tag:blogs.perl.org,2015:/users/racke//830.6951</id>
+
+    <published>2015-07-31T18:41:31Z</published>
+    <updated>2015-07-31T19:10:20Z</updated>
+
+    <summary><![CDATA[In a discussion group about animal activism on Facebook, someone recently shared an article titled The Myth of the Ethical Shopper. It’s a really interesting piece about some of the problems with consumer advocacy aimed at encouraging people to buy sweatshop-free products. I highly recommend reading it. The discussion in the Facebook group was about&#8230; <a href="http://blog.urth.org/2015/08/19/parallels-between-anti-sweatshop-campaigns-and-consumer-advocacy-for-animals/">Continue reading <span class="meta-nav">&#8594;</span></a>]]></summary>
+    <author>
+        <name>Stefan Hornburg (Racke)</name>
+        <uri>http://www.linuxia.de/</uri>
+    </author>
+    
+    <category term="dancerdancer2pluginconferenceauthentication" label="Dancer Dancer2 Plugin Conference Authentication" scheme="http://www.sixapart.com/ns/types#tag" />
+    
+    <content type="html" xml:lang="en" xml:base="http://blogs.perl.org/users/racke/">
+        <![CDATA[<p>Andrew Beverly is going to talk about <a href="http://www.perl.dance/talks/6-complete-user-management-using-plugin%3A%3Aauth%3A%3Aextensible">https://metacpan.org/pod/Dancer2::Plugin::Auth::Extensible</a> at the <a href="http://www.perl.dance/">Perl Dancer Conference</a>.</p>
+
+<p>This talk will give an overview of what's now possible with very little code, including user registration, password resets and the management of user details.</p>]]>
+        
+    </content>
+</entry>
+</feed>

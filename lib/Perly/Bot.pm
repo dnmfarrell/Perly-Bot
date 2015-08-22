@@ -13,7 +13,7 @@ use Time::Seconds;
 use Try::Tiny;
 use YAML::XS qw/LoadFile/;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 my $DEBUG = 0;
 binmode STDOUT, ':encoding(UTF-8)';
 
@@ -186,7 +186,7 @@ sub should_emit
   my ($post, $cache, $age_threshold_secs) = @_;
 
   # posts must mention a Perl keyword to be considered relevant
-  my $looks_perly = qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi?)\b/i;
+  my $looks_perly = qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
 
   my $time_now = gmtime;
 
@@ -200,7 +200,7 @@ sub should_emit
   && !$cache->has_posted($post)
 
   # does it looks Perl related?
-  && any { $_ // '' =~ /$looks_perly/ } $post->title, $post->description
+  && any { ($_ // '') =~ /$looks_perly/ } $post->title, $post->description
 }
 
 =head2 emit
