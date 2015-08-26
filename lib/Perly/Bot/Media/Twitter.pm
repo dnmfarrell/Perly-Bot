@@ -53,13 +53,12 @@ sub new
 {
   my ($class, $args) = @_;
 
-  unless ($args->{agent_string}
-          && $args->{consumer_key}
-          && $args->{consumer_secret}
-          && $args->{access_token}
-          && $args->{access_secret})
+  my @missing = grep { ! exists $args->{$_} }
+  	qw(agent_string consumer_key consumer_secret access_token access_secret);
+
+  if( @missing )
   {
-    $logger->logcroak( 'args is missing required variables for ' . __PACKAGE__ );
+    $logger->logcroak( "args is missing required variables (@missing) for $class" );
   }
 
   try

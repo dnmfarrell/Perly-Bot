@@ -68,13 +68,12 @@ sub new
 {
   my ($class, $args) = @_;
 
-  unless ($args->{agent_string}
-          && $args->{username}
-          && $args->{password}
-          && $args->{session_filepath}
-          && $args->{subreddit})
+  my @missing = grep { ! exists $args->{$_} }
+  	qw(agent_string username password session_filepath subreddit);
+
+  if( @missing )
   {
-    $logger->logcroak( 'args is missing required variables for ' . __PACKAGE__ );
+    $logger->logcroak( "args is missing required variables (@missing) for $class" );
   }
 
   try
