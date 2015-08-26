@@ -27,7 +27,7 @@ for my $args (@$feeds)
     state $methods = [qw(url type date_name date_format media)];
     foreach my $method ( @$methods )
     {
-    ok $feed->$method(), "$method returns something that is true"
+      ok $feed->$method(), "$method returns something that is true (" . $feed->$method() . ")";
     }
 
     TODO: {
@@ -38,9 +38,9 @@ for my $args (@$feeds)
     "There are the right number of media targets for " . $feed->url;
     }
 
-    like $feed->active, qr/^[01]$/, "active field is 0 or 1";
-    like $feed->proxy, qr/^[01]$/, "proxy field is 0 or 1";
-    like $feed->delay_seconds, qr/^[0-9]+$/, , "delay_seconds field is only digits";
+    like $feed->active, qr/^[01]$/, "active field is 0 or 1 (" . $feed->active . ")";
+    like $feed->proxy, qr/^[01]$/, "proxy field is 0 or 1 (" . $feed->proxy . ")";
+    like $feed->delay_seconds, qr/^[0-9]+$/, , "delay_seconds field is only digits (" . $feed->delay_seconds . ")";
   };
 }
 
