@@ -2,6 +2,8 @@ package Perly::Bot;
 use warnings;
 use strict;
 use 5.10.1;
+use open qw(:std :utf8);
+
 use HTTP::Tiny;
 use List::Util 'any';
 use Path::Tiny;
@@ -13,8 +15,6 @@ use Try::Tiny;
 use YAML::XS qw/LoadFile/;
 
 our $VERSION = 0.09;
-my $DEBUG = 0;
-binmode STDOUT, ':encoding(UTF-8)';
 
 # modulino pattern
 __PACKAGE__->run( load_config() ) unless caller();
