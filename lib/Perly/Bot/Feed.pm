@@ -18,6 +18,18 @@ Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy me
 
 my $logger = Log::Log4perl->get_logger();
 
+=encoding utf8
+
+=head1 NAME
+
+Perly::Bot::Feed - represent a feed
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
 =head2 get_posts ($xml)
 
 This method requires an xml string of the blog feed and returns an arrayref of L<Perl::Bot::Feed::Blog> objects.
@@ -78,6 +90,31 @@ sub get_posts
   }
   return \@posts
 }
+
+=back
+
+=head1 TO DO
+
+=head1 SEE ALSO
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a GitHub project.
+
+	https://github.com/dnmfarrell/Perly-Bot
+
+=head1 AUTHOR
+
+David Farrell C<< <sillymoos@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;
 

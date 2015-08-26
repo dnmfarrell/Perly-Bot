@@ -12,6 +12,14 @@ with 'Perly::Bot::Media';
 
 my $logger = Log::Log4perl->get_logger();
 
+=encoding utf8
+
+=head1 NAME
+
+Perly::Bot::Media::Twitter - repost Perl content to Twitter
+
+=head1 SYNOPSIS
+
 =head1 DESCRIPTION
 
 This class is for posting to Twitter
@@ -119,4 +127,30 @@ sub send
     $logger->logcroak("Error tweeting $blog_post->{url} $blog_post->{title} " . $_->code . " " . $_->message . " " . $_->error);
   };
 }
+
+=back
+
+=head1 TO DO
+
+=head1 SEE ALSO
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a GitHub project.
+
+	https://github.com/dnmfarrell/Perly-Bot
+
+=head1 AUTHOR
+
+David Farrell C<< <sillymoos@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
 1;

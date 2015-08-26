@@ -41,6 +41,8 @@ $logger->level( $ENV{PERLYBOT_LOG_LEVEL} // $INFO );
 # modulino pattern
 __PACKAGE__->run( load_config() ) unless caller();
 
+=encoding utf8
+
 =head1 NAME
 
 Perly::Bot - repost Perl content to social media
@@ -249,5 +251,30 @@ sub emit
   $_->send($post) for values %{$feed->media};
   return 1;
 }
+
+=back
+
+=head1 TO DO
+
+=head1 SEE ALSO
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a GitHub project.
+
+	https://github.com/dnmfarrell/Perly-Bot
+
+=head1 AUTHOR
+
+David Farrell C<< <sillymoos@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;

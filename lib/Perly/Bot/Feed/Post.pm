@@ -14,6 +14,18 @@ Perly::Bot::Feed::Post->mk_accessors(qw/url title description datetime proxy del
 
 my $logger = Log::Log4perl->get_logger();
 
+=encoding utf8
+
+=head1 NAME
+
+Perly::Bot::Feed::Post - process a social media post
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
 =head2 clean_url
 
 Removes the query component of the url. This is to reduce the risk of posting duplicate urls with different query parameters.
@@ -65,6 +77,31 @@ sub decoded_title
   my ($self) = @_;
   decode_entities( $self->title );
 }
+
+=back
+
+=head1 TO DO
+
+=head1 SEE ALSO
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a GitHub project.
+
+	https://github.com/dnmfarrell/Perly-Bot
+
+=head1 AUTHOR
+
+David Farrell C<< <sillymoos@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;
 

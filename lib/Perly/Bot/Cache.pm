@@ -7,6 +7,14 @@ use Log::Log4perl::Level;
 
 my $logger = Log::Log4perl->get_logger();
 
+=encoding utf8
+
+=head1 NAME
+
+Perly::Bot::Cache - store what Perlybot has already done
+
+=head1 SYNOPSIS
+
 =head1 DESCRIPTION
 
 This is a thin wrapper around C<CHI::File>, used to store URLs of
@@ -75,4 +83,30 @@ sub save_post
 
   $self->{chi}->set($post->root_url, $post);
 }
+
+=back
+
+=head1 TO DO
+
+=head1 SEE ALSO
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a GitHub project.
+
+	https://github.com/dnmfarrell/Perly-Bot
+
+=head1 AUTHOR
+
+David Farrell C<< <sillymoos@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
 1;
