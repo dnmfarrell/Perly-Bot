@@ -4,6 +4,7 @@ use v5.10.1;
 use Test::More 0.95;
 use YAML::XS 'LoadFile';
 
+my $feeds = LoadFile('t/test_feeds.yml');
 
 my $class = 'Perly::Bot::Feed';
 
@@ -18,8 +19,8 @@ for my $args (@$feeds)
     my $feed = new_ok( $class => [ $args ] );
 
     state $methods = [qw(url type date_name date_format media)];
-    foreach my $method ( @$methods )
     can_ok( $feed, @$methods );
+    foreach my $method ( @$methods )
     {
       ok $feed->$method(), "$method returns something that is true (" . $feed->$method() . ")";
     }
