@@ -29,7 +29,7 @@ for my $args (@$feeds)
     TODO: {
     # This test might not make sense if you want to configure the media
     # source differently in the config.
-    local $TODO = 'The Perltricks setting has one target';
+    local $TODO = 'The Perltricks setting has only one target';
     is scalar keys %{$feed->media}, scalar @{$args_copy{media_targets}},
     "There are the right number of media targets for " . $feed->url;
     }
