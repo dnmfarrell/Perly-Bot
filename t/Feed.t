@@ -4,12 +4,6 @@ use v5.10.1;
 use Test::More 0.95;
 use YAML::XS 'LoadFile';
 
-my $feeds = LoadFile('feeds.yml');
-my $allowed_social_media = qr/twitter|reddit/;
-my $media = {
-  'Perly::Bot::Media::Twitter' => bless({}, 'Perly::Bot::Media::Twitter'),
-  'Perly::Bot::Media::Reddit'  => bless({}, 'Perly::Bot::Media::Reddit'),
-};
 
 my $class = 'Perly::Bot::Feed';
 
@@ -20,7 +14,6 @@ for my $args (@$feeds)
   subtest $args->{url} => sub
   {
     my %args_copy = %$args;
-    $args->{media} = $media;
 
     my $feed = new_ok( $class => [ $args ] );
 
