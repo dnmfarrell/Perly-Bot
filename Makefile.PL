@@ -70,6 +70,7 @@ my %WriteMakefile = (
 		'Class::Accessor'                 => '0',
 		'HTML::Entities'                  => '0',
 		'HTTP::Tiny'                      => '0',
+		'Log::Log4perl'                   => '0',
 		'Net::Twitter::Lite::WithAPIv1_1' => '0',
 		'Path::Tiny'                      => '0',
 		'Perly::Bot::Feed::Post'          => '0',
