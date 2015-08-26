@@ -30,13 +30,8 @@ for my $args (@$feeds)
       ok $feed->$method(), "$method returns something that is true (" . $feed->$method() . ")";
     }
 
-    TODO: {
-    # This test might not make sense if you want to configure the media
-    # source differently in the config.
-    local $TODO = 'The Perltricks setting has only one target';
-    is scalar keys %{$feed->media}, scalar @{$args_copy{media_targets}},
-    "There are the right number of media targets for " . $feed->url;
-    }
+    ok( $feed->type eq 'rss' || $feed->type eq 'atom', 'Feed type is either rss or atom (' . $feed->type . ')' );
+    isa_ok $feed->media, ref [];
 
     like $feed->active, qr/^[01]$/, "active field is 0 or 1 (" . $feed->active . ")";
     like $feed->proxy, qr/^[01]$/, "proxy field is 0 or 1 (" . $feed->proxy . ")";
