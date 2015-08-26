@@ -37,6 +37,63 @@ This method requires an xml string of the blog feed and returns an arrayref of L
 
 =cut
 
+sub new
+{
+  state $type_defaults = {
+  	rss => {
+		date_name   => 'pubDate',
+		date_format => '%a, %d %b %Y %H:%M:%S %z',
+		parser      => 'XML::RSS::Parser',
+  		},
+  	atom => {
+		date_name   => 'published',
+		date_format => '%Y-%m-%dT%H:%M:%SZ',
+		parser      => 'XML::Atom::Client',
+  		},
+  };
+
+  state $defaults = {
+    active        => 1,
+    proxy         => 0,
+    media         => ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit'],
+    delay_seconds => 21600,
+  };
+
+  my ($class, $args) = @_;
+
+  unless( defined $args->{type} )
+  {
+    $args->{type} = 'rss';
+    $logger->debug( "Config for $args->{url} did not specify a source type. Assuming RSS" );
+  }
+
+  my %config = (
+    %{ $type_defaults->{$args->{type}} },
+    %$defaults,
+    %$args
+    );
+
+  state $required = [qw(url type date_name date_format active media proxy delay_seconds parser)];
+  my @missing = grep { ! exists $config{$_} } @$required;
+  $logger->logcroak( "Missing fields (@missing) in call to $class" )
+  	if @missing;
+
+  $logger->logcroak( "Unallowed content parser $config{parser}" )
+  	unless exists $class->_allowed_parsers->{ $config{parser} };
+
+  bless \%config, $class;
+}
+
+sub _allowed_parsers
+{
+  state $allowed = {
+	  map { $_ => 1 } qw(
+	   XML::RSS::Parser
+	   XML::Atom::Client
+	   ) };
+  $allowed;
+}
+
 sub get_posts
 {
   my ($self, $xml) = @_;
