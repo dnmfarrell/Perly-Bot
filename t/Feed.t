@@ -10,7 +10,10 @@ my $media = {
   'Perly::Bot::Media::Twitter' => bless({}, 'Perly::Bot::Media::Twitter'),
   'Perly::Bot::Media::Reddit'  => bless({}, 'Perly::Bot::Media::Reddit'),
 };
-use_ok('Perly::Bot::Feed');
+
+my $class = 'Perly::Bot::Feed';
+
+use_ok($class) or BAIL_OUT( "$class did not load" );
 
 for my $args (@$feeds)
 {
