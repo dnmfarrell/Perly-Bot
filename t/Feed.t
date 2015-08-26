@@ -19,6 +19,7 @@ for my $args (@$feeds)
 
     state $methods = [qw(url type date_name date_format media)];
     foreach my $method ( @$methods )
+    can_ok( $feed, @$methods );
     {
       ok $feed->$method(), "$method returns something that is true (" . $feed->$method() . ")";
     }
