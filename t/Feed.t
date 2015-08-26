@@ -39,29 +39,4 @@ for my $args (@$feeds)
   like $feed->delay_seconds, qr/^[0-9]+$/;
 }
 
-if ($ENV{PERLY_BOT_UTF8_TEST})
-{
-  my $feed = Perly::Bot::Feed->new({
-    url           => 'http://blogs.perl.org/atom.xml',
-    type          => 'atom',
-    date_name     => 'published',
-    date_format   => '%Y-%m-%dT%H:%M:%SZ',
-    active        => 1,
-    media_targets => ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit'],
-    proxy         => 0,
-    delay_seconds => 21600,
-  });
-  my $response = do { local(@ARGV, $/) = 't/atom.xml';<> };
-
-  use Encode qw/encode decode/;
-  my $decoded_response = decode('UTF-8', $response);
-  $decoded_response = encode('UTF-8', $decoded_response);
-
-  my $posts = $feed->get_posts($decoded_response);
-  for (@$posts)
-  {
-    say $_->title;
-  }
-}
-
 done_testing();
