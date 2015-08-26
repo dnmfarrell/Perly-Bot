@@ -78,8 +78,6 @@ sub decoded_title
   decode_entities( $self->title );
 }
 
-=back
-
 =head1 TO DO
 
 =head1 SEE ALSO

@@ -84,8 +84,6 @@ sub save_post
   $self->{chi}->set($post->root_url, $post);
 }
 
-=back
-
 =head1 TO DO
 
 =head1 SEE ALSO

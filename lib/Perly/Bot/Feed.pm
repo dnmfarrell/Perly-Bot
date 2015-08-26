@@ -91,8 +91,6 @@ sub get_posts
   return \@posts
 }
 
-=back
-
 =head1 TO DO
 
 =head1 SEE ALSO

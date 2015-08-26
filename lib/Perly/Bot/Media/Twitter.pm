@@ -127,8 +127,6 @@ sub send
   };
 }
 
-=back
-
 =head1 TO DO
 
 =head1 SEE ALSO

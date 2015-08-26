@@ -112,8 +112,6 @@ sub send
   sleep(2); # throttle requests to avoid exceeding API limit
 }
 
-=back
-
 =head1 TO DO
 
 =head1 SEE ALSO

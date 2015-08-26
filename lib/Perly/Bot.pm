@@ -252,8 +252,6 @@ sub emit
   return 1;
 }
 
-=back
-
 =head1 TO DO
 
 =head1 SEE ALSO
