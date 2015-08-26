@@ -1,13 +1,18 @@
 package Perly::Bot::Feed::Post;
 use strict;
 use warnings;
-use URI;
-use HTTP::Tiny;
-use HTML::Entities;
-use Carp;
 use base 'Class::Accessor';
 
+use Carp;
+use HTML::Entities;
+use HTTP::Tiny;
+use Log::Log4perl;
+use Log::Log4perl::Level;
+use URI;
+
 Perly::Bot::Feed::Post->mk_accessors(qw/url title description datetime proxy delay_seconds twitter/);
+
+my $logger = Log::Log4perl->get_logger();
 
 =head2 clean_url
 
@@ -45,7 +50,7 @@ sub root_url
   }
   else
   {
-    croak "Error requesting $response->{url}. $response->{status} $response->{reason}";
+    $logger->logcroak( "Error requesting $response->{url}. $response->{status} $response->{reason}" );
   }
 }
 

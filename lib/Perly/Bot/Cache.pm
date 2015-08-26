@@ -2,6 +2,10 @@ package Perly::Bot::Cache;
 use strict;
 use warnings;
 use CHI;
+use Log::Log4perl;
+use Log::Log4perl::Level;
+
+my $logger = Log::Log4perl->get_logger();
 
 =head1 DESCRIPTION
 
@@ -23,13 +27,13 @@ sub new
 {
   my ($class, $cache_path, $expires_secs) = @_;
 
-  die 'new() requires a directory path with rwx permissions'
+  $logger->logdie( 'new() requires a directory path with rwx permissions' )
     unless $cache_path
       && -x $cache_path
       && -w $cache_path
       && -r $cache_path;
 
-  die 'new() requires a positive integer for the expiry duration of entries'
+  $logger->logdie( 'new() requires a positive integer for the expiry duration of entries' )
     unless $expires_secs
       && $expires_secs =~ /^[0-9]+$/
       && $expires_secs > 0;
@@ -51,7 +55,7 @@ Checks the cache to see if the C<Perly::Bot::Feed::Post> has already been posted
 
 sub has_posted {
   my ($self, $post) = @_;
-  die 'has_posted() requires a Perly::Bot::Feed::Post object as an argument'
+  $logger->logdie( 'has_posted() requires a Perly::Bot::Feed::Post object as an argument' )
     unless $post && $post->isa('Perly::Bot::Feed::Post');
 
   $self->{chi}->is_valid($post->root_url);
@@ -66,7 +70,7 @@ Saves the C<Perly::Bot::Feed::Post> object in the cache.
 sub save_post
 {
   my ($self, $post) = @_;
-  die 'save_post() requires a Perly::Bot::Feed::Post object as an argument'
+  $logger->logdie( 'save_post() requires a Perly::Bot::Feed::Post object as an argument' )
     unless $post && $post->isa('Perly::Bot::Feed::Post');
 
   $self->{chi}->set($post->root_url, $post);

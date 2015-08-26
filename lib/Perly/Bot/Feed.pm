@@ -2,16 +2,21 @@ package Perly::Bot::Feed;
 use strict;
 use warnings;
 #use utf8;
+
+use Carp;
+use Log::Log4perl;
+use Log::Log4perl::Level;
+use Perly::Bot::Feed::Post;
+use Role::Tiny;
 use Time::Piece;
 use Time::Seconds;
-use Carp;
-use Perly::Bot::Feed::Post;
-use XML::RSS::Parser;
 use XML::Atom::Client;
-use Role::Tiny;
+use XML::RSS::Parser;
 
 use base 'Class::Accessor';
 Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy media delay_seconds twitter/);
+
+my $logger = Log::Log4perl->get_logger();
 
 =head2 get_posts ($xml)
 
@@ -23,7 +28,7 @@ sub get_posts
 {
   my ($self, $xml) = @_;
 
-  croak 'Error get_posts() requires an $xml argument' unless $xml;
+  $logger->logcroak( 'Error get_posts() requires an $xml argument' ) unless $xml;
 
   my @posts = ();
 

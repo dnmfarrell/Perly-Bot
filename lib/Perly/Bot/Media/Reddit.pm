@@ -2,11 +2,15 @@ package Perly::Bot::Media::Reddit;
 use strict;
 use warnings;
 use Carp;
+use Log::Log4perl;
+use Log::Log4perl::Level;
 use Try::Tiny;
 use Reddit::Client;
 use Role::Tiny::With;
 
 with 'Perly::Bot::Media';
+
+my $logger = Log::Log4perl->get_logger();
 
 =head1 DESCRIPTION
 
@@ -50,7 +54,7 @@ sub new
           && $args->{session_filepath}
           && $args->{subreddit})
   {
-    croak 'args is missing required variables for ' . __PACKAGE__;
+    $logger->logcroak( 'args is missing required variables for ' . __PACKAGE__ );
   }
 
   try
@@ -73,7 +77,7 @@ sub new
   }
   catch
   {
-    croak "Error constructing Reddit API object: $_";
+    $logger->logcroak( "Error constructing Reddit API object: $_" );
   };
 }
 

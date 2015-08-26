@@ -2,11 +2,15 @@ package Perly::Bot::Media::Twitter;
 use strict;
 use warnings;
 use Carp;
+use Log::Log4perl;
+use Log::Log4perl::Level;
 use Try::Tiny;
 use Net::Twitter::Lite::WithAPIv1_1;
 use Role::Tiny::With;
 
 with 'Perly::Bot::Media';
+
+my $logger = Log::Log4perl->get_logger();
 
 =head1 DESCRIPTION
 
@@ -47,7 +51,7 @@ sub new
           && $args->{access_token}
           && $args->{access_secret})
   {
-    croak 'args is missing required variables for ' . __PACKAGE__;
+    $logger->logcroak( 'args is missing required variables for ' . __PACKAGE__ );
   }
 
   try
@@ -68,7 +72,7 @@ sub new
   }
   catch
   {
-    croak "Error constructing Twitter API object: $_";
+    $logger->logcroak(  "Error constructing Twitter API object: $_" );
   };
 }
 
@@ -112,7 +116,7 @@ sub send
   }
   catch
   {
-    croak("Error tweeting $blog_post->{url} $blog_post->{title} " . $_->code . " " . $_->message . " " . $_->error);
+    $logger->logcroak("Error tweeting $blog_post->{url} $blog_post->{title} " . $_->code . " " . $_->message . " " . $_->error);
   };
 }
 1;
