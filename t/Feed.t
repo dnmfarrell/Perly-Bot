@@ -22,12 +22,13 @@ for my $args (@$feeds)
     my %args_copy = %$args;
     $args->{media} = $media;
 
-    ok my $feed = Perly::Bot::Feed->new($args);
-    ok $feed->url;
-    ok $feed->type;
-    ok $feed->date_name;
-    ok $feed->date_format;
-    ok $feed->media;
+    my $feed = new_ok( $class => [ $args ] );
+
+    state $methods = [qw(url type date_name date_format media)];
+    foreach my $method ( @$methods )
+    {
+    ok $feed->$method(), "$method returns something that is true"
+    }
 
     TODO: {
     # This test might not make sense if you want to configure the media
@@ -37,9 +38,9 @@ for my $args (@$feeds)
     "There are the right number of media targets for " . $feed->url;
     }
 
-    like $feed->active, qr/^[01]$/;
-    like $feed->proxy, qr/^[01]$/;
-    like $feed->delay_seconds, qr/^[0-9]+$/;
+    like $feed->active, qr/^[01]$/, "active field is 0 or 1";
+    like $feed->proxy, qr/^[01]$/, "proxy field is 0 or 1";
+    like $feed->delay_seconds, qr/^[0-9]+$/, , "delay_seconds field is only digits";
   };
 }
 
