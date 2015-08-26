@@ -129,7 +129,10 @@ sub run
         $feed_args->{media}{$_} = $config->{media}{$_};
       }
 
-      trawl_blog($feed_args,
+  	  my $feed = Perly::Bot::Feed->new($feed_args);
+      return unless $feed->active;
+
+      trawl_blog($feed,
         $cache,
         $config->{agent_string},
         $config->{should_emit}{age_threshold_secs},
@@ -151,10 +154,7 @@ or not.
 
 sub trawl_blog
 {
-  my ($feed_args, $cache, $agent_string, $age_threshold_secs) = @_;
-
-  my $feed = Perly::Bot::Feed->new($feed_args);
-  return unless $feed->active;
+  my ($feed, $cache, $agent_string, $age_threshold_secs) = @_;
 
   my $ua = HTTP::Tiny->new( agent => $agent_string);
   my $response = $ua->get($feed->url);
