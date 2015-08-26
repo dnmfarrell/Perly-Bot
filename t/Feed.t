@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use v5.10.1;
-use Test::More '0.95';
+use Test::More 0.95;
 use YAML::XS 'LoadFile';
 use Perly::Bot::Media::Twitter;
 use Perly::Bot::Media::Reddit;
