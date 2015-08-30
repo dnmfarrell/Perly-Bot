@@ -2,7 +2,6 @@ package Perly::Bot;
 use warnings;
 use strict;
 use 5.10.1;
-use Encode qw/encode decode/;
 use HTTP::Tiny;
 use List::Util 'any';
 use Path::Tiny;
@@ -134,8 +133,10 @@ sub trawl_blog
     print "Checking $feed->{url} ... " if $DEBUG;
 
     # decode the HTML and re-encode it, to avoid double-encoding
-    my $decoded_response = decode('UTF-8', $response->{content});
-    $decoded_response = encode('UTF-8', $decoded_response);
+    # This should already be a Perl string since HTTP::Tiny does
+    # that bit. However, I think it does it incorrectly.
+    my $decoded_response = $response->{content};
+
     my $blog_posts = $feed->get_posts($decoded_response);
 
     say scalar @$blog_posts . ' posts found' if $DEBUG;
