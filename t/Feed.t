@@ -16,8 +16,10 @@ use_ok('Perly::Bot::Feed');
 
 for my $args (@$feeds)
 {
-  my %args_copy = %$args;
-  $args->{media} = $media;
+  for my $media_class (@{$args->{media_targets}})
+  {
+    $args->{media}{$media_class} = $media->{$media_class};
+  }
 
   ok my $feed = Perly::Bot::Feed->new($args);
   ok $feed->url;
@@ -25,7 +27,7 @@ for my $args (@$feeds)
   ok $feed->date_name;
   ok $feed->date_format;
   ok $feed->media;
-  is scalar keys %{$feed->media}, scalar @{$args_copy{media_targets}};
+  is scalar keys %{$feed->media}, scalar @{$args->{media_targets}};
   like $feed->active, qr/^[01]$/;
   like $feed->proxy, qr/^[01]$/;
   like $feed->delay_seconds, qr/^[0-9]+$/;
