@@ -9,7 +9,7 @@
     media_targets: ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit']
     delay_seconds: 21600
 - 
-    url: http://rjbs.manxome.org/rubric/entries/user/rjbs/has_body/1?format=rss
+    url: http://rjbs.manxome.org/rubric/entries/tags/perl?format=rss
     type: rss
     date_name: dc:date
     date_format: '%Y-%m-%dT%H:%M:%S'
