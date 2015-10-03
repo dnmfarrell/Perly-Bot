@@ -2,11 +2,23 @@ package Perly::Bot::Media::Twitter;
 use strict;
 use warnings;
 use Carp;
+use Log::Log4perl;
+use Log::Log4perl::Level;
 use Try::Tiny;
 use Net::Twitter::Lite::WithAPIv1_1;
 use Role::Tiny::With;
 
 with 'Perly::Bot::Media';
+
+my $logger = Log::Log4perl->get_logger();
+
+=encoding utf8
+
+=head1 NAME
+
+Perly::Bot::Media::Twitter - repost Perl content to Twitter
+
+=head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
@@ -41,13 +53,12 @@ sub new
 {
   my ($class, $args) = @_;
 
-  unless ($args->{agent_string}
-          && $args->{consumer_key}
-          && $args->{consumer_secret}
-          && $args->{access_token}
-          && $args->{access_secret})
+  my @missing = grep { ! exists $args->{$_} }
+  	qw(agent_string consumer_key consumer_secret access_token access_secret);
+
+  if( @missing )
   {
-    croak 'args is missing required variables for ' . __PACKAGE__;
+    $logger->logcroak( "args is missing required variables (@missing) for $class" );
   }
 
   try
@@ -68,7 +79,7 @@ sub new
   }
   catch
   {
-    croak "Error constructing Twitter API object: $_";
+    $logger->logcroak(  "Error constructing Twitter API object: $_" );
   };
 }
 
@@ -112,7 +123,31 @@ sub send
   }
   catch
   {
-    croak("Error tweeting $blog_post->{url} $blog_post->{title} " . $_->code . " " . $_->message . " " . $_->error);
+    $logger->logcroak("Error tweeting $blog_post->{url} $blog_post->{title} " . $_->code . " " . $_->message . " " . $_->error);
   };
 }
+
+=head1 TO DO
+
+=head1 SEE ALSO
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a GitHub project.
+
+	https://github.com/dnmfarrell/Perly-Bot
+
+=head1 AUTHOR
+
+David Farrell C<< <sillymoos@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
 1;

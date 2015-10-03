@@ -1,61 +1,37 @@
 use strict;
 use warnings;
 use v5.10.1;
-use Test::More;
+use Test::More 0.95;
 use YAML::XS 'LoadFile';
-use Perly::Bot::Media::Twitter;
-use Perly::Bot::Media::Reddit;
 
-my $feeds = LoadFile('feeds.yml');
-my $allowed_social_media = qr/twitter|reddit/;
-my $media = {
-  'Perly::Bot::Media::Twitter' => bless({}, 'Perly::Bot::Media::Twitter'),
-  'Perly::Bot::Media::Reddit'  => bless({}, 'Perly::Bot::Media::Reddit'),
-};
-use_ok('Perly::Bot::Feed');
+my $feeds = LoadFile('t/test_feeds.yml');
+
+my $class = 'Perly::Bot::Feed';
+
+use_ok($class) or BAIL_OUT( "$class did not load" );
 
 for my $args (@$feeds)
 {
-  for my $media_class (@{$args->{media_targets}})
+  subtest $args->{url} => sub
   {
-    $args->{media}{$media_class} = $media->{$media_class};
-  }
+    my %args_copy = %$args;
 
-  ok my $feed = Perly::Bot::Feed->new($args);
-  ok $feed->url;
-  ok $feed->type;
-  ok $feed->date_name;
-  ok $feed->date_format;
-  ok $feed->media;
-  is scalar keys %{$feed->media}, scalar @{$args->{media_targets}};
-  like $feed->active, qr/^[01]$/;
-  like $feed->proxy, qr/^[01]$/;
-  like $feed->delay_seconds, qr/^[0-9]+$/;
-}
+    my $feed = new_ok( $class => [ $args ] );
 
-if ($ENV{PERLY_BOT_UTF8_TEST})
-{
-  my $feed = Perly::Bot::Feed->new({
-    url           => 'http://blogs.perl.org/atom.xml',
-    type          => 'atom',
-    date_name     => 'published',
-    date_format   => '%Y-%m-%dT%H:%M:%SZ',
-    active        => 1,
-    media_targets => ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit'],
-    proxy         => 0,
-    delay_seconds => 21600,
-  });
-  my $response = do { local(@ARGV, $/) = 't/atom.xml';<> };
+    state $methods = [qw(url type date_name date_format media)];
+    can_ok( $feed, @$methods );
+    foreach my $method ( @$methods )
+    {
+      ok $feed->$method(), "$method returns something that is true (" . $feed->$method() . ")";
+    }
 
-  use Encode qw/encode decode/;
-  my $decoded_response = decode('UTF-8', $response);
-  $decoded_response = encode('UTF-8', $decoded_response);
+    ok( $feed->type eq 'rss' || $feed->type eq 'atom', 'Feed type is either rss or atom (' . $feed->type . ')' );
+    isa_ok $feed->media, ref [];
 
-  my $posts = $feed->get_posts($decoded_response);
-  for (@$posts)
-  {
-    say $_->title;
-  }
+    like $feed->active, qr/^[01]$/, "active field is 0 or 1 (" . $feed->active . ")";
+    like $feed->proxy, qr/^[01]$/, "proxy field is 0 or 1 (" . $feed->proxy . ")";
+    like $feed->delay_seconds, qr/^[0-9]+$/, , "delay_seconds field is only digits (" . $feed->delay_seconds . ")";
+  };
 }
 
 done_testing();
