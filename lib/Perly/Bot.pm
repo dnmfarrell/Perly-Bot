@@ -2,8 +2,12 @@ package Perly::Bot;
 use warnings;
 use strict;
 use 5.10.1;
+use open qw(:std :utf8);
+
 use HTTP::Tiny;
 use List::Util 'any';
+use Log::Log4perl;
+use Log::Log4perl::Level;
 use Path::Tiny;
 use Perly::Bot::Cache;
 use Perly::Bot::Feed;
@@ -12,12 +16,40 @@ use Time::Seconds;
 use Try::Tiny;
 use YAML::XS qw/LoadFile/;
 
-our $VERSION = 0.10;
-my $DEBUG = 0;
-binmode STDOUT, ':encoding(UTF-8)';
+our $VERSION = 0.09;
+
+Log::Log4perl->init(\ <<'LOG');
+	layout_class   = Log::Log4perl::Layout::PatternLayout
+    layout_pattern = %d %F{1} %L> %m %n
+
+    log4perl.rootLogger = WARN, Logfile, Screen
+
+    log4perl.appender.Logfile  = Log::Log4perl::Appender::File
+    log4perl.appender.Logfile.filename = perlybot.log
+    log4perl.appender.Logfile.layout = ${layout_class}
+    log4perl.appender.Logfile.layout.ConversionPattern = ${layout_pattern}
+
+    log4perl.appender.Screen  = Log::Log4perl::Appender::Screen
+    log4perl.appender.Screen.layout = ${layout_class}
+    log4perl.appender.Screen.layout.ConversionPattern = ${layout_pattern}
+LOG
+
+my $logger = Log::Log4perl->get_logger();
+
+$logger->level( $ENV{PERLYBOT_LOG_LEVEL} // $INFO );
 
 # modulino pattern
 __PACKAGE__->run( load_config() ) unless caller();
+
+=encoding utf8
+
+=head1 NAME
+
+Perly::Bot - repost Perl content to social media
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
@@ -40,7 +72,11 @@ sub load_config
 
   try
   {
-    $DEBUG = $ENV{PERLY_BOT_DEBUG} // $config->{debug};
+    if( $ENV{PERLY_BOT_DEBUG} // $config->{debug} )
+    {
+      $logger->level( $DEBUG );
+
+    }
 
     $config->{agent_string} = $config->{agent_string} . $VERSION;
 
@@ -62,10 +98,7 @@ sub load_config
   }
   catch
   {
-    open my $error_log, '>>', $config->{error_log_path} or die $!;
-    my $timestamp = gmtime;
-    say $error_log $timestamp->datetime . "\tload_config encountered an error: $_";
-    exit 0;
+    $logger->logdie( "load_config encountered an error: $_" );
   };
   return $config;
 }
@@ -83,7 +116,7 @@ sub run
   my $cache = $config->{cache};
   my $feeds = LoadFile($config->{feeds_path});
 
-  printf "Checking %s feeds\n", scalar @$feeds if $DEBUG;
+  $logger->debug( sprintf "Checking %s feeds\n", scalar @$feeds );
 
   # Loop through feeds, check for new posts
   for my $feed_args ( @$feeds )
@@ -96,7 +129,10 @@ sub run
         $feed_args->{media}{$_} = $config->{media}{$_};
       }
 
-      trawl_blog($feed_args,
+  	  my $feed = Perly::Bot::Feed->new($feed_args);
+      return unless $feed->active;
+
+      trawl_blog($feed,
         $cache,
         $config->{agent_string},
         $config->{should_emit}{age_threshold_secs},
@@ -104,9 +140,7 @@ sub run
     }
     catch
     {
-      open my $error_log, '>>', $config->{error_log_path} or die $!;
-      my $timestamp = gmtime;
-      say $error_log $timestamp->datetime . "\tError processing $feed_args->{url} $_";
+      $logger->error( "Error processing $feed_args->{url} $_" );
     };
   }
 }
@@ -120,17 +154,14 @@ or not.
 
 sub trawl_blog
 {
-  my ($feed_args, $cache, $agent_string, $age_threshold_secs) = @_;
-
-  my $feed = Perly::Bot::Feed->new($feed_args);
-  return unless $feed->active;
+  my ($feed, $cache, $agent_string, $age_threshold_secs) = @_;
 
   my $ua = HTTP::Tiny->new( agent => $agent_string);
   my $response = $ua->get($feed->url);
 
   if ($response->{success})
   {
-    print "Checking $feed->{url} ... " if $DEBUG;
+    $logger->debug( "Checking $feed->{url} ... " );
 
     # decode the HTML and re-encode it, to avoid double-encoding
     # This should already be a Perl string since HTTP::Tiny does
@@ -139,13 +170,13 @@ sub trawl_blog
 
     my $blog_posts = $feed->get_posts($decoded_response);
 
-    say scalar @$blog_posts . ' posts found' if $DEBUG;
+    $logger->debug( scalar @$blog_posts . ' posts found' );
 
     foreach my $post (@$blog_posts)
     {
       try
       {
-        printf "Testing %s\n", $post->title if $DEBUG;
+        $logger->debug( sprintf "Testing %s", $post->title );
 
         if ( should_emit($post, $cache, $age_threshold_secs)
              && emit($post, $feed) )
@@ -160,13 +191,13 @@ sub trawl_blog
         $cache->save_post($post);
 
         # rethrow the exception
-        die $_;
+        $logger->logdie( $_ );
       }
     }
   }
   else
   {
-    die "Error requesting $response->{url}. $response->{status} $response->{reason}";
+    $logger->logdie( "Error requesting $response->{url}. $response->{status} $response->{reason}" );
   }
 }
 
@@ -214,13 +245,34 @@ sub emit
 {
   my ($post, $feed) = @_;
 
-  if ($DEBUG)
-  {
-    printf STDOUT "Not posting %s as program is in debug mode\n", $post->root_url;
-    return 0;
-  }
+  $logger->debug( sprintf "Not posting %s as program is in debug mode", $post->root_url );
+  return 0 if $logger->is_debug;
+
   $_->send($post) for values %{$feed->media};
   return 1;
 }
+
+=head1 TO DO
+
+=head1 SEE ALSO
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a GitHub project.
+
+	https://github.com/dnmfarrell/Perly-Bot
+
+=head1 AUTHOR
+
+David Farrell C<< <sillymoos@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;
