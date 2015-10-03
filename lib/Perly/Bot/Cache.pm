@@ -2,6 +2,18 @@ package Perly::Bot::Cache;
 use strict;
 use warnings;
 use CHI;
+use Log::Log4perl;
+use Log::Log4perl::Level;
+
+my $logger = Log::Log4perl->get_logger();
+
+=encoding utf8
+
+=head1 NAME
+
+Perly::Bot::Cache - store what Perlybot has already done
+
+=head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
@@ -23,13 +35,13 @@ sub new
 {
   my ($class, $cache_path, $expires_secs) = @_;
 
-  die 'new() requires a directory path with rwx permissions'
+  $logger->logdie( 'new() requires a directory path with rwx permissions' )
     unless $cache_path
       && -x $cache_path
       && -w $cache_path
       && -r $cache_path;
 
-  die 'new() requires a positive integer for the expiry duration of entries'
+  $logger->logdie( 'new() requires a positive integer for the expiry duration of entries' )
     unless $expires_secs
       && $expires_secs =~ /^[0-9]+$/
       && $expires_secs > 0;
@@ -51,7 +63,7 @@ Checks the cache to see if the C<Perly::Bot::Feed::Post> has already been posted
 
 sub has_posted {
   my ($self, $post) = @_;
-  die 'has_posted() requires a Perly::Bot::Feed::Post object as an argument'
+  $logger->logdie( 'has_posted() requires a Perly::Bot::Feed::Post object as an argument' )
     unless $post && $post->isa('Perly::Bot::Feed::Post');
 
   $self->{chi}->is_valid($post->root_url);
@@ -66,9 +78,33 @@ Saves the C<Perly::Bot::Feed::Post> object in the cache.
 sub save_post
 {
   my ($self, $post) = @_;
-  die 'save_post() requires a Perly::Bot::Feed::Post object as an argument'
+  $logger->logdie( 'save_post() requires a Perly::Bot::Feed::Post object as an argument' )
     unless $post && $post->isa('Perly::Bot::Feed::Post');
 
   $self->{chi}->set($post->root_url, $post);
 }
+
+=head1 TO DO
+
+=head1 SEE ALSO
+
+=head1 SOURCE AVAILABILITY
+
+This source is part of a GitHub project.
+
+	https://github.com/dnmfarrell/Perly-Bot
+
+=head1 AUTHOR
+
+David Farrell C<< <sillymoos@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
 1;

@@ -44,7 +44,7 @@ my $github    = 'https://github.com/dnmfarrell/Perly-Bot';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.008',
+	'MIN_PERL_VERSION' => '5.010',
 
 	'NAME'	        => $module,
 	'ABSTRACT_FROM' => $main_file,
@@ -62,6 +62,7 @@ my %WriteMakefile = (
 
 	'TEST_REQUIRES' => {
 		'Test::More' => '0.94',
+		'Test::Pod'  => '1.51',
 		},
 
 	'PREREQ_PM'     => {
@@ -70,6 +71,7 @@ my %WriteMakefile = (
 		'Class::Accessor'                 => '0',
 		'HTML::Entities'                  => '0',
 		'HTTP::Tiny'                      => '0',
+		'Log::Log4perl'                   => '0',
 		'Net::Twitter::Lite::WithAPIv1_1' => '0',
 		'Path::Tiny'                      => '0',
 		'Perly::Bot::Feed::Post'          => '0',
