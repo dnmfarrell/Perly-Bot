@@ -37,7 +37,6 @@ Log::Log4perl->init(\ <<'LOG');
 LOG
 
 my $logger = Log::Log4perl->get_logger();
-
 $logger->level( $ENV{PERLYBOT_LOG_LEVEL} // $INFO );
 
 # modulino pattern
@@ -67,24 +66,22 @@ sub load_config
   # use local config or fallback on user config file
   my $config_path = -e 'config.yml'
     ? 'config.yml'
-    : "$ENV{HOME}.perlybot/config.yml";
+    : "$ENV{HOME}/.perly_bot/config.yml";
 
   # use canonpath for cross platform support
   my $config = LoadFile(Path::Tiny->new($config_path)->canonpath);
 
   try
   {
-    if( $ENV{PERLY_BOT_DEBUG} // $config->{debug} )
-    {
-      $logger->level( $DEBUG );
-
-    }
+    my $perlybot_home = exists $config->{perlybot_path}
+      ? $config->{perlybot_path}
+      : "$ENV{HOME}/.perly_bot";
 
     $config->{agent_string} = $config->{agent_string} . $VERSION;
 
     # init cache
     my $cache = Perly::Bot::Cache->new(
-      $config->{cache}{path},
+      "$perlybot_home/$config->{cache}{path}",
       $config->{cache}{expiry_secs}
     );
     $config->{cache} = $cache;
@@ -93,7 +90,7 @@ sub load_config
     for my $module_name (keys %{$config->{media}})
     {
       eval "require $module_name";
-      my $config_path = $config->{media}{$module_name}{config_path};
+      my $config_path = "$perlybot_home/$config->{media}{$module_name}{config_path}";
       my $args = LoadFile($config_path);
       $config->{media}{$module_name} = $module_name->new($args);
     }

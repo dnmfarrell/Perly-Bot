@@ -1,20 +1,19 @@
-debug: 0
 agent_string: 'Perly_Bot/v'
 feeds_path: 'feeds.yml'
 session_path: 'logs/session_data.json'
 error_log_path: 'logs/errors.log'
 cache: {
   expiry_secs: 604800,
-  path: '/home/sillymoose/.perly_bot/cache'
+  path: 'cache'
 }
 should_emit: {
   age_threshold_secs: 86400
 }
 media: {
   'Perly::Bot::Media::Reddit': {
-    config_path: '/home/sillymoose/.perly_bot/reddit/reddit.yml'
+    config_path: 'reddit/reddit.yml'
   },
   'Perly::Bot::Media::Twitter': {
-    config_path: '/home/sillymoose/.perly_bot/twitter/twitter.yml'
+    config_path: 'twitter/twitter.yml'
   }
 }
