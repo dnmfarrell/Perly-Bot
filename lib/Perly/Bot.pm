@@ -19,7 +19,7 @@ use YAML::XS qw/LoadFile/;
 our $VERSION = 0.09;
 
 Log::Log4perl->init(\ <<'LOG');
-	layout_class   = Log::Log4perl::Layout::PatternLayout
+  layout_class   = Log::Log4perl::Layout::PatternLayout
     layout_pattern = %d %F{1} %L> %m %n
 
     log4perl.rootLogger = WARN, Logfile, Screen
@@ -129,7 +129,7 @@ sub run
         $feed_args->{media}{$_} = $config->{media}{$_};
       }
 
-  	  my $feed = Perly::Bot::Feed->new($feed_args);
+      my $feed = Perly::Bot::Feed->new($feed_args);
       return unless $feed->active;
 
       trawl_blog($feed,
@@ -260,15 +260,15 @@ sub emit
 
 This source is part of a GitHub project.
 
-	https://github.com/dnmfarrell/Perly-Bot
+  https://github.com/dnmfarrell/Perly-Bot
 
 =head1 AUTHOR
 
-David Farrell C<< <sillymoos@cpan.org> >>
+David Farrell C<< <dfarrell@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+Copyright © 2015, David Farrell C<< <dfarrell@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

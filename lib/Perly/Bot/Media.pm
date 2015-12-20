@@ -19,15 +19,15 @@ Perly::Bot::Media - enforce the interface for media destinations
 
 This source is part of a GitHub project.
 
-	https://github.com/dnmfarrell/Perly-Bot
+  https://github.com/dnmfarrell/Perly-Bot
 
 =head1 AUTHOR
 
-David Farrell C<< <sillymoos@cpan.org> >>
+David Farrell C<< <dfarrell@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+Copyright © 2015, David Farrell C<< <dfarrell@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

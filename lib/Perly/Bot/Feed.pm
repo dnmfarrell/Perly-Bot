@@ -11,7 +11,7 @@ use Perly::Bot::Feed::Post;
 use Role::Tiny;
 use Time::Piece;
 use Time::Seconds;
-use XML::Atom::Client;
+use XML::FeedPP;
 use XML::RSS::Parser;
 
 use base 'Class::Accessor';
@@ -40,16 +40,16 @@ This method requires an xml string of the blog feed and returns an arrayref of L
 sub new
 {
   state $type_defaults = {
-  	rss => {
-		date_name   => 'pubDate',
-		date_format => '%a, %d %b %Y %H:%M:%S %z',
-		parser      => 'XML::RSS::Parser',
-  		},
-  	atom => {
-		date_name   => 'published',
-		date_format => '%Y-%m-%dT%H:%M:%SZ',
-		parser      => 'XML::Atom::Client',
-  		},
+    rss => {
+    date_name   => 'pubDate',
+    date_format => '%a, %d %b %Y %H:%M:%S %z',
+    parser      => 'XML::RSS::Parser',
+      },
+    atom => {
+    date_name   => 'published',
+    date_format => '%Y-%m-%dT%H:%M:%SZ',
+    parser      => 'XML::FeedPP',
+      },
   };
 
   state $defaults = {
@@ -76,10 +76,10 @@ sub new
   state $required = [qw(url type date_name date_format active media proxy delay_seconds parser)];
   my @missing = grep { ! exists $config{$_} } @$required;
   $logger->logcroak( "Missing fields (@missing) in call to $class" )
-  	if @missing;
+    if @missing;
 
   $logger->logcroak( "Unallowed content parser $config{parser}" )
-  	unless exists $class->_allowed_parsers->{ $config{parser} };
+    unless exists $class->_allowed_parsers->{ $config{parser} };
 
   bless \%config, $class;
 }
@@ -87,10 +87,10 @@ sub new
 sub _allowed_parsers
 {
   state $allowed = {
-	  map { $_ => 1 } qw(
-	   XML::RSS::Parser
-	   XML::Atom::Client
-	   ) };
+    map { $_ => 1 } qw(
+     XML::RSS::Parser
+     XML::FeedPP
+     ) };
   $allowed;
 }
 
@@ -128,18 +128,16 @@ sub get_posts
     # accessors are generated from the available tags in the atom feed
     # the tags can have different names, so we store the tag name in feeds.yml
     no strict 'refs';
-    my $items = XML::Atom::Feed->new( Stream => \$xml);
-    foreach my $i ( $items->entries )
+    my @items = XML::FeedPP::Atom->new($xml, -type => 'string')->get_item();
+    foreach my $i ( @items )
     {
       # extract the post date
-      my $datetime_element_name = $self->date_name;
-      my $datetime_raw = $i->$datetime_element_name =~ s/ UTC| GMT//gr;
+      my $datetime_raw = $i->get( $self->date_name ) =~ s/ UTC| GMT//gr;
       my $datetime = Time::Piece->strptime( $datetime_raw, $self->date_format );
 
         push @posts, Perly::Bot::Feed::Post->new({
           description => $i->summary,
           datetime    => $datetime,
-          #title       => encode('utf8', decode('utf8', $i->title)),
           title       => $i->title,
           url         => $i->link->href,
           proxy       => $self->proxy,
@@ -157,15 +155,15 @@ sub get_posts
 
 This source is part of a GitHub project.
 
-	https://github.com/dnmfarrell/Perly-Bot
+  https://github.com/dnmfarrell/Perly-Bot
 
 =head1 AUTHOR
 
-David Farrell C<< <sillymoos@cpan.org> >>
+David Farrell C<< <dfarrell@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+Copyright © 2015, David Farrell C<< <dfarrell@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
