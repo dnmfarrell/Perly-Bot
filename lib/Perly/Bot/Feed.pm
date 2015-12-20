@@ -136,10 +136,10 @@ sub get_posts
       my $datetime = Time::Piece->strptime( $datetime_raw, $self->date_format );
 
         push @posts, Perly::Bot::Feed::Post->new({
-          description => $i->summary,
+          description => $i->description,
           datetime    => $datetime,
           title       => $i->title,
-          url         => $i->link->href,
+          url         => $i->link,
           proxy       => $self->proxy,
         });
     }
