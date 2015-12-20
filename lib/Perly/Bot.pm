@@ -28,10 +28,12 @@ Log::Log4perl->init(\ <<'LOG');
     log4perl.appender.Logfile.filename = perlybot.log
     log4perl.appender.Logfile.layout = ${layout_class}
     log4perl.appender.Logfile.layout.ConversionPattern = ${layout_pattern}
+    log4perl.appender.Logfile.utf8 = 1
 
     log4perl.appender.Screen  = Log::Log4perl::Appender::Screen
     log4perl.appender.Screen.layout = ${layout_class}
     log4perl.appender.Screen.layout.ConversionPattern = ${layout_pattern}
+    log4perl.appender.Screen.utf8 = 1
 LOG
 
 my $logger = Log::Log4perl->get_logger();
