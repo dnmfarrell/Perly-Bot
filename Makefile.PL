@@ -50,7 +50,7 @@ my %WriteMakefile = (
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
 	'LICENSE'       => 'perl',
-	'AUTHOR'        => 'David Farrell <sillymoos@cpan.org>',
+	'AUTHOR'        => 'David Farrell <dfarrell@cpan.org>',
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -82,7 +82,7 @@ my %WriteMakefile = (
 		'Time::Seconds'                   => '0',
 		'Try::Tiny'                       => '0',
 		'URI'                             => '0',
-		'XML::Atom::Client'               => '0',
+		'XML::FeedPP'                     => '0',
 		'XML::RSS::Parser'                => '0',
 		'YAML::XS'                        => '0',
 		},

@@ -20,7 +20,7 @@ use YAML::XS qw/LoadFile/;
 our $VERSION = 0.09;
 
 Log::Log4perl->init(\ <<'LOG');
-	layout_class   = Log::Log4perl::Layout::PatternLayout
+  layout_class   = Log::Log4perl::Layout::PatternLayout
     layout_pattern = %d %F{1} %L> %m %n
 
     log4perl.rootLogger = WARN, Logfile, Screen
@@ -29,14 +29,15 @@ Log::Log4perl->init(\ <<'LOG');
     log4perl.appender.Logfile.filename = perlybot.log
     log4perl.appender.Logfile.layout = ${layout_class}
     log4perl.appender.Logfile.layout.ConversionPattern = ${layout_pattern}
+    log4perl.appender.Logfile.utf8 = 1
 
     log4perl.appender.Screen  = Log::Log4perl::Appender::Screen
     log4perl.appender.Screen.layout = ${layout_class}
     log4perl.appender.Screen.layout.ConversionPattern = ${layout_pattern}
+    log4perl.appender.Screen.utf8 = 1
 LOG
 
 my $logger = Log::Log4perl->get_logger();
-
 $logger->level( $ENV{PERLYBOT_LOG_LEVEL} // $INFO );
 
 # modulino pattern
@@ -66,24 +67,22 @@ sub load_config
   # use local config or fallback on user config file
   my $config_path = -e 'config.yml'
     ? 'config.yml'
-    : "$ENV{HOME}.perlybot/config.yml";
+    : "$ENV{HOME}/.perly_bot/config.yml";
 
   # use canonpath for cross platform support
   my $config = LoadFile(Path::Tiny->new($config_path)->canonpath);
 
   try
   {
-    if( $ENV{PERLY_BOT_DEBUG} // $config->{debug} )
-    {
-      $logger->level( $DEBUG );
-
-    }
+    my $perlybot_home = exists $config->{perlybot_path}
+      ? $config->{perlybot_path}
+      : "$ENV{HOME}/.perly_bot";
 
     $config->{agent_string} = $config->{agent_string} . $VERSION;
 
     # init cache
     my $cache = Perly::Bot::Cache->new(
-      $config->{cache}{path},
+      "$perlybot_home/$config->{cache}{path}",
       $config->{cache}{expiry_secs}
     );
     $config->{cache} = $cache;
@@ -92,7 +91,7 @@ sub load_config
     for my $module_name (keys %{$config->{media}})
     {
       eval "require $module_name";
-      my $config_path = $config->{media}{$module_name}{config_path};
+      my $config_path = "$perlybot_home/$config->{media}{$module_name}{config_path}";
       my $args = LoadFile($config_path);
       $config->{media}{$module_name} = $module_name->new($args);
     }
@@ -130,7 +129,7 @@ sub run
         $feed_args->{media}{$_} = $config->{media}{$_};
       }
 
-  	  my $feed = Perly::Bot::Feed->new($feed_args);
+      my $feed = Perly::Bot::Feed->new($feed_args);
       return unless $feed->active;
 
       trawl_blog($feed,
@@ -261,15 +260,15 @@ sub emit
 
 This source is part of a GitHub project.
 
-	https://github.com/dnmfarrell/Perly-Bot
+  https://github.com/dnmfarrell/Perly-Bot
 
 =head1 AUTHOR
 
-David Farrell C<< <sillymoos@cpan.org> >>
+David Farrell C<< <dfarrell@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2015, David Farrell C<< <sillymoos@cpan.org> >>. All rights reserved.
+Copyright © 2015, David Farrell C<< <dfarrell@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
