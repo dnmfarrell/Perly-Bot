@@ -66,24 +66,22 @@ my %WriteMakefile = (
 		},
 
 	'PREREQ_PM'     => {
-		'Carp'                            => '0',
 		'CHI'                             => '0',
+		'Carp'                            => '0',
 		'Class::Accessor'                 => '0',
 		'HTML::Entities'                  => '0',
 		'HTTP::Tiny'                      => '0',
 		'Log::Log4perl'                   => '0',
+		'Mojo::Snoo'                      => '0.14', # github.com/dnmfarrell/Mojo-Snoo
 		'Net::Twitter::Lite::WithAPIv1_1' => '0',
 		'Path::Tiny'                      => '0',
-		'Perly::Bot::Feed::Post'          => '0',
-		'Reddit::Client'                  => '0',
-		'Role::Tiny::With'                => '0',
 		'Role::Tiny'                      => '0',
+		'Role::Tiny::With'                => '0',
 		'Time::Piece'                     => '0',
 		'Time::Seconds'                   => '0',
 		'Try::Tiny'                       => '0',
 		'URI'                             => '0',
 		'XML::FeedPP'                     => '0',
-		'XML::RSS::Parser'                => '0',
 		'YAML::XS'                        => '0',
 		},
 

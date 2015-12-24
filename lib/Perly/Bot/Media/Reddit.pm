@@ -5,7 +5,7 @@ use Carp;
 use Log::Log4perl;
 use Log::Log4perl::Level;
 use Try::Tiny;
-use Reddit::Client;
+use Mojo::Snoo::Subreddit;
 use Role::Tiny::With;
 
 with 'Perly::Bot::Media';
@@ -20,17 +20,17 @@ Perly::Bot::Media::Reddit - Post to Reddit
 
 =head1 SYNOPSIS
 
-	use Perly::Bot::Media::Reddit;
+  use Perly::Bot::Media::Reddit;
 
-	my $poster = Perly::Bot::Media::Reddit->new(
-		agent_string     => ...,
-		username         => ...,
-		password         => ...,
-		session_filepath => ...,
-		subreddit        => ...,
-		);
+  my $poster = Perly::Bot::Media::Reddit->new(
+    agent_string     => ...,
+    username         => ...,
+    password         => ...,
+    session_filepath => ...,
+    subreddit        => ...,
+    );
 
-	$poster->send( ... );
+  $poster->send( ... );
 
 =head1 DESCRIPTION
 
@@ -69,29 +69,22 @@ sub new
   my ($class, $args) = @_;
 
   my @missing = grep { ! exists $args->{$_} }
-  	qw(agent_string username password session_filepath subreddit);
+    qw(agent_string username password client_id client_secret subreddit);
 
   if( @missing )
   {
     $logger->logcroak( "args is missing required variables (@missing) for $class" );
   }
-
   try
   {
-    my $reddit = Reddit::Client->new(
-      session_file => $args->{session_filepath},
-      user_agent   => $args->{agent_string},
-    );
-
-    unless ($reddit->is_logged_in)
-    {
-        $reddit->login($args->{username}, $args->{password});
-        $reddit->save_session();
-    }
-
-    return bless {
-      reddit_api => $reddit,
-      subreddit  => $args->{subreddit},
+    bless {
+      reddit_api => Mojo::Snoo::Subreddit->new(
+        name          => $args->{subreddit},
+        client_id     => $args->{client_id},
+        client_secret => $args->{client_secret},
+        username      => $args->{username},
+        password      => $args->{password},
+      ),
     }, $class;
   }
   catch
@@ -105,9 +98,8 @@ sub send
   my ($self, $blog_post) = @_;
 
   $self->{reddit_api}->submit_link(
-    subreddit => $self->{subreddit},
-    title     => $blog_post->decoded_title,
-    url       => $blog_post->root_url
+    $blog_post->decoded_title,
+    $blog_post->root_url
   );
   sleep(2); # throttle requests to avoid exceeding API limit
 }
@@ -120,7 +112,7 @@ sub send
 
 This source is part of a GitHub project.
 
-	https://github.com/dnmfarrell/Perly-Bot
+  https://github.com/dnmfarrell/Perly-Bot
 
 =head1 AUTHOR
 

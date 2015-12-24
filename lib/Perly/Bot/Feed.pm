@@ -10,7 +10,6 @@ use Log::Log4perl::Level;
 use Perly::Bot::Feed::Post;
 use Role::Tiny;
 use Time::Piece;
-use Time::Seconds;
 use XML::FeedPP;
 
 use base 'Class::Accessor';
@@ -39,15 +38,20 @@ This method requires an xml string of the blog feed and returns an arrayref of L
 sub new
 {
   state $type_defaults = {
+    rdf => {
+    date_name   => 'dc:date',
+    date_format => '%Y-%m-%dT%T%z',
+    parser      => 'XML::FeedPP::RDF',
+      },
     rss => {
     date_name   => 'pubDate',
-    date_format => '%a, %d %b %Y %H:%M:%S %z',
-    parser      => 'XML::FeedPP',
+    date_format => '%a, %d %b %Y %T %z',
+    parser      => 'XML::FeedPP::RSS',
       },
     atom => {
     date_name   => 'published',
-    date_format => '%Y-%m-%dT%H:%M:%SZ',
-    parser      => 'XML::FeedPP',
+    date_format => '%Y-%m-%dT%TZ',
+    parser      => 'XML::FeedPP::Atom',
       },
   };
 
@@ -80,6 +84,8 @@ sub new
   $logger->logcroak( "Unallowed content parser $config{parser}" )
     unless exists $class->_allowed_parsers->{ $config{parser} };
 
+    # $logger->debug("Building new feed objects with config " . Dumper(\%config));use Data::Dumper;
+
   bless \%config, $class;
 }
 
@@ -87,7 +93,9 @@ sub _allowed_parsers
 {
   state $allowed = {
     map { $_ => 1 } qw(
-     XML::FeedPP
+     XML::FeedPP::RSS
+     XML::FeedPP::RDF
+     XML::FeedPP::Atom
      ) };
   $allowed;
 }
@@ -100,16 +108,37 @@ sub get_posts
 
   my @posts = ();
 
-  my $class = $self->type eq 'rss' ? 'XML::FeedPP::RSS' : 'XML::FeedPP::Atom';
-
-  my @items = $class->new($xml, -type => 'string')->get_item();
+  my @items = $self->{parser}->new($xml, -type => 'string')->get_item();
   foreach my $i ( @items )
   {
     # extract the post date
-    my $datetime_raw = $i->get( $self->date_name ) =~ s/ UTC| GMT//gr;
-    my $datetime = Time::Piece->strptime( $datetime_raw, $self->date_format );
-  
-      push @posts, Perly::Bot::Feed::Post->new({
+    my $datetime_raw = $i->get( $self->date_name );
+    my $date_format = $self->date_format;
+    my $datetime_clean = $datetime_raw;
+
+    # time::piece does not recognise UTC as a time zone
+    $datetime_clean =~ s/UTC/GMT/ if $date_format =~ /\%Z/;
+
+    # time::piece requires timezone modifiers to not have a semicolon
+    $datetime_clean =~ s/([+\-][0-9][0-9]):([0-9][0-9]$)/$1$2/ if $date_format =~ /\%z/;
+
+    # time::piece struggles with milliseconds
+    if ($self->date_format =~ /%ms/)
+    {
+      $datetime_clean =~ s/\.[0-9][0-9][0-9]//;
+      $date_format =~ s/\%ms//; # %ms is a Perly bot convention not used by strptime
+    }
+
+    # save some useful debugging info, datetimes are weird
+    if ($logger->is_debug)
+    {
+      $logger->debug(sprintf 'Parsing %s changed to %s using format %s',
+        $datetime_raw, $datetime_clean, $date_format);
+    }
+
+    my $post = eval {
+      my $datetime = Time::Piece->strptime( $datetime_clean, $date_format );
+      Perly::Bot::Feed::Post->new({
         delay_seconds => $self->delay_seconds,
         description => $i->description,
         datetime    => $datetime,
@@ -118,8 +147,18 @@ sub get_posts
         proxy       => $self->proxy,
         twitter     => $self->twitter,
       });
+    };
+
+    if ($@)
+    {
+      $logger->warn("Error creating post object: $@");
+    }
+    else
+    {
+      push @posts, $post;
+    }
   }
-  return \@posts
+  return \@posts;
 }
 
 =head1 TO DO
@@ -146,4 +185,3 @@ it under the same terms as Perl itself.
 =cut
 
 1;
-

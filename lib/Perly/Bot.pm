@@ -17,7 +17,7 @@ use Time::Seconds;
 use Try::Tiny;
 use YAML::XS qw/LoadFile/;
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 Log::Log4perl->init(\ <<'LOG');
   layout_class   = Log::Log4perl::Layout::PatternLayout
