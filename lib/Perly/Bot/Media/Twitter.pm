@@ -103,13 +103,11 @@ sub _build_tweet
   {
     return join ' ', $title, $via, $url;
   }
-  elsif (length($title) < $char_count)
-  {
-    return join ' ', $title, $url;
-  }
   else
   {
-    return substr($title, 0, $char_count - 4) . "... " . $url;
+    # 5 chars = 3 ellipses plus 2 spaces
+    my $shortened_title =  substr($title, 0, $char_count - 5 - length($via));
+    return join ' ', $shortened_title, $via, $url;
   }
 }
 
