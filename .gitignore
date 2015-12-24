@@ -1,8 +1,8 @@
-logs/*
 MYMETA*
-*.log
 Makefile
 blib
 pm_to_blib
 Makefile.old
 *.swp
+*.old
+*.log
