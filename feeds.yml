@@ -5,21 +5,27 @@
 - 
     url: http://rjbs.manxome.org/rubric/entries/tags/perl?format=rss
     type: rdf
+    twitter: rjbs
 - 
     url: http://www.dagolden.com/index.php/feed/
     type: rss
+    twitter: xdg
 - 
     url: http://www.learning-perl.com/feed/
     type: rss
+    twitter: briandfoy_perl
 - 
     url: http://www.intermediateperl.com/feed/
     type: rss
+    twitter: briandfoy_perl
 - 
     url: http://www.masteringperl.org/feed/
     type: rss
+    twitter: briandfoy_perl
 - 
     url: http://www.effectiveperlprogramming.com/feed/
     type: rss
+    twitter: briandfoy_perl
 - 
     url: http://perltricks.com/feed/rss
     type: rss
@@ -30,6 +36,7 @@
     url: http://feeds.feedburner.com/szabgab?format=xml
     type: rdf
     proxy: 1
+    twitter: szagab
 - 
     url: http://blog.twoshortplanks.com/feed/
     type: rss
@@ -43,6 +50,7 @@
 - 
     url: https://p6weekly.wordpress.com/feed/
     type: rss
+    twitter: loltimo
 - 
     url: http://perlmaven.com/atom
     type: atom
@@ -53,11 +61,13 @@
     type: atom
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%S'
+    twitter: neilbowers
 - 
     url: http://jjnapiorkowski.typepad.com/modern-perl/atom.xml
     type: atom
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%S%z'
+    twitter: jjn1056
 - 
     url: http://perl.bearcircle.net/feeds/posts/default
     type: atom
@@ -74,6 +84,7 @@
     url: https://blog.afoolishmanifesto.com/index.xml
     type: rss
     date_format: '%a, %d %b %Y %T %Z'
+    twitter: frioux
 - 
     url: http://blogs.perl.org/atom.xml
     type: atom
@@ -87,25 +98,36 @@
     type: atom
     date_name: updated
     date_format: '%Y-%m-%dT%T%z'
+    twitter: sinan_unur
 - 
     url: http://www.wumpus-cave.net/feed/
     type: rss
+    twitter: wumpuscave
 - 
     url: http://feeds.feedburner.com/PerlHacks
     type: rss
     proxy: 1
+    twitter: davorg
 - 
     url: http://techblog.babyl.ca/feed/atom
     type: atom
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%SZ'
+    twitter: yenzie
 - 
     url: http://blog.plover.com/prog/index.atom
     type: atom
     date_name: published
+    twitter: mjdominus
 - 
     url: http://blog.urth.org/feed/
     type: rss
+    twitter: houseabsolute
 - 
     url: https://6guts.wordpress.com/feed/
     type: rss
+    twitter: jnthnwrthngtn
+- 
+    url: https://perl6advent.wordpress.com/feed/atom/
+    type: atom
+    date_name: published
