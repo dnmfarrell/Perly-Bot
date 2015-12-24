@@ -3,6 +3,7 @@ use warnings;
 use strict;
 use 5.10.1;
 use open qw(:std :utf8);
+use lib 'lib';
 
 use HTTP::Tiny;
 use List::Util 'any';

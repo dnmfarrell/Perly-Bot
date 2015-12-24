@@ -6,7 +6,7 @@ A Perl modulino class that tracks Perl blogs and posts them on social media.
 
 =head2 SYNOPSIS
 
-  $ perl -Ilib lib/Perly/Bot.pm
+  $ perl lib/Perly/Bot.pm
 
 =head2 Author
 
