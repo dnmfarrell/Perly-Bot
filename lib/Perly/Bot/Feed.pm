@@ -5,6 +5,7 @@ use v5.10;
 use utf8;
 
 use Carp;
+use Data::Dumper;
 use Log::Log4perl;
 use Log::Log4perl::Level;
 use Perly::Bot::Feed::Post;
@@ -58,7 +59,7 @@ sub new
   state $defaults = {
     active        => 1,
     proxy         => 0,
-    media         => ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit'],
+    media_targets => ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit'],
     delay_seconds => 21600,
   };
 
@@ -76,6 +77,14 @@ sub new
     %$args
     );
 
+  # load media objects
+  for my $class (@{$config{media_targets}})
+  {
+    $logger->debug("Loading $class");
+    eval "require $class";
+    push @{$config{media}}, $class->new( $config{media_config}->{$class} );
+  }
+
   state $required = [qw(url type date_name date_format active media proxy delay_seconds parser)];
   my @missing = grep { ! exists $config{$_} } @$required;
   $logger->logcroak( "Missing fields (@missing) in call to $class" )
@@ -83,8 +92,6 @@ sub new
 
   $logger->logcroak( "Unallowed content parser $config{parser}" )
     unless exists $class->_allowed_parsers->{ $config{parser} };
-
-    # $logger->debug("Building new feed objects with config " . Dumper(\%config));use Data::Dumper;
 
   bless \%config, $class;
 }

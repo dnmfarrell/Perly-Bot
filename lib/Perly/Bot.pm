@@ -90,10 +90,9 @@ sub load_config
     # load media objects
     for my $module_name (keys %{$config->{media}})
     {
-      eval "require $module_name";
       my $config_path = "$perlybot_home/$config->{media}{$module_name}{config_path}";
       my $args = LoadFile($config_path);
-      $config->{media}{$module_name} = $module_name->new($args);
+      $config->{media}{$module_name} = $args;
     }
   }
   catch
@@ -123,12 +122,8 @@ sub run
   {
     try
     {
-      # inject the loaded media objects into feed_args
-      for (@{$feed_args->{media_targets}})
-      {
-        $feed_args->{media}{$_} = $config->{media}{$_};
-      }
-
+      # inject the media config into the feed args
+      $feed_args->{media_config} = $config->{media};
       my $feed = Perly::Bot::Feed->new($feed_args);
       return unless $feed->active;
 
@@ -248,7 +243,7 @@ sub emit
   $logger->debug( sprintf "Not posting %s as program is in debug mode", $post->root_url );
   return 0 if $logger->is_debug;
 
-  $_->send($post) for values %{$feed->media};
+  $_->send($post) for values @{$feed->media};
   return 1;
 }
 
