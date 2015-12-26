@@ -127,11 +127,7 @@ sub run
       my $feed = Perly::Bot::Feed->new($feed_args);
       return unless $feed->active;
 
-      trawl_blog($feed,
-        $cache,
-        $config->{agent_string},
-        $config->{should_emit}{age_threshold_secs},
-      );
+      trawl_blog($feed, $cache, $config);
     }
     catch
     {
@@ -149,9 +145,9 @@ or not.
 
 sub trawl_blog
 {
-  my ($feed, $cache, $agent_string, $age_threshold_secs) = @_;
+  my ($feed, $cache, $config) = @_;
 
-  my $ua = HTTP::Tiny->new( agent => $agent_string);
+  my $ua = HTTP::Tiny->new( agent => $config->{agent_string});
   my $response = $ua->get($feed->url);
 
   if ($response->{success})
@@ -173,15 +169,15 @@ sub trawl_blog
       {
         $logger->debug( sprintf "Testing %s", $post->title );
 
-        if ( should_emit($post, $cache, $age_threshold_secs)
-             && emit($post, $feed) )
+        if ( should_emit($post, $cache, $config) &&
+             emit($post, $feed))
         {
           $cache->save_post($post);
         }
       }
       catch
       {
-        # exception thrown, cache the post so we don't
+        # exception thrown, cache the post so we dont
         # try to emit it again
         $cache->save_post($post);
 
@@ -210,7 +206,7 @@ Feel free to subclass and override this logic with your own needs!
 
 sub should_emit
 {
-  my ($post, $cache, $age_threshold_secs) = @_;
+  my ($post, $cache, $config) = @_;
 
   # posts must mention a Perl keyword to be considered relevant
   my $looks_perly = qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
@@ -218,7 +214,7 @@ sub should_emit
   my $time_now = gmtime;
 
   # is the post fresh enough?
-  $post->datetime > $time_now - $age_threshold_secs
+  $post->datetime > $time_now - $config->{should_emit}{age_threshold_secs}
 
   # have we delayed posting enough for the owner to post themselves?
   && $time_now - $post->datetime > $post->delay_seconds
