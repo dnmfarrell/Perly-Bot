@@ -3,7 +3,7 @@
     url: http://cpanpr.tumblr.com/rss
     type: rss
 - 
-    url: http://rjbs.manxome.org/rubric/entries/tags/perl?format=rss
+    url: https://rjbs.manxome.org/rubric/entries/tags/perl?format=rss
     type: rdf
     twitter: rjbs
 - 
@@ -94,7 +94,7 @@
     url: https://perlancar.wordpress.com/feed/
     type: rss
 - 
-    url: http://www.nu42.com/nu42.atom.xml
+    url: https://www.nu42.com/nu42.atom.xml
     type: atom
     date_name: updated
     date_format: '%Y-%m-%dT%T%z'

@@ -5,10 +5,10 @@ use 5.10.1;
 use open qw(:std :utf8);
 use lib 'lib';
 
-use HTTP::Tiny;
 use List::Util 'any';
 use Log::Log4perl;
 use Log::Log4perl::Level;
+use Mojo::UserAgent;
 use Path::Tiny;
 use Perly::Bot::Cache;
 use Perly::Bot::Feed;
@@ -21,7 +21,7 @@ our $VERSION = 0.10;
 
 Log::Log4perl->init(\ <<'LOG');
   layout_class   = Log::Log4perl::Layout::PatternLayout
-    layout_pattern = %d %F{1} %L> %m %n
+    layout_pattern = %d %F{1} %L> %m%n
 
     log4perl.rootLogger = WARN, Logfile, Screen
 
@@ -150,16 +150,9 @@ sub trawl_blog
   my $ua = HTTP::Tiny->new( agent => $config->{agent_string});
   my $response = $ua->get($feed->url);
 
-  if ($response->{success})
+  if (my $content = fetch_feed($feed, $config) )
   {
-    $logger->debug( "Checking $feed->{url} ... " );
-
-    # decode the HTML and re-encode it, to avoid double-encoding
-    # This should already be a Perl string since HTTP::Tiny does
-    # that bit. However, I think it does it incorrectly.
-    my $decoded_response = $response->{content};
-
-    my $blog_posts = $feed->get_posts($decoded_response);
+    my $blog_posts = $feed->get_posts($content);
 
     $logger->debug( scalar @$blog_posts . ' posts found' );
 
@@ -185,10 +178,6 @@ sub trawl_blog
         $logger->logdie( $_ );
       }
     }
-  }
-  else
-  {
-    $logger->logdie( "Error requesting $response->{url}. $response->{status} $response->{reason}" );
   }
 }
 
@@ -241,6 +230,28 @@ sub emit
 
   $_->send($post) for values @{$feed->media};
   return 1;
+}
+
+sub fetch_feed
+{
+  my ($feed, $config) = @_;
+
+  state $ua = do {
+    my $ua = Mojo::UserAgent->new;
+    $ua->transactor->name( $config->{agent_string} );
+    $ua;
+  };
+
+  $logger->debug( "Checking $feed->{url} ..." );
+  my $tx = $ua->get($feed->url);
+
+  if( $tx->success )
+  {
+    my $content = $tx->res->text; # decode
+    $logger->debug( sprintf 'Received content length: %s', length($content) );
+    return $content;
+  }
+  $logger->logdie( "Error requesting [%s]. [%s] [%s]", $feed->url, $tx->res->code, $tx->res->message );
 }
 
 =head1 TO DO
