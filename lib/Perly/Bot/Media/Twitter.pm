@@ -54,7 +54,7 @@ sub new
   my ($class, $args) = @_;
 
   my @missing = grep { ! exists $args->{$_} }
-  	qw(agent_string consumer_key consumer_secret access_token access_secret);
+    qw(agent_string consumer_key consumer_secret access_token access_secret);
 
   if( @missing )
   {
@@ -106,7 +106,7 @@ sub _build_tweet
   else
   {
     # 5 chars = 3 ellipses plus 2 spaces
-    my $shortened_title =  substr($title, 0, $char_count - 5 - length($via));
+    my $shortened_title =  substr($title, 0, $char_count - 5 - length($via)) . '...';
     return join ' ', $shortened_title, $via, $url;
   }
 }
@@ -133,7 +133,7 @@ sub send
 
 This source is part of a GitHub project.
 
-	https://github.com/dnmfarrell/Perly-Bot
+  https://github.com/dnmfarrell/Perly-Bot
 
 =head1 AUTHOR
 
