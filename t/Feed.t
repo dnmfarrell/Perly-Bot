@@ -25,7 +25,7 @@ for my $args (@$feeds)
       ok $feed->$method(), "$method returns something that is true (" . $feed->$method() . ")";
     }
 
-    ok( $feed->type eq 'rss' || $feed->type eq 'atom', 'Feed type is either rss or atom (' . $feed->type . ')' );
+    ok( $feed->type eq 'rss' || $feed->type eq 'atom' || $feed->type eq 'rdf', 'Feed type is either rss, atom or rdf (' . $feed->type . ')' );
     isa_ok $feed->media, ref [];
 
     like $feed->active, qr/^[01]$/, "active field is 0 or 1 (" . $feed->active . ")";
