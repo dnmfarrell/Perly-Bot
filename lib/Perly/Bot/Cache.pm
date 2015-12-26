@@ -4,6 +4,7 @@ use warnings;
 use CHI;
 use Log::Log4perl;
 use Log::Log4perl::Level;
+use File::Path qw/make_path/;
 
 my $logger = Log::Log4perl->get_logger();
 
@@ -34,6 +35,9 @@ and the number of seconds to store a cache entry for.
 sub new
 {
   my ($class, $cache_path, $expires_secs) = @_;
+
+  make_path( $cache_path ) unless !$cache_path ||
+    ($cache_path && -d $cache_path);
 
   $logger->logdie( 'new() requires a directory path with rwx permissions' )
     unless $cache_path
