@@ -10,7 +10,8 @@ use Log::Log4perl;
 use Log::Log4perl::Level;
 use URI;
 
-Perly::Bot::Feed::Post->mk_accessors(qw/url title description datetime proxy delay_seconds twitter/);
+Perly::Bot::Feed::Post->mk_accessors(
+  qw/url title description datetime proxy delay_seconds twitter/);
 
 my $logger = Log::Log4perl->get_logger();
 
@@ -34,9 +35,9 @@ Removes the query component of the url. This is to reduce the risk of posting du
 
 sub clean_url
 {
-    my ($self, $url) = @_;
-    my $uri = URI->new($url);
-    return $uri->scheme . '://' . $uri->host . $uri->path;
+  my ( $self, $url ) = @_;
+  my $uri = URI->new($url);
+  return $uri->scheme . '://' . $uri->host . $uri->path;
 }
 
 =head2 root_url
@@ -48,21 +49,23 @@ Returns the clean url, if the blog post url is a proxy, it will follow the proxy
 sub root_url
 {
   my ($self) = @_;
-  return $self->clean_url($self->url) unless $self->proxy;
+  return $self->clean_url( $self->url ) unless $self->proxy;
 
   # if we've already retrieved the root url, don't pull it again
   return $self->{_root_url} if exists $self->{_root_url};
 
-  my $response = HTTP::Tiny->new->get($self->url);
+  my $response = HTTP::Tiny->new->get( $self->url );
 
-  if ($response->{success})
+  if ( $response->{success} )
   {
-    $self->{_root_url} = $self->clean_url($response->{url});
+    $self->{_root_url} = $self->clean_url( $response->{url} );
     return $self->{_root_url};
   }
   else
   {
-    $logger->logcroak( "Error requesting $response->{url}. $response->{status} $response->{reason}" );
+    $logger->logcroak(
+      "Error requesting $response->{url}. $response->{status} $response->{reason}"
+    );
   }
 }
 

@@ -51,41 +51,42 @@ is not enough chars left (e.g. if the blog post title is extremely long). This i
 
 sub new
 {
-  my ($class, $args) = @_;
+  my ( $class, $args ) = @_;
 
-  my @missing = grep { ! exists $args->{$_} }
+  my @missing = grep { !exists $args->{$_} }
     qw(agent_string consumer_key consumer_secret access_token access_secret);
 
-  if( @missing )
+  if (@missing)
   {
-    $logger->logcroak( "args is missing required variables (@missing) for $class" );
+    $logger->logcroak(
+      "args is missing required variables (@missing) for $class");
   }
 
   try
   {
     my $twitter = Net::Twitter::Lite::WithAPIv1_1->new(
-          consumer_key        => $args->{consumer_key},
-          consumer_secret     => $args->{consumer_secret},
-          access_token        => $args->{access_token},
-          access_token_secret => $args->{access_secret},
-          user_agent          => $args->{agent_string},
-          ssl                 => 1,
+      consumer_key        => $args->{consumer_key},
+      consumer_secret     => $args->{consumer_secret},
+      access_token        => $args->{access_token},
+      access_token_secret => $args->{access_secret},
+      user_agent          => $args->{agent_string},
+      ssl                 => 1,
     );
 
     return bless {
       twitter_api => $twitter,
-      hashtag     => ($args->{hashtag} || ''),
+      hashtag     => ( $args->{hashtag} || '' ),
     }, $class;
   }
   catch
   {
-    $logger->logcroak(  "Error constructing Twitter API object: $_" );
+    $logger->logcroak("Error constructing Twitter API object: $_");
   };
 }
 
 sub _build_tweet
 {
-  my ($self, $blog_post) = @_;
+  my ( $self, $blog_post ) = @_;
 
   my $title   = $blog_post->decoded_title;
   my $url     = $blog_post->root_url;
@@ -95,25 +96,26 @@ sub _build_tweet
   my $char_count = 140;
   $char_count -= $url =~ /^https/ ? 23 : 22;
 
-  if (length(join ' ', $title, $via, $hashtag) < $char_count)
+  if ( length( join ' ', $title, $via, $hashtag ) < $char_count )
   {
     return join ' ', $title, $via, $hashtag, $url;
   }
-  elsif (length(join ' ', $title, $via) < $char_count)
+  elsif ( length( join ' ', $title, $via ) < $char_count )
   {
     return join ' ', $title, $via, $url;
   }
   else
   {
     # 5 chars = 3 ellipses plus 2 spaces
-    my $shortened_title =  substr($title, 0, $char_count - 5 - length($via)) . '...';
+    my $shortened_title =
+      substr( $title, 0, $char_count - 5 - length($via) ) . '...';
     return join ' ', $shortened_title, $via, $url;
   }
 }
 
 sub send
 {
-  my ($self, $blog_post) = @_;
+  my ( $self, $blog_post ) = @_;
 
   try
   {
@@ -121,7 +123,10 @@ sub send
   }
   catch
   {
-    $logger->logcroak("Error tweeting $blog_post->{url} $blog_post->{title} " . $_->code . " " . $_->message . " " . $_->error);
+    $logger->logcroak( "Error tweeting $blog_post->{url} $blog_post->{title} "
+        . $_->code . " "
+        . $_->message . " "
+        . $_->error );
   };
 }
 

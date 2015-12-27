@@ -66,14 +66,15 @@ karama (it's a bot filter).
 
 sub new
 {
-  my ($class, $args) = @_;
+  my ( $class, $args ) = @_;
 
-  my @missing = grep { ! exists $args->{$_} }
+  my @missing = grep { !exists $args->{$_} }
     qw(agent_string username password client_id client_secret subreddit);
 
-  if( @missing )
+  if (@missing)
   {
-    $logger->logcroak( "args is missing required variables (@missing) for $class" );
+    $logger->logcroak(
+      "args is missing required variables (@missing) for $class");
   }
   try
   {
@@ -89,19 +90,17 @@ sub new
   }
   catch
   {
-    $logger->logcroak( "Error constructing Reddit API object: $_" );
+    $logger->logcroak("Error constructing Reddit API object: $_");
   };
 }
 
 sub send
 {
-  my ($self, $blog_post) = @_;
+  my ( $self, $blog_post ) = @_;
 
-  $self->{reddit_api}->submit_link(
-    $blog_post->decoded_title,
-    $blog_post->root_url
-  );
-  sleep(2); # throttle requests to avoid exceeding API limit
+  $self->{reddit_api}
+    ->submit_link( $blog_post->decoded_title, $blog_post->root_url );
+  sleep(2);    # throttle requests to avoid exceeding API limit
 }
 
 =head1 TO DO

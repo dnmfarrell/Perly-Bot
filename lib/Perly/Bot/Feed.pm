@@ -14,7 +14,8 @@ use Time::Piece;
 use XML::FeedPP;
 
 use base 'Class::Accessor';
-Perly::Bot::Feed->mk_accessors(qw/url type date_name date_format active proxy media delay_seconds twitter/);
+Perly::Bot::Feed->mk_accessors(
+  qw/url type date_name date_format active proxy media delay_seconds twitter/);
 
 my $logger = Log::Log4perl->get_logger();
 
@@ -40,57 +41,56 @@ sub new
 {
   state $type_defaults = {
     rdf => {
-    date_name   => 'dc:date',
-    date_format => '%Y-%m-%dT%T%z',
-    parser      => 'XML::FeedPP::RDF',
-      },
+      date_name   => 'dc:date',
+      date_format => '%Y-%m-%dT%T%z',
+      parser      => 'XML::FeedPP::RDF',
+    },
     rss => {
-    date_name   => 'pubDate',
-    date_format => '%a, %d %b %Y %T %z',
-    parser      => 'XML::FeedPP::RSS',
-      },
+      date_name   => 'pubDate',
+      date_format => '%a, %d %b %Y %T %z',
+      parser      => 'XML::FeedPP::RSS',
+    },
     atom => {
-    date_name   => 'published',
-    date_format => '%Y-%m-%dT%TZ',
-    parser      => 'XML::FeedPP::Atom',
-      },
+      date_name   => 'published',
+      date_format => '%Y-%m-%dT%TZ',
+      parser      => 'XML::FeedPP::Atom',
+    },
   };
 
   state $defaults = {
-    active        => 1,
-    proxy         => 0,
-    media_targets => ['Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit'],
+    active => 1,
+    proxy  => 0,
+    media_targets =>
+      [ 'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit' ],
     delay_seconds => 21600,
   };
 
-  my ($class, $args) = @_;
+  my ( $class, $args ) = @_;
 
-  unless( defined $args->{type} )
+  unless ( defined $args->{type} )
   {
     $args->{type} = 'rss';
-    $logger->debug( "Config for $args->{url} did not specify a source type. Assuming RSS" );
+    $logger->debug(
+      "Config for $args->{url} did not specify a source type. Assuming RSS");
   }
 
-  my %config = (
-    %{ $type_defaults->{$args->{type}} },
-    %$defaults,
-    %$args
-    );
+  my %config = ( %{ $type_defaults->{ $args->{type} } }, %$defaults, %$args );
 
   # load media objects
-  for my $class (@{$config{media_targets}})
+  for my $class ( @{ $config{media_targets} } )
   {
     $logger->debug("Loading $class");
     eval "require $class";
-    push @{$config{media}}, $class->new( $config{media_config}->{$class} );
+    push @{ $config{media} }, $class->new( $config{media_config}->{$class} );
   }
 
-  state $required = [qw(url type date_name date_format active media proxy delay_seconds parser)];
-  my @missing = grep { ! exists $config{$_} } @$required;
-  $logger->logcroak( "Missing fields (@missing) in call to $class" )
+  state $required = [
+    qw(url type date_name date_format active media proxy delay_seconds parser)];
+  my @missing = grep { !exists $config{$_} } @$required;
+  $logger->logcroak("Missing fields (@missing) in call to $class")
     if @missing;
 
-  $logger->logcroak( "Unallowed content parser $config{parser}" )
+  $logger->logcroak("Unallowed content parser $config{parser}")
     unless exists $class->_allowed_parsers->{ $config{parser} };
 
   bless \%config, $class;
@@ -99,61 +99,64 @@ sub new
 sub _allowed_parsers
 {
   state $allowed = {
-    map { $_ => 1 } qw(
-     XML::FeedPP::RSS
-     XML::FeedPP::RDF
-     XML::FeedPP::Atom
-     ) };
+    map { $_ => 1 }
+      qw(
+      XML::FeedPP::RSS
+      XML::FeedPP::RDF
+      XML::FeedPP::Atom
+      ) };
   $allowed;
 }
 
 sub get_posts
 {
-  my ($self, $xml) = @_;
+  my ( $self, $xml ) = @_;
 
-  $logger->logcroak( 'Error get_posts() requires an $xml argument' ) unless $xml;
+  $logger->logcroak('Error get_posts() requires an $xml argument') unless $xml;
 
   my @posts = ();
 
-  my @items = $self->{parser}->new($xml, -type => 'string')->get_item();
-  foreach my $i ( @items )
+  my @items = $self->{parser}->new( $xml, -type => 'string' )->get_item();
+  foreach my $i (@items)
   {
     # extract the post date
-    my $datetime_raw = $i->get( $self->date_name );
-    my $date_format = $self->date_format;
+    my $datetime_raw   = $i->get( $self->date_name );
+    my $date_format    = $self->date_format;
     my $datetime_clean = $datetime_raw;
 
     # time::piece does not recognise UTC as a time zone
     $datetime_clean =~ s/UTC/GMT/ if $date_format =~ /\%Z/;
 
     # time::piece requires timezone modifiers to not have a semicolon
-    $datetime_clean =~ s/([+\-][0-9][0-9]):([0-9][0-9]$)/$1$2/ if $date_format =~ /\%z/;
+    $datetime_clean =~ s/([+\-][0-9][0-9]):([0-9][0-9]$)/$1$2/
+      if $date_format =~ /\%z/;
 
     # time::piece struggles with milliseconds
-    if ($self->date_format =~ /%ms/)
+    if ( $self->date_format =~ /%ms/ )
     {
       $datetime_clean =~ s/\.[0-9][0-9][0-9]//;
-      $date_format =~ s/\%ms//; # %ms is a Perly bot convention not used by strptime
+      $date_format =~
+        s/\%ms//;    # %ms is a Perly bot convention not used by strptime
     }
 
     # save some useful debugging info, datetimes are weird
-    if ($logger->is_debug)
+    if ( $logger->is_debug )
     {
-      $logger->debug(sprintf 'Parsing %s changed to %s using format %s',
-        $datetime_raw, $datetime_clean, $date_format);
+      $logger->debug( sprintf 'Parsing %s changed to %s using format %s',
+        $datetime_raw, $datetime_clean, $date_format );
     }
 
     my $post = eval {
       my $datetime = Time::Piece->strptime( $datetime_clean, $date_format );
-      Perly::Bot::Feed::Post->new({
+      Perly::Bot::Feed::Post->new( {
         delay_seconds => $self->delay_seconds,
-        description => $i->description,
-        datetime    => $datetime,
-        title       => $i->title,
-        url         => $i->link,
-        proxy       => $self->proxy,
-        twitter     => $self->twitter,
-      });
+        description   => $i->description,
+        datetime      => $datetime,
+        title         => $i->title,
+        url           => $i->link,
+        proxy         => $self->proxy,
+        twitter       => $self->twitter,
+      } );
     };
 
     if ($@)
