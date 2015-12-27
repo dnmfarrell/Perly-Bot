@@ -9,50 +9,51 @@ no warnings qw(experimental::signatures);
 use Perly::Bot;
 use Getopt::Long qw(GetOptions);
 
-__PACKAGE__->run( @ARGV ) unless caller;
+__PACKAGE__->run(@ARGV) unless caller;
 
-sub run ( $class, @args ) {
-	my $opts = $class->process_args( @args );
+sub run ( $class, @args )
+{
+  my $opts = $class->process_args(@args);
 
-	say <<"HERE";
+  say <<"HERE";
 Run summary
-	config   $opts->{config}
-	feeds    $opts->{feeds}
-	log4perl $opts->{log4perl}
-	level    $opts->{log_level}
+  config   $opts->{config}
+  feeds    $opts->{feeds}
+  log4perl $opts->{log4perl}
+  level    $opts->{log_level}
 
 PERLYBOT_LOG_LEVEL => $ENV{PERLYBOT_LOG_LEVEL}
 PERLY_BOT_DEBUG    => $ENV{PERLY_BOT_DEBUG}
 HERE
 
-	exit 0;
-	}
+  exit 0;
+}
 
-sub process_args ( $class, @args ) {
-	local @ARGV = @args;
+sub process_args ( $class, @args )
+{
+  local @ARGV = @args;
 
-	my %opts = ();
-	$opts{config}    = -e 'config.yml'
-    	? 'config.yml'
-		: "$ENV{HOME}.perlybot/config.yml";
-	$opts{feeds}     = undef,
-	$opts{log4perl}  = undef,
-	$opts{log_level} = 'INFO';
-	$opts{debug}     = 0;
+  my %opts = ();
+  $opts{config} =
+    -e 'config.yml'
+    ? 'config.yml'
+    : "$ENV{HOME}.perlybot/config.yml";
+  $opts{feeds} = undef, $opts{log4perl} = undef, $opts{log_level} = 'INFO';
+  $opts{debug} = 0;
 
-	GetOptions(
-		"config|c=s"   => \$opts{config},
-		"feeds|f=s"    => \$opts{feeds},
-		"log4perl|l=s" => \$opts{log4perl},
-		"level|L=s"    => \$opts{log_level},
-		"debug|d=s"    => \$opts{debug},
-		);
+  GetOptions(
+    "config|c=s"   => \$opts{config},
+    "feeds|f=s"    => \$opts{feeds},
+    "log4perl|l=s" => \$opts{log4perl},
+    "level|L=s"    => \$opts{log_level},
+    "debug|d=s"    => \$opts{debug},
+  );
 
-	$ENV{PERLYBOT_LOG_LEVEL} = $opts{log_level} // $ENV{PERLYBOT_LOG_LEVEL};
-	$ENV{PERLY_BOT_DEBUG}    = $opts{debug} // $ENV{PERLY_BOT_DEBUG};
+  $ENV{PERLYBOT_LOG_LEVEL} = $opts{log_level} // $ENV{PERLYBOT_LOG_LEVEL};
+  $ENV{PERLY_BOT_DEBUG}    = $opts{debug}     // $ENV{PERLY_BOT_DEBUG};
 
-	return \%opts;
-	}
+  return \%opts;
+}
 
 1;
 
@@ -66,22 +67,22 @@ perlybot - run the PerlyBot social media broadcaster
 
 =head1 SYNOPSIS
 
-	# run with defaults
-	% perlybot
+  # run with defaults
+  % perlybot
 
-	# run with specific config, short or long switches
-	% perlybot -c CONFIG_FILE
-	% perlybot --config CONFIG_FILE
+  # run with specific config, short or long switches
+  % perlybot -c CONFIG_FILE
+  % perlybot --config CONFIG_FILE
 
-	# run with specific feed file
-	% perlybot -f FEED_FILE
-	% perlybot --feeds FEED_FILE
+  # run with specific feed file
+  % perlybot -f FEED_FILE
+  % perlybot --feeds FEED_FILE
 
-	# specify both
-	% perlybot -c CONFIG_FILE -f FEED_FILE
+  # specify both
+  % perlybot -c CONFIG_FILE -f FEED_FILE
 
-	# change the log4perl config
-	% perlybot -l LOG4PERL_FILE
+  # change the log4perl config
+  % perlybot -l LOG4PERL_FILE
 
 =head1 DESCRIPTION
 
@@ -123,7 +124,7 @@ level set in C<PERLYBOT_LOG_LEVEL>.
 
 This source is part of a GitHub project:
 
-	https://github.com/dnmfarrell/Perly-Bot
+  https://github.com/dnmfarrell/Perly-Bot
 
 =head1 AUTHOR
 

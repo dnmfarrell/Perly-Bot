@@ -52,6 +52,8 @@ my %WriteMakefile = (
 	'LICENSE'       => 'perl',
 	'AUTHOR'        => 'David Farrell <dfarrell@cpan.org>',
 
+	'EXE_FILES'     => [ qw( bin/perlybot ) ],
+
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
 		'File::Spec::Functions' => '0',

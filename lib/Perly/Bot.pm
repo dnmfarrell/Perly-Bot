@@ -40,6 +40,9 @@ LOG
 my $logger = Log::Log4perl->get_logger();
 $logger->level( $ENV{PERLYBOT_LOG_LEVEL} // $INFO );
 
+# modulino pattern
+__PACKAGE__->run( load_config() ) unless caller();
+
 =encoding utf8
 
 =head1 NAME
