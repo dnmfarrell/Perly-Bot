@@ -1,0 +1,7 @@
+type: reddit
+agent_string:
+username:
+password:
+client_id:
+client_secret:
+subreddit: /r/perlybot
