@@ -1,21 +1,27 @@
 package Perly::Bot::Feed;
 use strict;
 use warnings;
-use v5.10;
+use v5.22;
 use utf8;
+use feature qw(signatures postderef);
 
 use Carp;
 use Data::Dumper;
 use Log::Log4perl;
 use Log::Log4perl::Level;
+
+
 use Perly::Bot::Feed::Post;
 use Role::Tiny;
 use Time::Piece;
 use XML::FeedPP;
 
+no warnings qw(experimental::signatures experimental::postderef);
+
 use base 'Class::Accessor';
 Perly::Bot::Feed->mk_accessors(
   qw/url type date_name date_format active proxy media delay_seconds twitter/);
+
 
 my $logger = Log::Log4perl->get_logger();
 
@@ -33,67 +39,90 @@ Perly::Bot::Feed - represent a feed
 
 =head2 get_posts ($xml)
 
-This method requires an xml string of the blog feed and returns an arrayref of L<Perl::Bot::Feed::Blog> objects.
+This method requires an xml string of the blog feed and returns an
+arrayref of L<Perl::Bot::Feed::Blog> objects.
 
 =cut
 
-sub new
-{
+sub type_defaults ( $self ) {
   state $type_defaults = {
     rdf => {
       date_name   => 'dc:date',
       date_format => '%Y-%m-%dT%T%z',
       parser      => 'XML::FeedPP::RDF',
-    },
+      },
     rss => {
       date_name   => 'pubDate',
       date_format => '%a, %d %b %Y %T %z',
       parser      => 'XML::FeedPP::RSS',
-    },
+      },
     atom => {
       date_name   => 'published',
       date_format => '%Y-%m-%dT%TZ',
       parser      => 'XML::FeedPP::Atom',
-    },
-  };
+      },
+    };
 
+  return $type_defaults;
+  }
+
+sub defaults_for_type ( $self, $type='rss' ) {
+  state $type_defaults = $self->type_defaults;
+
+  unless( exists $type_defaults->{$type} ) {
+    carp "No defaults for media type [$type]!";
+    return;
+    }
+
+  return $self->type_defaults->{$type}
+  }
+
+sub defaults ( $class ) {
   state $defaults = {
     active => 1,
     proxy  => 0,
-    media_targets =>
+    media  =>
       [ 'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit' ],
     delay_seconds => 21600,
-  };
+    };
 
-  my ( $class, $args ) = @_;
-
-  unless ( defined $args->{type} )
-  {
-    $args->{type} = 'rss';
-    $logger->debug(
-      "Config for $args->{url} did not specify a source type. Assuming RSS");
+  $defaults;
   }
 
-  my %config = ( %{ $type_defaults->{ $args->{type} } }, %$defaults, %$args );
+sub new ( $class, $args )
+{
+  my %feed = ( $class->defaults->%*, $args->%* );
+  my $self = bless \%feed, $class;
 
-  # load media objects
-  for my $class ( @{ $config{media_targets} } )
+  unless ( defined $self->{type} )
   {
-    $logger->debug("Loading $class");
-    eval "require $class";
-    push @{ $config{media} }, $class->new( $config{media_config}->{$class} );
+    $self->{type} = 'rss';
+    $logger->debug(
+      "Config for $self->{url} did not specify a source type. Assuming RSS");
+  }
+
+
+  while( my( $k, $v ) = each $self->defaults_for_type( $self->{type} )->%* )
+  {
+    next if defined $self->{$k};
+    $self->{$k} = $v;
   }
 
   state $required = [
     qw(url type date_name date_format active media proxy delay_seconds parser)];
-  my @missing = grep { !exists $config{$_} } @$required;
-  $logger->logcroak("Missing fields (@missing) in call to $class")
+  my @missing = grep { ! exists $self->{ $_ } } $required->@*;
+  $logger->logcroak("Missing fields (@missing) for feed $self->{url}")
     if @missing;
 
-  $logger->logcroak("Unallowed content parser $config{parser}")
-    unless exists $class->_allowed_parsers->{ $config{parser} };
+  $logger->logcroak("Unallowed content parser $self->{parser}")
+    unless $self->parser_allowed( $self->{parser} );
 
-  bless \%config, $class;
+  bless $args, $class;
+}
+
+sub parser_allowed ( $self, $parser )
+{
+  return exists $self->_allowed_parsers->{$parser}
 }
 
 sub _allowed_parsers

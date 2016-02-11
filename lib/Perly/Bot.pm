@@ -15,7 +15,6 @@ use Perly::Bot::Feed;
 use Time::Piece;
 use Time::Seconds;
 use Try::Tiny;
-use YAML::XS qw/LoadFile/;
 
 our $VERSION = 0.10;
 
@@ -41,7 +40,7 @@ my $logger = Log::Log4perl->get_logger();
 $logger->level( $ENV{PERLYBOT_LOG_LEVEL} // $INFO );
 
 # modulino pattern
-__PACKAGE__->run( load_config() ) unless caller();
+__PACKAGE__->run( @ARGV ) unless caller();
 
 =encoding utf8
 
@@ -62,59 +61,19 @@ required variables.
 
 =cut
 
-sub load_config
-{
-  # use local config or fallback on user config file
-  my $config_path =
-    -e 'config.yml'
-    ? 'config.yml'
-    : "$ENV{HOME}/.perly_bot/config.yml";
 
-  # use canonpath for cross platform support
-  my $config = LoadFile( Path::Tiny->new($config_path)->canonpath );
-
-  try
-  {
-    my $perlybot_home =
-      exists $config->{perlybot_path}
-      ? $config->{perlybot_path}
-      : "$ENV{HOME}/.perly_bot";
-
-    $config->{agent_string} = $config->{agent_string} . $VERSION;
-
-    # init cache
-    my $cache = Perly::Bot::Cache->new( "$perlybot_home/$config->{cache}{path}",
-      $config->{cache}{expiry_secs} );
-    $config->{cache} = $cache;
-
-    # load media objects
-    for my $module_name ( keys %{ $config->{media} } )
-    {
-      my $config_path =
-        "$perlybot_home/$config->{media}{$module_name}{config_path}";
-      my $args = LoadFile($config_path);
-      $config->{media}{$module_name} = $args;
-    }
-  }
-  catch
-  {
-    $logger->logdie("load_config encountered an error: $_");
-  };
-  return $config;
-}
-
-=head2 run ($package, $config)
+=head2 run ($package, $config_file)
 
 The main routine, trawls blog feeds for new posts.
 
 =cut
 
-sub run
+sub run ( $package, $config_file )
 {
-  my ( $package, $config ) = @_;
+  my $config = Perly::Bot::Config->new( $config_file );
 
-  my $cache = $config->{cache};
-  my $feeds = LoadFile( $config->{feeds_path} );
+  my $cache = $config->cache;
+  my $feeds = $config->feeds;
 
   $logger->debug( sprintf "Checking %s feeds\n", scalar @$feeds );
 
@@ -124,11 +83,10 @@ sub run
     try
     {
       # inject the media config into the feed args
-      $feed_args->{media_config} = $config->{media};
-      my $feed = Perly::Bot::Feed->new($feed_args);
+      $feed_args->{media_config} = $config->media;
+      my $feed = Perly::Bot::Feed->new( $feed_args );
       return unless $feed->active;
-
-      trawl_blog( $feed, $cache, $config );
+      trawl_blog( $feed, $cache );
     }
     catch
     {
@@ -146,12 +104,14 @@ or not.
 
 sub trawl_blog
 {
-  my ( $feed, $cache, $config ) = @_;
+  my ( $feed, $cache ) = @_;
 
-  my $ua = HTTP::Tiny->new( agent => $config->{agent_string} );
+  my $config = $config_class->get_config;
+
+  my $ua = HTTP::Tiny->new( agent => $config->agent_string );
   my $response = $ua->get( $feed->url );
 
-  if ( my $content = fetch_feed( $feed, $config ) )
+  if ( my $content = fetch_feed( $feed ) )
   {
     my $blog_posts = $feed->get_posts($content);
 
@@ -163,8 +123,7 @@ sub trawl_blog
       {
         $logger->debug( sprintf "Testing %s", $post->title );
 
-        if ( should_emit( $post, $cache, $config )
-          && emit( $post, $feed ) )
+        if ( should_emit( $post, $cache ) && emit( $post, $feed ) )
         {
           $cache->save_post($post);
         }
@@ -196,7 +155,9 @@ Feel free to subclass and override this logic with your own needs!
 
 sub should_emit
 {
-  my ( $post, $cache, $config ) = @_;
+  my ( $post, $cache ) = @_;
+
+  my $config = Perly::Bot::Config->get_config;
 
   # posts must mention a Perl keyword to be considered relevant
   my $looks_perly =
@@ -205,7 +166,7 @@ sub should_emit
   my $time_now = gmtime;
 
   # is the post fresh enough?
-  $post->datetime > $time_now - $config->{should_emit}{age_threshold_secs}
+  $post->datetime > $time_now - $config->age_threshold_secs
 
     # have we delayed posting enough for the owner to post themselves?
     && $time_now - $post->datetime > $post->delay_seconds
@@ -237,14 +198,17 @@ sub emit
 
 sub fetch_feed
 {
-  my ( $feed, $config ) = @_;
+  my ( $feed ) = @_;
+
 
   state $ua = do
   {
+    my $config = Perly::Bot::Config->get_config;
     my $ua = Mojo::UserAgent->new;
     $ua->transactor->name( $config->{agent_string} );
     $ua;
   };
+
 
   $logger->debug("Checking $feed->{url} ...");
   my $tx = $ua->get( $feed->url );
