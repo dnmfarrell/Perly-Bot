@@ -9,7 +9,6 @@ package Perly::Bot::Cache;
 
 use CHI;
 use Log::Log4perl;
-use Log::Log4perl::Level;
 use File::Path qw/make_path/;
 
 my $logger = Log::Log4perl->get_logger();

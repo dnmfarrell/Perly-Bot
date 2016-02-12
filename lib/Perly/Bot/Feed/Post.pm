@@ -7,7 +7,6 @@ use Carp;
 use HTML::Entities;
 use HTTP::Tiny;
 use Log::Log4perl;
-use Log::Log4perl::Level;
 use URI;
 
 Perly::Bot::Feed::Post->mk_accessors(

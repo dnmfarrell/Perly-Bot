@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Carp;
 use Log::Log4perl;
-use Log::Log4perl::Level;
 use Try::Tiny;
 use Net::Twitter::Lite::WithAPIv1_1;
 use Role::Tiny::With;

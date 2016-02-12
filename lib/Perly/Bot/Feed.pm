@@ -7,8 +7,6 @@ use feature qw(signatures postderef);
 use Carp;
 use Data::Dumper;
 use Log::Log4perl;
-use Log::Log4perl::Level;
-
 
 use Perly::Bot::Feed::Post;
 use Role::Tiny;
