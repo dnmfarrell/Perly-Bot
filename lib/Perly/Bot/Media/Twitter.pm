@@ -1,6 +1,8 @@
 package Perly::Bot::Media::Twitter;
 use strict;
 use warnings;
+
+use namespace::autoclean;
 use Carp;
 use Log::Log4perl;
 use Try::Tiny;

@@ -1,6 +1,7 @@
 package Perly::Bot::Media::Reddit;
 use strict;
 use warnings;
+use namespace::autoclean;
 use Carp;
 use Log::Log4perl;
 use Log::Log4perl::Level;

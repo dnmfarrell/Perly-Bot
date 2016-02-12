@@ -7,6 +7,7 @@ use open qw(:std :utf8);
 
 package Perly::Bot::Cache;
 
+use namespace::autoclean;
 use CHI;
 use Log::Log4perl;
 use File::Path qw/make_path/;

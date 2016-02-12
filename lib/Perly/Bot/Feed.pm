@@ -4,6 +4,7 @@ package Perly::Bot::Feed;
 use utf8;
 use feature qw(signatures postderef);
 
+use namespace::autoclean;
 use Carp;
 use Data::Dumper;
 use Log::Log4perl;
