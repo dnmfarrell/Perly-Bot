@@ -1,6 +1,5 @@
 use v5.22;
 package Perly::Bot::Feed::Post;
-use base 'Class::Accessor';
 
 use Carp;
 use HTML::Entities;
@@ -8,6 +7,7 @@ use HTTP::Tiny;
 use Log::Log4perl;
 use URI;
 
+use base 'Class::Accessor';
 Perly::Bot::Feed::Post->mk_accessors(
   qw/url title description datetime proxy delay_seconds twitter/);
 
