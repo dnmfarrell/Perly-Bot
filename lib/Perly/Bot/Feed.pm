@@ -10,7 +10,6 @@ use Data::Dumper;
 use Log::Log4perl;
 
 use Perly::Bot::Feed::Post;
-use Role::Tiny;
 use Time::Piece;
 use XML::FeedPP;
 
