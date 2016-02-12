@@ -117,7 +117,7 @@ sub new ( $class, $args )
   $logger->logcroak("Unallowed content parser $self->{parser}")
     unless $self->parser_allowed( $self->{parser} );
 
-  bless $args, $class;
+  $self;
 }
 
 sub parser_allowed ( $self, $parser )
