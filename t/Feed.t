@@ -1,21 +1,13 @@
-use strict;
-use warnings;
 use v5.22;
+use lib qw(t/lib);
 use Test::More 0.95;
+
+
 use YAML::XS 'LoadFile';
 
 my $feeds = LoadFile('t/test_feeds.yml');
 
 my $class = 'Perly::Bot::Feed';
-
-BEGIN {
-package Log::Log4perl {
-	no warnings 'redefine';
-	sub AUTOLOAD   { __PACKAGE__ };
-	}
-$INC{'Log/Log4perl.pm'} = 'Feed.t';
-}
-
 use_ok($class) or BAIL_OUT( "$class did not load" );
 
 

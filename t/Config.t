@@ -1,18 +1,10 @@
-use strict;
-use warnings;
 use v5.22;
 use feature qw(postderef postderef_qq);
 no warnings qw(experimental::postderef);
 
-use Test::More 0.95;
+use lib qw(t/lib);
 
-BEGIN {
-package Log::Log4perl {
-	no warnings 'redefine';
-	sub AUTOLOAD   { __PACKAGE__ };
-	}
-$INC{'Log/Log4perl.pm'} = 'Feed.t';
-}
+use Test::More 0.95;
 
 use Data::Dumper;
 use File::Spec::Functions;
