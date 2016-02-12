@@ -1,7 +1,6 @@
-package Perly::Bot::Feed;
-use strict;
-use warnings;
 use v5.22;
+
+package Perly::Bot::Feed;
 use utf8;
 use feature qw(signatures postderef);
 

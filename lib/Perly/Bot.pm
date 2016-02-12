@@ -1,11 +1,10 @@
-package Perly::Bot;
-use warnings;
-use strict;
 use v5.22;
-use open qw(:std :utf8);
-use lib 'lib';
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
+
+package Perly::Bot;
+use open qw(:std :utf8);
+use lib 'lib';
 
 use List::Util 'any';
 use Log::Log4perl;
