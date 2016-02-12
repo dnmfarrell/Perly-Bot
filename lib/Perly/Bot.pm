@@ -106,7 +106,7 @@ sub trawl_blog
 {
   my ( $feed, $cache ) = @_;
 
-  my $config = $config_class->get_config;
+  my $config = Perly::Bot::Config->get_config;
 
   my $ua = HTTP::Tiny->new( agent => $config->agent_string );
   my $response = $ua->get( $feed->url );
