@@ -6,6 +6,14 @@ no warnings qw(experimental::postderef);
 
 use Test::More 0.95;
 
+BEGIN {
+package Log::Log4perl {
+	no warnings 'redefine';
+	sub AUTOLOAD   { __PACKAGE__ };
+	}
+$INC{'Log/Log4perl.pm'} = 'Feed.t';
+}
+
 use Data::Dumper;
 use File::Spec::Functions;
 use YAML::XS 'LoadFile';

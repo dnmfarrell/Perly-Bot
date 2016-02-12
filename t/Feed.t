@@ -8,6 +8,14 @@ my $feeds = LoadFile('t/test_feeds.yml');
 
 my $class = 'Perly::Bot::Feed';
 
+BEGIN {
+package Log::Log4perl {
+	no warnings 'redefine';
+	sub AUTOLOAD   { __PACKAGE__ };
+	}
+$INC{'Log/Log4perl.pm'} = 'Feed.t';
+}
+
 use_ok($class) or BAIL_OUT( "$class did not load" );
 
 for my $args (@$feeds)
