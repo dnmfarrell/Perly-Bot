@@ -6,7 +6,7 @@ use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
 use Carp qw(carp croak);
-#use namespace::autoclean;
+use namespace::autoclean;
 use File::Spec::Functions;
 use Log::Log4perl;
 use Path::Tiny;
@@ -20,7 +20,6 @@ sub _config_setup ( $class, $flag = 0 ) {
 
 	$setup = $flag;
 	}
-
 
 sub new ( $class, $file = catfile( $ENV{HOME}, '.perlybot', 'config' ) ) {
 	state $self;
