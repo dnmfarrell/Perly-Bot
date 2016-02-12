@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use v5.10.1;
+use v5.22;
 use Test::More 0.95;
 use YAML::XS 'LoadFile';
 
@@ -17,6 +17,7 @@ $INC{'Log/Log4perl.pm'} = 'Feed.t';
 }
 
 use_ok($class) or BAIL_OUT( "$class did not load" );
+
 
 for my $args (@$feeds)
 {
@@ -47,6 +48,7 @@ for my $args (@$feeds)
     like $feed->proxy, qr/^[01]$/, "proxy field is 0 or 1 (" . $feed->proxy . ")";
     like $feed->delay_seconds, qr/^[0-9]+$/, , "delay_seconds field is only digits (" . $feed->delay_seconds . ")";
   };
+
 }
 
 done_testing();
