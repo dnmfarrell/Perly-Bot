@@ -1,6 +1,5 @@
+use v5.22;
 package Perly::Bot::Feed::Post;
-use strict;
-use warnings;
 use base 'Class::Accessor';
 
 use Carp;

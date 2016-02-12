@@ -1,6 +1,6 @@
+use v5.22;
+
 package Perly::Bot::Media::Twitter;
-use strict;
-use warnings;
 
 use namespace::autoclean;
 use Carp;
