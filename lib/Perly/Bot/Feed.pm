@@ -1,19 +1,17 @@
 use v5.22;
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
 
 package Perly::Bot::Feed;
 use utf8;
-use feature qw(signatures postderef);
 
 use namespace::autoclean;
 use Carp;
-use Data::Dumper;
 use Log::Log4perl;
 
 use Perly::Bot::Feed::Post;
 use Time::Piece;
 use XML::FeedPP;
-
-no warnings qw(experimental::signatures experimental::postderef);
 
 use base 'Class::Accessor';
 Perly::Bot::Feed->mk_accessors(
