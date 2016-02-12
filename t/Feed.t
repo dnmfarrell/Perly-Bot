@@ -24,7 +24,7 @@ for my $args (@$feeds)
   {
     my %args_copy = %$args;
 
-    my $feed = eval { $class->new($args) };
+	my $feed = eval { new_ok( $class, [ $args ] ) };
 
     if ($@ || !$feed)
     {
