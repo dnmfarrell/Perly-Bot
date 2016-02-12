@@ -4,7 +4,6 @@ package Perly::Bot::Media::Reddit;
 use namespace::autoclean;
 use Carp;
 use Log::Log4perl;
-use Log::Log4perl::Level;
 use Try::Tiny;
 use Mojo::Snoo::Subreddit;
 use Role::Tiny::With;
