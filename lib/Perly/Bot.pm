@@ -1,9 +1,11 @@
 package Perly::Bot;
 use warnings;
 use strict;
-use 5.10.1;
+use v5.22;
 use open qw(:std :utf8);
 use lib 'lib';
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
 
 use List::Util 'any';
 use Log::Log4perl;
@@ -102,10 +104,8 @@ or not.
 
 =cut
 
-sub trawl_blog
+sub trawl_blog ( $feed, $cache )
 {
-  my ( $feed, $cache ) = @_;
-
   my $config = Perly::Bot::Config->get_config;
 
   my $ua = HTTP::Tiny->new( agent => $config->agent_string );
