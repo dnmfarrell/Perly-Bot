@@ -42,7 +42,7 @@ subtest media_objects => sub {
 
 	my @classes = $config->get_media_classes;
 	ok( @classes > 0, "There are some media classes" );
-	diag( "Media classes are @classes" );
+	diag( "Media classes are @classes" ) if $ENV{TEST_VERBOSE};
 
 	my $method = 'has_media_object';
 	can_ok( $config, $method );
@@ -52,10 +52,16 @@ subtest media_objects => sub {
 		my $object = $config->get_media_object( $class );
 		isa_ok( $object, $class );
 		}
+	};
 
+subtest cache => sub {
+	my $method = 'cache';
+	my $config = $class->get_config;
+	isa_ok( $config, $class );
 
-
-
+	can_ok( $class, $method );
+	my $ref = $config->$method();
+	isa_ok( $ref, 'Perly::Bot::Cache' ); # XXX: This is fragile
 	};
 
 subtest feeds => sub {
