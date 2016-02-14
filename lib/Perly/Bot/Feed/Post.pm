@@ -1,15 +1,20 @@
 use v5.22;
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
+
 package Perly::Bot::Feed::Post;
 
+use namespace::autoclean;
 use Carp;
 use HTML::Entities;
 use HTTP::Tiny;
+use List::Util 'any';
 use Log::Log4perl;
 use URI;
 
 use base 'Class::Accessor';
 Perly::Bot::Feed::Post->mk_accessors(
-  qw/url title description datetime proxy delay_seconds twitter/);
+  qw/url title description datetime proxy delay_seconds twitter feed/);
 
 my $logger = Log::Log4perl->get_logger();
 
@@ -77,6 +82,68 @@ sub decoded_title
 {
   my ($self) = @_;
   decode_entities( $self->title );
+}
+
+=head2 should_emit
+
+The logic to decide if a blog post should be emitted or not. This is:
+
+- if the post is recent
+- not too new to exceed the delay (to allow authors to post their own links)
+- it looks Perl-related and is not already posted
+
+Feel free to subclass and override this logic with your own needs for a particular
+post type!
+
+=cut
+
+sub should_emit ( $post )
+{
+  my $config = Perly::Bot::Config->get_config;
+  my $cache  = $config->cache;
+
+  # posts must mention a Perl keyword to be considered relevant
+
+  my $time_now = gmtime;
+
+  # is the post fresh enough?
+  $post->datetime > $time_now - $post->age_threshold_secs
+
+  # have we delayed posting enough for the owner to post themselves?
+  && $time_now - $post->datetime > $post->delay_seconds
+
+  # is the post cached?
+  && !$cache->has_posted($post)
+
+  # does it looks Perl related?
+  && $post->looks_perly
+}
+
+=head2 age_threshold_secs
+
+Returns the configured age_threshold_secs value. You can override this
+to decide a value based on anything you like.
+
+=cut
+
+sub age_threshold_secs
+{
+  Perly::Bot::Config->get_config->age_threshold_secs;
+}
+
+=head2 looks_perly( POST )
+
+Returns true if the post looks like it's about Perl. Since it's a method
+you can override this in specialized post types.
+
+=cut
+
+sub looks_perly ( $post )
+{
+  state $looks_perly =
+    qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
+
+  any { ( $_ // '' ) =~ /$looks_perly/ } $post->title, $post->description;
 }
 
 =head1 TO DO

@@ -9,13 +9,16 @@ use namespace::autoclean;
 use Carp;
 use Log::Log4perl;
 
+use Mojo::UserAgent;
 use Perly::Bot::Feed::Post;
 use Time::Piece;
+use Time::Seconds;
 use XML::FeedPP;
 
 use base 'Class::Accessor';
 Perly::Bot::Feed->mk_accessors(
-  qw/url type date_name date_format active proxy media delay_seconds twitter/);
+  qw/url type date_name date_format active
+  	proxy media delay_seconds twitter post_class/);
 
 
 my $logger = Log::Log4perl->get_logger();
@@ -79,6 +82,7 @@ sub defaults ( $class ) {
     media  =>
       [ 'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit' ],
     delay_seconds => 21600,
+    post_class    => 'Perly::Bot::Feed::Post',
     };
 
   $defaults;
@@ -112,6 +116,17 @@ sub new ( $class, $args )
   $logger->logcroak("Unallowed content parser $self->{parser}")
     unless $self->parser_allowed( $self->{parser} );
 
+  unless( $self->post_class =~ m/ \A [A-Z0-9_]+ (?: :: [A-Z0-9_]+ )+ \z /xi )
+  {
+  croak "Invalid post class " . $self->post_class . " for " . $self->url;
+  }
+  else
+  {
+  unless( eval "require " . $self->post_class . "; 1" ) {
+    croak "Could not load post class " . $self->post_class . ": $@";
+  	}
+  }
+
   $self;
 }
 
@@ -132,15 +147,57 @@ sub _allowed_parsers
   $allowed;
 }
 
-sub get_posts
+sub trawl_blog ( $self )
 {
-  my ( $self, $xml ) = @_;
+  my $config = Perly::Bot::Config->get_config;
+  my $cache = $config->cache;
 
-  $logger->logcroak('Error get_posts() requires an $xml argument') unless $xml;
+  my $ua = HTTP::Tiny->new( agent => $config->agent_string );
+  my $response = $ua->get( $self->url );
 
+  if ( my $content = $self->fetch_feed )
+  {
+    my $blog_posts = $self->extract_posts( $content );
+    return $blog_posts;
+  }
+  else
+  {
+    $logger->logwarn( "Recieved nothing for feed " . $self->url );
+    return [];
+  }
+}
+
+sub fetch_feed ( $self )
+{
+  state $ua = do
+  {
+    my $config = Perly::Bot::Config->get_config;
+    my $ua = Mojo::UserAgent->new;
+    $ua->transactor->name( $config->{agent_string} );
+    $ua;
+  };
+
+  $logger->debug("Checking $self->{url} ...");
+  my $tx = $ua->get( $self->url );
+
+  if ( $tx->success )
+  {
+    my $content = $tx->res->text;    # decode
+    $logger->debug( sprintf 'Received content length: %s', length($content) );
+    $self->{tx} =  $tx;
+    $self->{content} =  $content;
+    return $content;
+  }
+  $logger->logdie( "Error requesting [%s]. [%s] [%s]",
+    $self->url, $tx->res->code, $tx->res->message );
+}
+
+sub extract_posts ( $self, $xml )
+{
   my @posts = ();
 
   my @items = $self->{parser}->new( $xml, -type => 'string' )->get_item();
+
   foreach my $i (@items)
   {
     # extract the post date
@@ -172,7 +229,7 @@ sub get_posts
 
     my $post = eval {
       my $datetime = Time::Piece->strptime( $datetime_clean, $date_format );
-      Perly::Bot::Feed::Post->new( {
+      $self->post_class->new( {
         delay_seconds => $self->delay_seconds,
         description   => $i->description,
         datetime      => $datetime,
@@ -180,6 +237,7 @@ sub get_posts
         url           => $i->link,
         proxy         => $self->proxy,
         twitter       => $self->twitter,
+        feed          => $self->url,
       } );
     };
 
