@@ -1,11 +1,11 @@
 use v5.22;
-use utf8;
-
-package Perly::Bot::Config;
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
-use Carp qw(carp croak);
+use utf8;
+
+package Perly::Bot::Config;
+
 use namespace::autoclean;
 use File::Spec::Functions;
 use Log::Log4perl;
@@ -45,14 +45,14 @@ sub AUTOLOAD ( $self ) {
 		return $self->{$method};
 		}
 	else {
-		carp "$method is not configured";
+		$logger->warn( "$method is not configured" );
 		return;
 		}
 	}
 
 sub get_config ( $class ) {
 	unless( $class->_config_setup ) {
-		croak "Config is not setup! Call new() first";
+		$logger->error( "Config is not setup! Call new() first" );
 		}
 
 	$class->new;
@@ -73,12 +73,11 @@ sub load_config ( $self,
 
 sub init_cache ( $self, $cache_class='Perly::Bot::Cache' ) {
     # init cache
-    croak "Cache class <$cache_class> does not look like a valid namespace!"
+    $logger->logdie( "Cache class <$cache_class> does not look like a valid namespace!" )
     	unless $cache_class =~ / \A [A-Z0-9_]+ ( :: [A-Z0-9_]+ )* \z /xi;
-	say STDERR "Class is $cache_class";
 	state $module = do {
 		my $rc = eval "require $cache_class; 1";
-		if( $@ ) { carp "$@" }
+		if( $@ ) { $logger->warn( "$@" ) }
 		$rc;
 		};
     $self->{cache} = $cache_class->new(
@@ -88,11 +87,13 @@ sub init_cache ( $self, $cache_class='Perly::Bot::Cache' ) {
 	$self;
 	}
 
+sub cache ( $self ) { $self->{cache} }
+
 sub load_media ( $self ) {
 	state $module = require YAML::XS;
     foreach my $module_name ( keys $self->media->%* ) {
     	unless( $module_name =~ m/ \A [A-Z0-9_]+ ( :: [A-Z0-9_]+ )+ \z /xi ) {
-    		carp "Invalid namespace [$module_name]!";
+    		$logger->error( "Invalid namespace [$module_name]!" );
     		next;
     		}
 
@@ -109,12 +110,12 @@ sub load_media ( $self ) {
 
 sub add_media_object ( $self, $module_name, $config_path ) {
 	unless( $module_name =~ m/ \A [A-Z0-9_]+ ( :: [A-Z0-9_]+ )+ \z /xi ) {
-		carp "Invalid namespace [$module_name]!";
+		$logger->warn( "Invalid namespace [$module_name]!" );
 		next;
 		}
 
 	unless( eval "require $module_name; 1" ) {
-		carp "Could not load [$module_name]: $@";
+		$logger->error( "Could not load [$module_name]: $@" );
 		return;
 		}
 
@@ -122,7 +123,7 @@ sub add_media_object ( $self, $module_name, $config_path ) {
 
 	my $object = eval { $module_name->new( $media_config ) };
 	unless( ref $object ) {
-		carp "Could not make object for [$module_name]! $@";
+		$logger->error( "Could not make object for [$module_name]! $@" );
 		return;
 		}
 
@@ -132,7 +133,7 @@ sub add_media_object ( $self, $module_name, $config_path ) {
 sub has_media_object ( $self, $module_name ) {
 	my $has = eval{ defined $self->media->{$module_name}{object} };
 	if( $@ ) {
-		carp "Could not check for $module_name: $@";
+		$logger->warn( "Could not check for $module_name: $@" );
 		}
 
 	return $has;
@@ -161,13 +162,13 @@ sub add_media_type ( $self, $type ) {
 
 sub media_config ( $self, $class ) {
 	unless( exists $self->{media}{$class}{config} ) {
-		carp "There's no config for media target $class";
+		$logger->logwarn( "There's no config for media target $class" );
 		return;
 		}
 
 	my $args = $self->{media}{$class}{config};
 	unless( ref $args eq ref {} ) {
-		carp "Data for media target $class isn't a hash ref";
+		$logger->logwarn( "Data for media target $class isn't a hash ref" );
 		return;
 		}
 
