@@ -60,8 +60,6 @@ sub new
       "args is missing required variables (@missing) for $class");
   }
 
-  try
-  {
     my $twitter = Net::Twitter::Lite::WithAPIv1_1->new(
       consumer_key        => $args->{consumer_key},
       consumer_secret     => $args->{consumer_secret},
@@ -111,21 +109,12 @@ sub _build_tweet
   }
 }
 
-sub send
-{
-  my ( $self, $blog_post ) = @_;
-
-  try
-  {
-    $self->{twitter_api}->update( $self->_build_tweet($blog_post) );
-  }
-  catch
-  {
-    $logger->logcroak( "Error tweeting $blog_post->{url} $blog_post->{title} "
+sub send ( $self, $blog_post ) {
+	eval { $self->{twitter_api}->update( $self->_build_tweet($blog_post) ); 1 }
+		or $logger->logcroak( "Error tweeting $blog_post->{url} $blog_post->{title} "
         . $_->code . " "
         . $_->message . " "
         . $_->error );
-  };
 }
 
 =head1 TO DO

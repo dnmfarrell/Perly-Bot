@@ -64,7 +64,7 @@ sub defaults_for_type ( $self, $type='rss' ) {
   state $type_defaults = $self->type_defaults;
 
   unless( exists $type_defaults->{$type} ) {
-    carp "No defaults for media type [$type]!";
+    $logger->warn( "No defaults for media type [$type]!" );
     return;
     }
 
@@ -113,12 +113,12 @@ sub new ( $class, $args ) {
 
   unless( $self->post_class =~ m/ \A [A-Z0-9_]+ (?: :: [A-Z0-9_]+ )+ \z /xi )
   {
-  croak "Invalid post class " . $self->post_class . " for " . $self->url;
+  $logger->logcroak( "Invalid post class " . $self->post_class . " for " . $self->url );
   }
   else
   {
   unless( eval "require " . $self->post_class . "; 1" ) {
-    croak "Could not load post class " . $self->post_class . ": $@";
+    $logger->logcroak( "Could not load post class " . $self->post_class . ": $@" );
   	}
   }
 

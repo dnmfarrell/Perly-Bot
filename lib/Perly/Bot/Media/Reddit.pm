@@ -94,22 +94,22 @@ sub new ( $class, $args ) {
     $logger->logcroak(
       "args is missing required variables (@missing) for $class");
   }
-  try
-  {
-    bless {
-      reddit_api => Mojo::Snoo::Subreddit->new(
-        name          => $args->{subreddit},
-        client_id     => $args->{client_id},
-        client_secret => $args->{client_secret},
-        username      => $args->{username},
-        password      => $args->{password},
-      ),
-    }, $class;
-  }
-  catch
-  {
-    $logger->logcroak("Error constructing Reddit API object: $_");
-  };
+
+	my $snoo = Mojo::Snoo::Subreddit->new(
+        name          => $args->{subreddit}     // $config->subreddit,
+        client_id     => $args->{client_id}     // $config->reddit_client_id,
+        client_secret => $args->{client_secret} // $config->reddit_client_secret,
+        username      => $args->{username}      // $config->reddit_username,
+        password      => $args->{password}      // $config->reddit_password,
+		);
+
+
+    my $self = bless { reddit_api => $snoo }, $class;
+
+    $logger->logcroak("Error constructing Reddit API object: $_")
+    	unless ref $self;
+
+    return $self;
 }
 
 sub send
