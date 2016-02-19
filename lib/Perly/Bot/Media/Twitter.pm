@@ -47,25 +47,34 @@ is not enough chars left (e.g. if the blog post title is extremely long). This i
 
 =cut
 
-sub new
-{
-  my ( $class, $args ) = @_;
+sub config_defaults ( $class, $config={} ) {
+	state $defaults = {
+		type                    => 'twitter',
+		class                   => __PACKAGE__,
+		twitter_consumer_key    => $ENV{PERLYBOT_TWITTER_CONSUMER_KEY}    // undef,
+		twitter_consumer_secret => $ENV{PERLYBOT_TWITTER_CONSUMER_SECRET} // undef,
+		twitter_access_token    => $ENV{PERLYBOT_TWITTER_ACCESS_TOKEN}    // undef,,
+		twitter_access_secret   => $ENV{PERLYBOT_TWITTER_ACCESS_SECRET}   // undef,
+		};
 
-  my @missing = grep { !exists $args->{$_} }
-    qw(agent_string consumer_key consumer_secret access_token access_secret);
+	$defaults;
+	}
 
-  if (@missing)
-  {
-    $logger->logcroak(
-      "args is missing required variables (@missing) for $class");
-  }
+sub is_properly_configured ( $class, $config ) {
+
+	0;
+
+	}
+
+sub new ( $class, $args = {} ) {
+	my $config = Perly::Bot::Config->get_config;
 
     my $twitter = Net::Twitter::Lite::WithAPIv1_1->new(
-      consumer_key        => $args->{consumer_key},
-      consumer_secret     => $args->{consumer_secret},
-      access_token        => $args->{access_token},
-      access_token_secret => $args->{access_secret},
-      user_agent          => $args->{agent_string},
+      consumer_key        => $args->{consumer_key}    // $config->twitter_consumer_key,
+      consumer_secret     => $args->{consumer_secret} // $config->twitter_consumer_secret,
+      access_token        => $args->{access_token}    // $config->twitter_access_token,
+      access_token_secret => $args->{access_secret}   // $config->twitter_access_secret,
+      user_agent          => $args->{agent_string}    // $config->agent_string,
       ssl                 => 1,
     );
 
