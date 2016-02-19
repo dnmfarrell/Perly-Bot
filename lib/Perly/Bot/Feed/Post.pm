@@ -5,12 +5,8 @@ no warnings qw(experimental::signatures experimental::postderef);
 package Perly::Bot::Feed::Post;
 
 use namespace::autoclean;
-use Carp;
 use HTML::Entities;
-use HTTP::Tiny;
-use List::Util 'any';
-use Log::Log4perl;
-use URI;
+use List::Util qw(sum any);
 
 use base 'Class::Accessor';
 Perly::Bot::Feed::Post->mk_accessors(

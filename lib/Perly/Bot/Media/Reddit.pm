@@ -1,14 +1,14 @@
 use v5.22;
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
 
 package Perly::Bot::Media::Reddit;
 use namespace::autoclean;
-use Carp;
-use Log::Log4perl;
-use Try::Tiny;
 use Mojo::Snoo::Subreddit;
 use Role::Tiny::With;
 
 with 'Perly::Bot::Media';
+use Perly::Bot::CommonSetup;
 
 my $logger = Log::Log4perl->get_logger();
 

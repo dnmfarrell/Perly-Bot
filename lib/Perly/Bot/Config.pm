@@ -7,9 +7,8 @@ use utf8;
 package Perly::Bot::Config;
 
 use namespace::autoclean;
+use Perly::Bot::CommonSetup;
 use File::Spec::Functions;
-use Log::Log4perl;
-use Path::Tiny;
 
 our $VERSION = '1.001';
 my $logger = Log::Log4perl->get_logger();

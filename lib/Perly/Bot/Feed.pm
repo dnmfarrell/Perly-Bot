@@ -6,11 +6,7 @@ package Perly::Bot::Feed;
 use utf8;
 
 use namespace::autoclean;
-use Carp;
-use Log::Log4perl;
-
-use Mojo::UserAgent;
-use Perly::Bot::Feed::Post;
+use Perly::Bot::CommonSetup;
 use Time::Piece;
 use Time::Seconds;
 use XML::FeedPP;

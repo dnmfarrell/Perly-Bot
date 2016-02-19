@@ -1,11 +1,10 @@
 use v5.22;
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
 
 package Perly::Bot::Media::Twitter;
 
 use namespace::autoclean;
-use Carp;
-use Log::Log4perl;
-use Try::Tiny;
 use Net::Twitter::Lite::WithAPIv1_1;
 use Role::Tiny::With;
 

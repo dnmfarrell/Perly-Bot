@@ -2,15 +2,14 @@ use v5.22;
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
-use lib 'lib';
 use open qw(:std :utf8);
 
 package Perly::Bot::Cache;
 
 use namespace::autoclean;
 use CHI;
-use Log::Log4perl;
 use File::Path qw/make_path/;
+use Perly::Bot::CommonSetup;
 
 my $logger = Log::Log4perl->get_logger();
 

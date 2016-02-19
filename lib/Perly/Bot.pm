@@ -7,10 +7,9 @@ use open qw(:std :utf8);
 use lib 'lib';
 
 use namespace::autoclean;
-
-use Log::Log4perl;
 use Log::Log4perl::Level;
 use Path::Tiny;
+use Perly::Bot::CommonSetup;
 
 our $VERSION = '0.101';
 
