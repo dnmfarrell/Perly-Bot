@@ -13,27 +13,35 @@ use File::Spec::Functions;
 our $VERSION = '1.001';
 my $logger = Log::Log4perl->get_logger();
 
-sub _config_setup ( $class, $flag = 0 ) {
-	state $setup = 0;
-	if( @_ == 1 ) { return $setup }
 
-	$setup = $flag;
-	}
+BEGIN {
+my $self;
 
 sub new ( $class, $file = catfile( $ENV{HOME}, '.perlybot', 'config' ) ) {
-	state $self;
+	$logger->debug( "config file is [$file]" );
 	return $self if defined $self;
 
 	$self = bless {}, $class;
 
 	$self->load_config( $file );
+
 	$self->init_cache;
 	$self->load_media;
 
-	$self->_config_setup( 1 );
 
 	$self;
 	}
+
+sub get_config ( $class ) {
+	unless( $class->_config_setup ) {
+		$logger->logcroak( "Config is not setup! Call new() first" );
+		}
+
+	$self;
+	}
+
+sub _config_setup ( $class ) { defined $self }
+}
 
 sub AUTOLOAD ( $self ) {
 	our $AUTOLOAD;
