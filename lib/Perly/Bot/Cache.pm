@@ -48,9 +48,7 @@ sub new ( $class ) {
 
   $logger->logdie('new() requires a directory path with rwx permissions')
     unless $cache_path
-    && -x $cache_path
-    && -w $cache_path
-    && -r $cache_path;
+    && -x -w -r $cache_path;
 
   $logger->logdie(
     'new() requires a positive integer for the expiry duration of entries')
