@@ -124,23 +124,29 @@ sub threshold ( $self ) { 2 }
 
 sub should_emit ( $post ) {
   my $config = Perly::Bot::Config->get_config;
-  my $cache  = $config->cache;
 
-  # posts must mention a Perl keyword to be considered relevant
+  # these checks are for non-content things we configured
+  if( my $policy = $post->fails_by_policy ) {
+  	$logger->debug( sprintf "Post fails policy [%08b] [%s]", $policy, $post->title );
+  	return 0;
+  	}
 
-  my $time_now = gmtime;
+  # these checks are for things that absolutely exclude the post
+  # no matter what else is going on
+  my $killed = grep { $post->$_() } $post->_content_exclusion_methods;
+  $logger->debug( sprintf "Killed count is [%d] for [%s]", $killed, $post->title );
+  return 0 if $killed;
 
-  # is the post fresh enough?
-  $post->datetime > $time_now - $post->age_threshold_secs
+  # these checks are for things that absolutely exclude the post
+  # no matter what else is going on
+  my %points = map { $_, $post->$_() } $post->_content_metric_methods;
+  my $points = sum( values %points );
+  $logger->debug( sprintf 'Points for emitting [%d] for [%s]', $points, $post->title );
+  $logger->debug( sprintf "Post has [%d] points [%s]", $points, $post->title );
 
-  # have we delayed posting enough for the owner to post themselves?
-  && $time_now - $post->datetime > $post->delay_seconds
+  return 1 if $points >= $post->threshold;
 
-  # is the post cached?
-  && !$cache->has_posted($post)
-
-  # does it looks Perl related?
-  && $post->looks_perly
+  return 0;
 }
 
 =head2 age_threshold_secs
@@ -163,8 +169,17 @@ sub looks_perly ( $post, $scalar_ref ) {
 	state $looks_perly =
 		qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
 
-  any { ( $_ // '' ) =~ /$looks_perly/ } $post->title, $post->description;
-}
+	$$scalar_ref =~ $looks_perly;
+	}
+
+sub has_no_perlybot_tag     ( $self ) { 0 }
+sub has_no_perlybot_comment ( $self ) { 0 }
+
+sub description_length      ( $self ) { ( length( $self->description ) / 1000 ) % 3 }
+sub description_looks_perly ( $self ) { $self->looks_perly( \ $self->description ) }
+sub description_author      ( $self ) { 0 }
+sub perly_links             ( $self ) { 0 }
+sub keywords                ( $self ) { 0 }
 
 =head1 TO DO
 
