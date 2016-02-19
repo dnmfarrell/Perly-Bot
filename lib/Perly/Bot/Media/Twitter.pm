@@ -3,12 +3,10 @@ use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
 package Perly::Bot::Media::Twitter;
+use parent qw(Perly::Bot::Media::Base);
 
 use namespace::autoclean;
 use Net::Twitter::Lite::WithAPIv1_1;
-use Role::Tiny::With;
-
-with 'Perly::Bot::Media';
 
 my $logger = Log::Log4perl->get_logger();
 

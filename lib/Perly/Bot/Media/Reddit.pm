@@ -3,11 +3,10 @@ use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
 package Perly::Bot::Media::Reddit;
+use parent qw(Perly::Bot::Media::Base);
+
 use namespace::autoclean;
 use Mojo::Snoo::Subreddit;
-use Role::Tiny::With;
-
-with 'Perly::Bot::Media';
 use Perly::Bot::CommonSetup;
 
 my $logger = Log::Log4perl->get_logger();
