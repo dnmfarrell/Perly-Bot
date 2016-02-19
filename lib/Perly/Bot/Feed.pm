@@ -158,6 +158,7 @@ sub trawl_blog ( $self ) {
     $logger->logwarn( "Received nothing for feed " . $self->url );
     return [];
   }
+  $logger->debug( "Trawled " . $self->url );
 }
 
 sub fetch_feed ( $self ) {
@@ -204,7 +205,7 @@ sub extract_posts ( $self, $xml ) {
     }
 
     # save some useful debugging info, datetimes are weird
-    if ( $logger->is_debug )
+    if( 0 && $logger->is_debug )
     {
       $logger->debug( sprintf 'Parsing %s changed to %s using format %s',
         $datetime_raw, $datetime_clean, $date_format );
