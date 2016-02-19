@@ -86,13 +86,12 @@ sub is_properly_configured ( $class, $config ) {
 sub new ( $class, $args ) {
 	my $config = Perly::Bot::Config->get_config;
 
-  my @missing = grep { !exists $args->{$_} }
-    qw(agent_string username password client_id client_secret subreddit);
+	my @missing = grep { ! exists $args->{$_} }
+		qw(agent_string username password client_id client_secret subreddit);
 
-  if (@missing)
-  {
+  if (@missing) {
     $logger->logcroak(
-      "args is missing required variables (@missing) for $class");
+      "args is missing required variables (@missing) for $class" );
   }
 
 	my $snoo = Mojo::Snoo::Subreddit->new(
