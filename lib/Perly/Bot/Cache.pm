@@ -37,9 +37,10 @@ and the number of seconds to store a cache entry for.
 
 =cut
 
-sub new
-{
-  my ( $class, $cache_path, $expires_secs ) = @_;
+sub new ( $class ) {
+  my $config = Perly::Bot::Config->get_config;
+  my $cache_path = $config->cache_path;
+  my $expires_secs = $config->cache_expiry;
 
   make_path($cache_path)
     unless !$cache_path
@@ -72,9 +73,7 @@ Checks the cache to see if the C<Perly::Bot::Feed::Post> has already been posted
 
 =cut
 
-sub has_posted
-{
-  my ( $self, $post ) = @_;
+sub has_posted ( $self, $post ) {
   $logger->logdie(
     'has_posted() requires a Perly::Bot::Feed::Post object as an argument')
     unless $post && $post->isa('Perly::Bot::Feed::Post');
@@ -88,9 +87,7 @@ Saves the C<Perly::Bot::Feed::Post> object in the cache.
 
 =cut
 
-sub save_post
-{
-  my ( $self, $post ) = @_;
+sub save_post ( $self, $post ) {
   $logger->logdie(
     'save_post() requires a Perly::Bot::Feed::Post object as an argument')
     unless $post && $post->isa('Perly::Bot::Feed::Post');

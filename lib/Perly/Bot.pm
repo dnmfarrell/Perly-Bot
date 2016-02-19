@@ -55,24 +55,24 @@ The main routine, trawls blog feeds for new posts.
 
 =cut
 
-sub run ( $package, $config_file = catfile( $ENV{HOME}, '.perlybot', 'config.yml' ) )
-{
-  my $config = Perly::Bot::Config->new( $config_file );
-  unless( $config ) {
-    $logger->logdie( "Could not read configuration from [$config_file]" );
-  	}
+sub run ( $package, $config_file = catfile( $ENV{HOME}, '.perlybot', 'config.yml' ) ) {
+	$logger->debug( "Config file is [$config_file]" );
+	my $config = Perly::Bot::Config->new( $config_file );
+	unless( $config ) {
+		$logger->logdie( "Could not read configuration from [$config_file]" );
+		}
 
-  # Loop through feeds, check for new posts
-  for my $feed ( $config->feeds->@* )
-  {
-      my $posts = $feed->trawl_blog;
-      foreach my $post ( $posts->@* )
-      {
-        next unless $post->should_emit;
-        emit( $post );
-      }
-  }
-}
+	# Loop through feeds, check for new posts
+	for my $feed ( $config->feeds->@* ) {
+  		$logger->debug( sprintf "Processing feed [%s]", $feed->url );
+		my $posts = $feed->trawl_blog;
+   		$logger->debug( sprintf "Found %d posts in [%s]", scalar @$posts, $feed->url );
+		for my $post ( $posts->@* ) {
+			next unless $post->should_emit;
+			emit( $post );
+			}
+		}
+	}
 
 =head2 emit
 
@@ -80,16 +80,14 @@ Sends the blog post to C<Perly::Bot::Media> objects for posting.
 
 =cut
 
-sub emit ( $post )
-{
+sub emit ( $post ) {
   $logger->debug( sprintf "Not posting %s as program is in debug mode",
     $post->root_url );
   return 0 if $logger->is_debug;
 
   my $cache = Perly::Bot::Config->get_config->cache;
 
-  foreach my $media_target ( $post->feed->media->@* )
-  {
+  foreach my $media_target ( $post->feed->media->@* ) {
     $_->send($post);
     eval { $cache->save_post( $post ) }
     	or $logger->logdie( $@ );

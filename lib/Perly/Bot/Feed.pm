@@ -84,8 +84,7 @@ sub defaults ( $class ) {
   $defaults;
   }
 
-sub new ( $class, $args )
-{
+sub new ( $class, $args ) {
   my %feed = ( $class->defaults->%*, $args->%* );
   my $self = bless \%feed, $class;
 
@@ -126,13 +125,11 @@ sub new ( $class, $args )
   $self;
 }
 
-sub parser_allowed ( $self, $parser )
-{
+sub parser_allowed ( $self, $parser ) {
   return exists $self->_allowed_parsers->{$parser}
 }
 
-sub _allowed_parsers
-{
+sub _allowed_parsers {
   state $allowed = {
     map { $_ => 1 }
       qw(
@@ -143,8 +140,8 @@ sub _allowed_parsers
   $allowed;
 }
 
-sub trawl_blog ( $self )
-{
+sub trawl_blog ( $self ) {
+  $logger->debug( "Trawling " . $self->url );
   my $config = Perly::Bot::Config->get_config;
   my $cache = $config->cache;
 
@@ -157,9 +154,8 @@ sub trawl_blog ( $self )
     my $blog_posts = $self->extract_posts( $content );
     return $blog_posts;
   }
-  else
-  {
-    $logger->logwarn( "Recieved nothing for feed " . $self->url );
+  else {
+    $logger->logwarn( "Received nothing for feed " . $self->url );
     return [];
   }
 }
@@ -180,8 +176,7 @@ sub fetch_feed ( $self ) {
   return;
 }
 
-sub extract_posts ( $self, $xml )
-{
+sub extract_posts ( $self, $xml ) {
   my @posts = ();
 
   my @items = $self->{parser}->new( $xml, -type => 'string' )->get_item();

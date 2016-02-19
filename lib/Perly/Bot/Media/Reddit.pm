@@ -63,9 +63,28 @@ karama (it's a bot filter).
 
 =cut
 
-sub new
-{
-  my ( $class, $args ) = @_;
+sub config_defaults ( $class, $config={} ) {
+	state $defaults = {
+		type          => 'reddit',
+		class         => __PACKAGE__,
+		username      => $ENV{PERLYBOT_REDDIT_USER}          // 'perlybotng',
+		password      => $ENV{PERLYBOT_REDDIT_PASS}          // undef,
+		client_id     => $ENV{PERLYBOT_REDDIT_CLIENT_ID}     // undef,
+		client_secret => $ENV{PERLYBOT_REDDIT_CLIENT_SECRET} // undef,
+		subreddit     => $ENV{PERLYBOT_SUBREDDIT}            // '/r/perlybot',
+		};
+
+	$defaults;
+	}
+
+sub is_properly_configured ( $class, $config ) {
+
+	1;
+
+	}
+
+sub new ( $class, $args ) {
+	my $config = Perly::Bot::Config->get_config;
 
   my @missing = grep { !exists $args->{$_} }
     qw(agent_string username password client_id client_secret subreddit);

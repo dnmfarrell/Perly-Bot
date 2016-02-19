@@ -32,10 +32,8 @@ Removes the query component of the url. This is to reduce the risk of posting du
 
 =cut
 
-sub clean_url
-{
-  my ( $self, $url ) = @_;
-  my $uri = URI->new($url);
+sub clean_url ( $self, $url ) {
+  my $uri = Mojo::URL->new($url);
   return $uri->scheme . '://' . $uri->host . $uri->path;
 }
 
@@ -45,9 +43,7 @@ Returns the clean url, if the blog post url is a proxy, it will follow the proxy
 
 =cut
 
-sub root_url
-{
-  my ($self) = @_;
+sub root_url ( $self ) {
   return $self->clean_url( $self->url ) unless $self->proxy;
 
   # if we've already retrieved the root url, don't pull it again
@@ -72,9 +68,7 @@ Returns the blog post title decoded from html using L<HTML::Entities>. This is r
 
 =cut
 
-sub decoded_title
-{
-  my ($self) = @_;
+sub decoded_title ( $self ) {
   decode_entities( $self->title );
 }
 
@@ -91,8 +85,44 @@ post type!
 
 =cut
 
-sub should_emit ( $post )
-{
+sub _content_exclusion_methods ( $self ) {
+	qw(
+	has_no_perlybot_tag
+	has_no_perlybot_comment
+  	);
+  	}
+
+sub _content_metric_methods ( $self ) {
+	qw(
+  	description_length
+  	description_looks_perly
+  	description_author
+  	perly_links
+  	keywords
+  	);
+  	}
+
+sub fails_by_policy ( $post ) {
+	my $config = Perly::Bot::Config->get_config;
+	my $cache  = $config->cache;
+	my $time_now = gmtime;
+
+	my $policy = sum(
+	  # is the post fresh enough?
+	  ($post->datetime > $time_now - $post->age_threshold_secs) ? 0 : 1,
+	  # have we delayed posting enough for the owner to post themselves?
+	  $time_now - $post->datetime > $post->delay_seconds ? 2 : 0,
+	  # is the post cached?
+      $cache->has_posted($post) ? 4 : 0,
+      );
+
+	$logger->debug( sprintf "Policy is [%0b] for [%s]", $policy, $post->title );
+    return $policy;
+	}
+
+sub threshold ( $self ) { 2 }
+
+sub should_emit ( $post ) {
   my $config = Perly::Bot::Config->get_config;
   my $cache  = $config->cache;
 
@@ -120,10 +150,7 @@ to decide a value based on anything you like.
 
 =cut
 
-sub age_threshold_secs
-{
-  Perly::Bot::Config->get_config->age_threshold_secs;
-}
+sub age_threshold_secs { Perly::Bot::Config->get_config->age_threshold_secs }
 
 =head2 looks_perly( POST )
 
@@ -132,10 +159,9 @@ you can override this in specialized post types.
 
 =cut
 
-sub looks_perly ( $post )
-{
-  state $looks_perly =
-    qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
+sub looks_perly ( $post, $scalar_ref ) {
+	state $looks_perly =
+		qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
 
   any { ( $_ // '' ) =~ /$looks_perly/ } $post->title, $post->description;
 }
