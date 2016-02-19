@@ -80,10 +80,7 @@ sub new
   };
 }
 
-sub _build_tweet
-{
-  my ( $self, $blog_post ) = @_;
-
+sub _build_tweet ( $self, $blog_post ) {
   my $title   = $blog_post->decoded_title;
   my $url     = $blog_post->root_url;
   my $via     = $blog_post->twitter ? 'via @' . $blog_post->twitter : '';
