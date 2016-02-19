@@ -1,7 +1,7 @@
 agent_string: 'Perly_Bot/v'
-feeds_path: 't/feeds.yml'
-session_path: 't/logs/session_data.json'
-error_log_path: 't/logs/errors.log'
+feeds_path: 'test_feeds.yml'
+session_path: 'logs/session_data.json'
+error_log_path: 'logs/errors.log'
 perlybot_path: 't'
 cache: {
   expiry_secs: 604800,
@@ -14,7 +14,4 @@ media: {
   'Perly::Bot::Media::Reddit': {
     config_path: 'configs/reddit.yml'
   },
-  'Perly::Bot::Media::Twitter': {
-    config_path: 'configs/twitter.yml'
-  }
 }
