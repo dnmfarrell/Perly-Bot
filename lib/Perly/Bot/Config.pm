@@ -1,8 +1,7 @@
 use v5.22;
+use utf8;
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
-
-use utf8;
 
 package Perly::Bot::Config;
 
@@ -11,6 +10,7 @@ use Perly::Bot::CommonSetup;
 use File::Spec::Functions;
 
 our $VERSION = '1.001';
+
 my $logger = Log::Log4perl->get_logger();
 
 
@@ -48,26 +48,23 @@ sub AUTOLOAD ( $self ) {
 
 	my( $method ) = $AUTOLOAD =~ m/.+::(.+)/;
 
-	if( exists $self->{$method} ) {
+	if( ! ref $self ) {
+		$logger->logcarp( "$method is not a class method" );
+		}
+	elsif( exists $self->{$method} ) {
 		return $self->{$method};
 		}
 	else {
-		$logger->warn( "$method is not configured" );
+		$logger->error( "$method is not configured" );
 		return;
 		}
 	}
 
-sub get_config ( $class ) {
-	unless( $class->_config_setup ) {
-		$logger->error( "Config is not setup! Call new() first" );
-		}
-
-	$class->new;
-	}
 
 sub load_config ( $self,
 	$file = do { 'config.yml' ? 'config.yml' : "$ENV{HOME}/.perly_bot/config.yml" }
 	) {
+	state $module = require YAML::XS;
 	$self->{_file} = $file;
 
 	# use canonpath for cross platform support
@@ -87,14 +84,13 @@ sub init_cache ( $self, $cache_class='Perly::Bot::Cache' ) {
 		if( $@ ) { $logger->warn( "$@" ) }
 		$rc;
 		};
-    $self->{cache} = $cache_class->new(
-    	catfile( $self->perlybot_home, $self->{cache}{path} ),
-      	$self->{cache}{expiry_secs}
-		);
+    $self->{cache} = $cache_class->new;
 	$self;
 	}
 
-sub cache ( $self ) { $self->{cache} }
+sub cache        ( $self ) { $self->{cache} }
+sub cache_path   ( $self ) { $self->cache->{path} }
+sub cache_expiry ( $self ) { $self->cache->{expiry_secs} }
 
 sub load_media ( $self ) {
 	state $module = require YAML::XS;
@@ -127,6 +123,8 @@ sub add_media_object ( $self, $module_name, $config_path ) {
 		}
 
 	my $media_config = YAML::XS::LoadFile($config_path);
+	$logger->debug( "Module name [$module_name} has config path [$config_path]" );
+	$logger->debug( sub { Dumper( $media_config ) } ); use Data::Dumper;
 
 	my $object = eval { $module_name->new( $media_config ) };
 	unless( ref $object ) {
@@ -186,19 +184,34 @@ sub media_targets ( $self ) {
 	return $self->{media_targets}->@*;
 	}
 
-sub feeds ( $self, $file='feeds.yml' ) {
+sub _full_path_or_resolve ( $self, $path ) {
+	$logger->debug( "Resolving path [$path]" );
+	return $path if File::Spec->file_name_is_absolute( $path );
+
+	return File::Spec->rel2abs( $path, $self->perlybot_path )
+	}
+
+sub feeds_path ( $self ) {
+	my $path = $self->_full_path_or_resolve( $self->{feeds_path} );
+	$logger->debug( "The feeds path is [$path]" );
+	return $path;
+	}
+
+sub feeds ( $self ) {
 	state $module =
 		require YAML::XS,
 		require Perly::Bot::Feed;
 
-	state $config = do {
-		YAML::XS::LoadFile( $file // $self->feeds_path );
+	my $config = Perly::Bot::Config->get_config;
+
+	state $feeds_file = do {
+		YAML::XS::LoadFile( $config->feeds_path );
 		};
 	state $feeds = [];
 	return $feeds if @$feeds;
 
-	foreach my $feed ( $config->@* ) {
-		push @$feeds, Perly::Bot::Feed->new( $feed );
+	foreach my $feed_info ( $feeds_file->@* ) {
+		push @$feeds, Perly::Bot::Feed->new( $feed_info );
 		}
 
 	$feeds;
@@ -211,3 +224,17 @@ sub agent_string ( $self ) {
 sub	age_threshold_secs ( $self ) {
 	$self->{should_emit}{age_threshold_secs}
 	}
+
+sub reddit               ( $self ) { $self->{reddit} // {} }
+sub subreddit            ( $self ) { $self->reddit->{subreddit}     }
+sub reddit_client_id     ( $self ) { $self->reddit->{client_id}     }
+sub reddit_client_secret ( $self ) { $self->reddit->{client_secret} }
+sub reddit_username      ( $self ) { $self->reddit->{username}      }
+sub reddit_password      ( $self ) { $self->reddit->{password}      }
+
+sub twitter                 ( $self ) { $self->{twitter} // {}   }
+sub twitter_consumer_key    ( $self ) { $self->{consumer_key}    }
+sub twitter_consumer_secret ( $self ) { $self->{consumer_secret} }
+sub twitter_access_token    ( $self ) { $self->{access_token}    }
+sub twitter_access_secret   ( $self ) { $self->{access_secret}   }
+
