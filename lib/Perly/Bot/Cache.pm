@@ -53,8 +53,7 @@ sub new ( $class ) {
   $logger->logdie(
     'new() requires a positive integer for the expiry duration of entries')
     unless $expires_secs
-    && $expires_secs =~ /^[0-9]+$/
-    && $expires_secs > 0;
+    && $expires_secs =~ /\A [0-9]+ \z/x;
 
   my $cache = CHI->new(
     driver     => 'File',
