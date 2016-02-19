@@ -53,17 +53,18 @@ sub root_url
   # if we've already retrieved the root url, don't pull it again
   return $self->{_root_url} if exists $self->{_root_url};
 
-  my $response = HTTP::Tiny->new->get( $self->url );
+  my $tx = Mojo::UserAgent->new->get( $self->url );
+  my $response = $tx->res;
 
-  if ( $response->{success} )
-  {
-    $self->{_root_url} = $self->clean_url( $response->{url} );
+  if ( $response->is_success ) {
+    my $location = $response->headers->header( 'Location' );
+    $logger->debug( sprintf "Location is [%s]", $location );
+    $self->{_root_url} = $self->clean_url( $location );
     return $self->{_root_url};
   }
-  else
-  {
-    $logger->logcroak(
-      "Error requesting $response->{url}. $response->{status} $response->{reason}"
+  else {
+    $logger->logcroak( sprintf "Error requesting [%s] [%s] [%s]",
+    	$response->{url}. $response->code, $response->message
     );
   }
 }

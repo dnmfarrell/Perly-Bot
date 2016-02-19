@@ -148,11 +148,12 @@ sub trawl_blog ( $self )
   my $config = Perly::Bot::Config->get_config;
   my $cache = $config->cache;
 
-  my $ua = HTTP::Tiny->new( agent => $config->agent_string );
-  my $response = $ua->get( $self->url );
+  my $ua = Perly::Bot::UserAgent->get_user_agent;
+  $logger->debug( "Got UA" );
 
-  if ( my $content = $self->fetch_feed )
-  {
+  if ( my $response = $ua->get( $self->url ) ) {
+  $logger->debug( "Got response" );
+  	my $content = $response->text;
     my $blog_posts = $self->extract_posts( $content );
     return $blog_posts;
   }
@@ -163,29 +164,20 @@ sub trawl_blog ( $self )
   }
 }
 
-sub fetch_feed ( $self )
-{
-  state $ua = do
-  {
-    my $config = Perly::Bot::Config->get_config;
-    my $ua = Mojo::UserAgent->new;
-    $ua->transactor->name( $config->{agent_string} );
-    $ua;
-  };
-
+sub fetch_feed ( $self ) {
   $logger->debug("Checking $self->{url} ...");
-  my $tx = $ua->get( $self->url );
 
-  if ( $tx->success )
-  {
-    my $content = $tx->res->text;    # decode
+  my $ua = Perly::Bot::UserAgent->get_user_agent;
+  my $response = $ua->get( $self->url );
+
+  if ( my $response = $ua->get( $self->url ) ) {
+    my $content = $response->text;    # decode
     $logger->debug( sprintf 'Received content length: %s', length($content) );
-    $self->{tx} =  $tx;
     $self->{content} =  $content;
     return $content;
   }
-  $logger->logdie( "Error requesting [%s]. [%s] [%s]",
-    $self->url, $tx->res->code, $tx->res->message );
+
+  return;
 }
 
 sub extract_posts ( $self, $xml )
