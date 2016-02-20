@@ -5,6 +5,7 @@ no warnings qw(experimental::signatures experimental::postderef);
 package Perly::Bot::Feed::Post;
 
 use namespace::autoclean;
+use Data::Dumper;
 use HTML::Entities;
 use List::Util qw(sum any);
 
@@ -68,9 +69,7 @@ Returns the blog post title decoded from html using L<HTML::Entities>. This is r
 
 =cut
 
-sub decoded_title ( $self ) {
-  decode_entities( $self->title );
-}
+sub decoded_title ( $self ) { decode_entities( $self->title ) }
 
 =head2 should_emit
 
@@ -140,6 +139,7 @@ sub should_emit ( $post ) {
 
   my $points = sum( values %points );
 
+$logger->debug( "Got to end of should_emit" );
   return 1 if $points >= $post->threshold;
 
   return 0;
@@ -167,16 +167,16 @@ sub looks_perly ( $post, $scalar_ref ) {
 
 	$$scalar_ref =~ $looks_perly;
 	}
-sub description_author      ( $self ) { 0 }
-sub perly_links             ( $self ) { 0 }
-sub keywords                ( $self ) { 0 }
-
 
 sub has_no_perlybot_tag     ( $self ) { 0 }
 sub has_no_perlybot_comment ( $self ) { 0 }
 
 sub description_length      ( $self ) { ( length( $self->description ) / 1000 ) % 3 }
 sub description_looks_perly ( $self ) { $self->looks_perly( \ $self->description ) }
+sub description_author      ( $self ) { 0 }
+sub perly_links             ( $self ) { 0 }
+sub keywords                ( $self ) { 0 }
+
 sub clone ( $self ) {
 	state $storable = require Storable;
 	my $clone = Storable::dclone( $self );
