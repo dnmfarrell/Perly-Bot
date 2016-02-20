@@ -107,17 +107,16 @@ sub fails_by_policy ( $post ) {
 	my $cache  = $config->cache;
 	my $time_now = gmtime;
 
-	my $policy = sum(
-	  # is the post fresh enough?
-	  ($post->datetime > $time_now - $post->age_threshold_secs) ? 0 : 1,
-	  # have we delayed posting enough for the owner to post themselves?
-	  $time_now - $post->datetime > $post->delay_seconds ? 2 : 0,
-	  # is the post cached?
-      $cache->has_posted($post) ? 4 : 0,
-      );
+	my $policy = {
+		fresh   => ($post->datetime > $time_now - $post->age_threshold_secs) ? 0 : 1,
+		embargo => ($time_now - $post->datetime > $post->delay_seconds)      ? 2 : 0,
+		cached  => $cache->has_posted($post) ? 4 : 0,
+		};
 
-	$logger->debug( sprintf "Policy is [%0b] for [%s]", $policy, $post->title );
-    return $policy;
+	$post->{policy} = $policy;
+	$post->{policy}{_sum} = sum( values %$policy );
+
+    return $post->{policy}{_sum};
 	}
 
 sub threshold ( $self ) { 2 }
@@ -126,10 +125,7 @@ sub should_emit ( $post ) {
   my $config = Perly::Bot::Config->get_config;
 
   # these checks are for non-content things we configured
-  if( my $policy = $post->fails_by_policy ) {
-  	$logger->debug( sprintf "Post fails policy [%08b] [%s]", $policy, $post->title );
-  	return 0;
-  	}
+  return 0 if $post->fails_by_policy;
 
   # these checks are for things that absolutely exclude the post
   # no matter what else is going on
@@ -173,6 +169,10 @@ sub looks_perly ( $post, $scalar_ref ) {
 
 	$$scalar_ref =~ $looks_perly;
 	}
+sub description_author      ( $self ) { 0 }
+sub perly_links             ( $self ) { 0 }
+sub keywords                ( $self ) { 0 }
+
 
 sub has_no_perlybot_tag     ( $self ) { 0 }
 sub has_no_perlybot_comment ( $self ) { 0 }
@@ -196,10 +196,6 @@ sub dump ( $self ) {
 
 	Dumper( $clone );
 	}
-
-sub description_author      ( $self ) { 0 }
-sub perly_links             ( $self ) { 0 }
-sub keywords                ( $self ) { 0 }
 
 =head1 TO DO
 
