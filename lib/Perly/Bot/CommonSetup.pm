@@ -1,6 +1,18 @@
 use v5.22;
 
+
+=pod
+
+I mean for this module to have all the stupid stuff we'd want to be at
+the top of a file, and to have it import everything into the module that
+used it like Modern::Perl does.
+
+Somehow it's not all working out.
+
+=cut
+
 use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
 use strict;
 use warnings;
 
