@@ -177,6 +177,24 @@ sub has_no_perlybot_comment ( $self ) { 0 }
 
 sub description_length      ( $self ) { ( length( $self->description ) / 1000 ) % 3 }
 sub description_looks_perly ( $self ) { $self->looks_perly( \ $self->description ) }
+sub clone ( $self ) {
+	state $storable = require Storable;
+	my $clone = Storable::dclone( $self );
+	}
+
+
+sub dump ( $self ) {
+	my $clone = $self->clone;
+	$clone->{description} =~ s/ \A \s+ //x;
+	$clone->{description} = substr $clone->{description}, 0, 50;
+	$clone->{description} =~ s/ \s+ \z//x;
+	$clone->{description} =~ s/ \v+ / /x;
+
+	$clone->{datetime} = '...';
+
+	Dumper( $clone );
+	}
+
 sub description_author      ( $self ) { 0 }
 sub perly_links             ( $self ) { 0 }
 sub keywords                ( $self ) { 0 }
