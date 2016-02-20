@@ -68,7 +68,10 @@ sub run ( $package, $config_file = catfile( $ENV{HOME}, '.perlybot', 'config.yml
 		my $posts = $feed->trawl_blog;
    		$logger->debug( sprintf "Found %d posts in [%s]", scalar @$posts, $feed->url );
 		for my $post ( $posts->@* ) {
-			next unless $post->should_emit;
+			my $should_emit = $post->should_emit;
+			$logger->debug( sprintf "Should emit is [%s] for [%s]", $should_emit, $post->title );
+			$logger->debug( "Post is " . $post->dump );
+			next unless $should_emit;
 			emit( $post );
 			}
 		}
@@ -81,19 +84,32 @@ Sends the blog post to C<Perly::Bot::Media> objects for posting.
 =cut
 
 sub emit ( $post ) {
-  $logger->debug( sprintf "Not posting %s as program is in debug mode",
-    $post->root_url );
-  return 0 if $logger->is_debug;
+	$logger->debug( sprintf "Emitting [%s]", $post->title );
 
-  my $cache = Perly::Bot::Config->get_config->cache;
+	if( ! $ENV{PERLYBOT_POST_ANYWAYS} && $logger->is_debug ) {
+		$logger->debug( sprintf "DEBUG MODE: Not posting [%s]", $post->title );
+		return 0;
+		}
 
-  foreach my $media_target ( $post->feed->media->@* ) {
-    $_->send($post);
-    eval { $cache->save_post( $post ) }
-    	or $logger->logdie( $@ );
-  }
-  return 1;
-}
+	my $config = Perly::Bot::Config->get_config;
+	my $cache  = $config->cache;
+
+	foreach my $media_target ( $post->feed->media_targets->@* ) {
+		$logger->debug( sprintf "Media target is [%s]", $media_target );
+		my $media = $config->get_media_object( $media_target );
+		my $response = $media->send($post);
+		unless( $response->success ) {
+			$logger->error( "Could not send post! " . $response->to_string );
+			}
+
+		sleep(2);    # throttle requests to avoid exceeding API limit
+
+		eval { $cache->save_post( $post ) }
+			or $logger->logdie( sprintf "Error caching [%s]: $@", $post->title );
+		}
+
+	return 1;
+	}
 
 
 =head1 TO DO
