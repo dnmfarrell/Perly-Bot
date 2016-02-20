@@ -139,7 +139,9 @@ sub should_emit ( $post ) {
 
   # these checks are for things that absolutely exclude the post
   # no matter what else is going on
-  my %points = map { $_, $post->$_() } $post->_content_metric_methods;
+  my %points = map { $_, $post->$_() // 0 } $post->_content_metric_methods;
+  $post->{points} = \%points;
+
   my $points = sum( values %points );
   $logger->debug( sprintf 'Points for emitting [%d] for [%s]', $points, $post->title );
   $logger->debug( sprintf "Post has [%d] points [%s]", $points, $post->title );
