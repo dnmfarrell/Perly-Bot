@@ -6,3 +6,5 @@ Makefile.old
 *.swp
 *.old
 *.log
+cache
+t/cache
