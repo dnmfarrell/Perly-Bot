@@ -7,6 +7,7 @@ use utf8;
 
 use namespace::autoclean;
 use Perly::Bot::CommonSetup;
+use Scalar::Util qw(weaken);
 use Time::Piece;
 use Time::Seconds;
 use XML::FeedPP;
@@ -14,7 +15,7 @@ use XML::FeedPP;
 use base 'Class::Accessor';
 Perly::Bot::Feed->mk_accessors(
   qw/url type date_name date_format active
-  	proxy media delay_seconds twitter post_class/);
+  	proxy media_targets delay_seconds twitter post_class/);
 
 
 my $logger = Log::Log4perl->get_logger();
@@ -73,12 +74,12 @@ sub defaults_for_type ( $self, $type='rss' ) {
 
 sub defaults ( $class ) {
   state $defaults = {
-    active => 1,
-    proxy  => 0,
-    media  =>
-      [ 'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit' ],
+    active        => 1,
+    proxy         => 0,
     delay_seconds => 21600,
     post_class    => 'Perly::Bot::Feed::Post',
+    media_targets =>
+      [ 'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit' ],
     };
 
   $defaults;
@@ -103,7 +104,7 @@ sub new ( $class, $args ) {
   }
 
   state $required = [
-    qw(url type date_name date_format active media proxy delay_seconds parser)];
+    qw(url type date_name date_format active media_targets proxy delay_seconds parser)];
   my @missing = grep { ! exists $self->{ $_ } } $required->@*;
   $logger->logcroak("Missing fields (@missing) for feed $self->{url}")
     if @missing;
@@ -211,6 +212,9 @@ sub extract_posts ( $self, $xml ) {
         $datetime_raw, $datetime_clean, $date_format );
     }
 
+	my $weak_self = $self;
+	weaken( $weak_self );
+
     my $post = eval {
       my $datetime = Time::Piece->strptime( $datetime_clean, $date_format );
       $self->post_class->new( {
@@ -221,7 +225,7 @@ sub extract_posts ( $self, $xml ) {
         url           => $i->link,
         proxy         => $self->proxy,
         twitter       => $self->twitter,
-        feed          => $self->url,
+        feed          => $weak_self,  # we have a reference to the feed
       } );
     };
 
