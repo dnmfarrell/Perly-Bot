@@ -127,13 +127,20 @@ sub add_media_object ( $self, $module_name, $config_path ) {
 		return;
 		}
 
-	my $media_config = YAML::XS::LoadFile($config_path);
-	$logger->debug( "Module name [$module_name} has config path [$config_path]" );
-	$logger->debug( sub { Dumper( $media_config ) } ); use Data::Dumper;
+	my $this = $self->{media}{$module_name} = {};
 
-	my $object = eval { $module_name->new( $media_config ) };
+	$this->{defaults} = $module_name->config_defaults;
+	$this->{media_config} = eval { YAML::XS::LoadFile( $config_path ) } // {};
+	$logger->debug( "Module name [$module_name} has config path [$config_path]" );
+
+	my %params = map { $this->{$_}->%* } qw(defaults media_config);
+
+	$self->{media}{$module_name}{params} = \%params;
+
+	my $object = eval { $module_name->new( \%params ) };
 	unless( ref $object ) {
-		$logger->error( "Could not make object for [$module_name]! $@" );
+		$logger->logcroak( "Media config is " . Dumper( \%params ) ); use Data::Dumper;
+		$logger->logcroak( "Could not make object for [$module_name]! $@" );
 		return;
 		}
 
@@ -230,7 +237,7 @@ sub	age_threshold_secs ( $self ) {
 	$self->{should_emit}{age_threshold_secs}
 	}
 
-sub reddit               ( $self ) { $self->{reddit} // {} }
+sub reddit               ( $self ) { $self->media->{'Perly::Bot::Media::Reddit'}{params} // {} }
 sub subreddit            ( $self ) { $self->reddit->{subreddit}     }
 sub reddit_client_id     ( $self ) { $self->reddit->{client_id}     }
 sub reddit_client_secret ( $self ) { $self->reddit->{client_secret} }
