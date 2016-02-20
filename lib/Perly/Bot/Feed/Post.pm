@@ -129,9 +129,9 @@ sub should_emit ( $post ) {
 
   # these checks are for things that absolutely exclude the post
   # no matter what else is going on
-  my $killed = grep { $post->$_() } $post->_content_exclusion_methods;
-  $logger->debug( sprintf "Killed count is [%d] for [%s]", $killed, $post->title );
-  return 0 if $killed;
+  my @killed = grep { $post->$_() } $post->_content_exclusion_methods;
+  $post->{killed} = \@killed;
+  return 0 if @killed;
 
   # these checks are for things that absolutely exclude the post
   # no matter what else is going on
@@ -139,8 +139,6 @@ sub should_emit ( $post ) {
   $post->{points} = \%points;
 
   my $points = sum( values %points );
-  $logger->debug( sprintf 'Points for emitting [%d] for [%s]', $points, $post->title );
-  $logger->debug( sprintf "Post has [%d] points [%s]", $points, $post->title );
 
   return 1 if $points >= $post->threshold;
 
