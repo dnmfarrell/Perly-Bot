@@ -12,5 +12,5 @@
     url: https://www.nu42.com/nu42.atom.xml
     type: atom
     date_name: updated
-    date_format: '%Y-%m-%dT%H:%M:%S'
     media_targets: ['Perly::Bot::Media::Reddit']
+    date_format: '%Y-%m-%dT%T%z'
