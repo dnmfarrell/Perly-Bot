@@ -39,7 +39,7 @@ and the number of seconds to store a cache entry for.
 
 sub new ( $class ) {
   my $config = Perly::Bot::Config->get_config;
-  my $cache_path = $config->cache_path;
+  my $cache_path   = $config->cache_path;
   my $expires_secs = $config->cache_expiry;
 
   make_path($cache_path)

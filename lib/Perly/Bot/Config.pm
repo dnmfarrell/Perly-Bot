@@ -77,6 +77,9 @@ sub load_config ( $self,
 
 sub init_cache ( $self, $cache_class='Perly::Bot::Cache' ) {
     # init cache
+
+    $self->{cache}{path} = $self->_full_path_or_resolve( $self->{cache}{path} );
+
     $logger->logdie( "Cache class <$cache_class> does not look like a valid namespace!" )
     	unless $cache_class =~ / \A [A-Z0-9_]+ ( :: [A-Z0-9_]+ )* \z /xi;
 	state $module = do {
@@ -84,15 +87,17 @@ sub init_cache ( $self, $cache_class='Perly::Bot::Cache' ) {
 		if( $@ ) { $logger->warn( "$@" ) }
 		$rc;
 		};
-    $self->{cache} = $cache_class->new;
+    $self->{cache}{class}  = $cache_class;
+    $self->{cache}{object} = $cache_class->new;
 	$self;
 	}
 
-sub cache        ( $self ) { $self->{cache} }
-sub cache_path   ( $self ) { $self->cache->{path} }
-sub cache_expiry ( $self ) { $self->cache->{expiry_secs} }
+sub cache        ( $self ) { $self->{cache}{object}      }
+sub cache_path   ( $self ) { $self->{cache}{path}        }
+sub cache_expiry ( $self ) { $self->{cache}{expiry_secs} }
 
 sub load_media ( $self ) {
+	$logger->trace( "load_media" );
 	state $module = require YAML::XS;
     foreach my $module_name ( keys $self->media->%* ) {
     	unless( $module_name =~ m/ \A [A-Z0-9_]+ ( :: [A-Z0-9_]+ )+ \z /xi ) {
