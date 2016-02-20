@@ -1,7 +1,4 @@
 type: reddit
-agent_string:
-username:
-password:
-client_id:
-client_secret:
 subreddit: perlybot
+username: perlybottest
+client_id: TaQzYyYZ3BYYBQ
