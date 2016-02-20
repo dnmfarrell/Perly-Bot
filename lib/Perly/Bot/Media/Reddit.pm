@@ -6,6 +6,7 @@ package Perly::Bot::Media::Reddit;
 use parent qw(Perly::Bot::Media::Base);
 
 use namespace::autoclean;
+use Data::Dumper;
 use Mojo::Snoo::Subreddit;
 use Perly::Bot::CommonSetup;
 
@@ -71,7 +72,7 @@ sub config_defaults ( $class, $config={} ) {
 		password      => $ENV{PERLYBOT_REDDIT_PASS}          // undef,
 		client_id     => $ENV{PERLYBOT_REDDIT_CLIENT_ID}     // undef,
 		client_secret => $ENV{PERLYBOT_REDDIT_CLIENT_SECRET} // undef,
-		subreddit     => $ENV{PERLYBOT_SUBREDDIT}            // '/r/perlybot',
+		subreddit     => $ENV{PERLYBOT_SUBREDDIT}            // 'perlybot',
 		};
 
 	$defaults;
@@ -83,24 +84,108 @@ sub is_properly_configured ( $class, $config ) {
 
 	}
 
+BEGIN {
+	use Mojo::Snoo::Subreddit;
+	package Mojo::Snoo::Subreddit;
+use Data::Dumper;
+	sub _submit_link_specialized ($self, $params) {
+		$logger->debug( "Snoo input submit params----\n" . Dumper( $params ) );
+
+		#$params->{url};
+		$params->{sr}       = $self->name;
+		$params->{api_type} = 'json';
+		$params->{kind}     = 'link';
+		$params->{resubmit} //= 0;
+		$logger->debug( "Snoo processed submit params----\n" . Dumper( $params ) );
+
+		my $tx = $self->_do_request('POST', '/api/submit', $params->%*);
+
+		$logger->debug( "------------Request is\n" . $tx->req->to_string );
+		$logger->debug( "------------Response is\n" . $tx->res->to_string );
+
+		}
+
+
+	sub Mojo::Snoo::Base::_do_request {
+		my ($self, $method, $path, %params) = @_;
+
+		my %headers;
+		if ($self->_token_required($path)) {
+			$headers{Authorization} = 'bearer ' . $self->access_token;
+			}
+
+		my $url = $self->base_url;
+
+		$url->path("$path.json");
+
+		if ($method eq 'GET') {
+			$url->query(%params) if %params;
+			return $self->agent->get($url => \%headers);
+			}
+		return $self->agent->post($url => \%headers, form => \%params);
+		}
+
+sub Mojo::Snoo::Base::_create_access_token {
+    my $self = shift;
+    # update base URL
+    my %form = (
+        grant_type => 'password',
+        username => $self->username,
+        password => $self->password,
+    );
+    my $access_url =
+        'https://'
+      . $self->client_id . ':'
+      . $self->client_secret
+      . '@www.reddit.com/api/v1/access_token';
+
+$logger->debug( "Access URL: $access_url" );
+    my $tx = $self->agent->post($access_url => form => \%form);
+
+
+    my $res = $tx->res;
+$logger->debug( "------------Request\n" . $tx->req->to_string );
+$logger->debug( "------------Response\n" . $res->to_string );
+    # if a problem arises, it is most likely due to given auth being incorrect
+    # let the user know in this case
+    if (exists($res->json->{error})) {
+        my $msg =
+          $res->json->{error} == 401
+          ? '401 status code (Unauthorized)'
+          : 'error response of ' . $res->json->{error};
+        Carp::croak("Received $msg while attempting to create OAuth access token.");
+    }
+
+    # update the base URL for future endpoint calls
+    $self->base_url->host('oauth.reddit.com');
+
+    # TODO we will want to eventually keep track of token type, scope and expiration
+    #      when dealing with user authentication (not just a personal script)
+    return $res->json->{access_token};
+}
+	};
+
 sub new ( $class, $args ) {
 	my $config = Perly::Bot::Config->get_config;
 
-	my @missing = grep { ! exists $args->{$_} }
-		qw(agent_string username password client_id client_secret subreddit);
-
-  if (@missing) {
-    $logger->logcroak(
-      "args is missing required variables (@missing) for $class" );
-  }
-
-	my $snoo = Mojo::Snoo::Subreddit->new(
-        name          => $args->{subreddit}     // $config->subreddit,
+	my %params = (
+		name          => $args->{subreddit}     // $config->subreddit,
         client_id     => $args->{client_id}     // $config->reddit_client_id,
         client_secret => $args->{client_secret} // $config->reddit_client_secret,
         username      => $args->{username}      // $config->reddit_username,
         password      => $args->{password}      // $config->reddit_password,
 		);
+
+	my @missing = grep { ! (exists $params{$_} && defined $params{$_}) }
+		qw(username password client_id client_secret name);
+
+	if (@missing) {
+		$logger->logcroak( "Missing required parameters (@missing) for $class" );
+		}
+
+	$logger->debug( "Snoo params: " . Dumper( \%params ) );
+
+	my $snoo = Mojo::Snoo::Subreddit->new( %params );
 
 
     my $self = bless { reddit_api => $snoo }, $class;
@@ -109,16 +194,18 @@ sub new ( $class, $args ) {
     	unless ref $self;
 
     return $self;
-}
+	}
 
-sub send
-{
-  my ( $self, $blog_post ) = @_;
-
-  $self->{reddit_api}
-    ->submit_link( $blog_post->decoded_title, $blog_post->root_url );
-  sleep(2);    # throttle requests to avoid exceeding API limit
-}
+sub send ( $self, $blog_post ) {
+	my $config = Perly::Bot::Config->get_config;
+	my $res = $self->{reddit_api}->_submit_link_specialized( {
+		title => $blog_post->decoded_title,
+		url   => $blog_post->root_url,
+		sr    => $config->subreddit
+		} );
+	$logger->debug( "Reddit send returns [$res]" );
+	$res;
+	}
 
 =head1 TO DO
 
