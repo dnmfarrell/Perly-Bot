@@ -28,7 +28,7 @@
     twitter: briandfoy_perl
 -
     url: http://perltricks.com/index.xml
-    type: atom
+    type: rss
     delay_seconds: 0
     media_targets: ['Perly::Bot::Media::Reddit']
 -
