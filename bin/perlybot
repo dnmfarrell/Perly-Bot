@@ -6,7 +6,7 @@ use v5.22;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
-use Perly::Bot;
+use Perly::Bot 0.201;
 use Getopt::Long qw(GetOptions);
 
 __PACKAGE__->run(@ARGV) unless caller;
