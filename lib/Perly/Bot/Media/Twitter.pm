@@ -69,7 +69,6 @@ sub is_properly_configured ( $class, $config ) {
 
 sub new ( $class, $args = {} ) {
 	state $module = require Net::Twitter::Lite::WithAPIv1_1;
-
 	my $config = Perly::Bot::Config->get_config;
 
 	my %params = (
@@ -96,11 +95,6 @@ sub new ( $class, $args = {} ) {
       twitter_api => $twitter,
       hashtag     => ( $args->{hashtag} || '' ),
     }, $class;
-  }
-  catch
-  {
-    $logger->logcroak("Error constructing Twitter API object: $_");
-  };
 }
 
 sub _build_tweet ( $self, $blog_post ) {
@@ -130,12 +124,33 @@ sub _build_tweet ( $self, $blog_post ) {
 }
 
 sub send ( $self, $blog_post ) {
-	eval { $self->{twitter_api}->update( $self->_build_tweet($blog_post) ); 1 }
-		or $logger->logcroak( "Error tweeting $blog_post->{url} $blog_post->{title} "
-        . $_->code . " "
-        . $_->message . " "
-        . $_->error );
+	my $tweet = $self->_build_tweet($blog_post);
+
+	$logger->debug( sprintf "Tweet is [%s]", $tweet );
+
+	my $twitter = $self->{twitter_api};
+	$logger->debug( "Twitter is [$twitter]" );
+	my $status = eval { $twitter->update( $tweet ) } // $@;
+	$logger->debug( sprintf "Twitter status is [%s] for [%s]",
+		$status, $blog_post->title );
+
+	unless( ref $status ) {
+		$logger->logcarp(
+			sprintf "Error tweeting [%s] [%s] [%d]",
+				$blog_post->{url},
+				$blog_post->{title},
+				$status
+				);
+		}
+
+	# fake the mojo::useragent api
+	return bless { result => $status }, 'Perly::Bot::Media::Twitter::Response';
 }
+
+package Perly::Bot::Media::Twitter::Response {
+	sub new ( $class, $args = {} ) { $args->{result} //= 0; bless $args, $class }
+	sub success ( $self ) { !! $self->{result} }
+	};
 
 =head1 TO DO
 
