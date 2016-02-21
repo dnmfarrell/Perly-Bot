@@ -223,7 +223,8 @@ sub feeds ( $self ) {
 	return $feeds if @$feeds;
 
 	foreach my $feed_info ( $feeds_file->@* ) {
-		push @$feeds, Perly::Bot::Feed->new( $feed_info );
+		my $feed = Perly::Bot::Feed->new( $feed_info );
+		push @$feeds, $feed if $feed->is_active;
 		}
 
 	$feeds;
