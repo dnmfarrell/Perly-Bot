@@ -8,6 +8,7 @@ package Perly::Bot::Config;
 use namespace::autoclean;
 use Perly::Bot::CommonSetup;
 use File::Spec::Functions;
+use Data::Dumper;
 
 our $VERSION = '1.001';
 
@@ -139,7 +140,7 @@ sub add_media_object ( $self, $module_name, $config_path ) {
 
 	my $object = eval { $module_name->new( \%params ) };
 	unless( ref $object ) {
-		$logger->logcroak( "Media config is " . Dumper( \%params ) ); use Data::Dumper;
+		$logger->logcroak( "Media config is " . Dumper( \%params ) );
 		$logger->logcroak( "Could not make object for [$module_name]! $@" );
 		return;
 		}
