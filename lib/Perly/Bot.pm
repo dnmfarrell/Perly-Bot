@@ -11,7 +11,7 @@ use Log::Log4perl::Level;
 use Path::Tiny;
 use Perly::Bot::CommonSetup;
 
-our $VERSION = '0.101';
+our $VERSION = '0.201';
 
 Log::Log4perl->init( \ <<'LOG');
   layout_class   = Log::Log4perl::Layout::PatternLayout
@@ -63,18 +63,31 @@ sub run ( $package, $config_file = catfile( $ENV{HOME}, '.perlybot', 'config.yml
 		}
 
 	# Loop through feeds, check for new posts
+	my $total_emitted = 0;
+	my $feeds_count   = 0;
+
 	for my $feed ( $config->feeds->@* ) {
-  		$logger->debug( sprintf "Processing feed [%s]", $feed->url );
+		$feeds_count++;
+  		$logger->info( sprintf "Processing feed [%s]", $feed->url );
 		my $posts = $feed->trawl_blog;
-   		$logger->debug( sprintf "Found %d posts in [%s]", scalar @$posts, $feed->url );
+   		$logger->info( sprintf "Found %d posts in [%s]", scalar @$posts, $feed->url );
+
+   		my $emitted = 0;
 		for my $post ( $posts->@* ) {
 			my $should_emit = $post->should_emit;
-			$logger->debug( sprintf "Should emit is [%s] for [%s]", $should_emit, $post->title );
-			$logger->debug( "Post is " . $post->dump );
+			# $logger->debug( sprintf "Should emit is [%s] for [%s]", $should_emit, $post->title );
+			# $logger->debug( "Post is " . $post->dump );
 			next unless $should_emit;
-			emit( $post );
+			my $result = emit( $post );  # positive numbers are bad because they are errors
+			$emitted++;
+			sleep(2);    # be nice to APIs
 			}
+
+			$total_emitted += $emitted;
+			$logger->info( sprintf "Emitted [%d] posts for [%s]", $emitted, $feed->url );
 		}
+
+	$logger->info( sprintf "Emitted [%d] posts in [%d] feeds", $total_emitted, $feeds_count );
 	}
 
 =head2 emit
@@ -84,7 +97,7 @@ Sends the blog post to C<Perly::Bot::Media> objects for posting.
 =cut
 
 sub emit ( $post ) {
-	$logger->debug( sprintf "Emitting [%s]", $post->title );
+	$logger->info( sprintf "Emitting [%s]", $post->title );
 
 	if( ! $ENV{PERLYBOT_POST_ANYWAYS} && $logger->is_debug ) {
 		$logger->debug( sprintf "DEBUG MODE: Not posting [%s]", $post->title );
@@ -94,21 +107,25 @@ sub emit ( $post ) {
 	my $config = Perly::Bot::Config->get_config;
 	my $cache  = $config->cache;
 
+	my @errors = ();
+	my $total_posts = 0;
+
 	foreach my $media_target ( $post->feed->media_targets->@* ) {
 		$logger->debug( sprintf "Media target is [%s]", $media_target );
 		my $media = $config->get_media_object( $media_target );
 		my $response = $media->send($post);
 		unless( $response->success ) {
-			$logger->error( "Could not send post! " . $response->to_string );
+			$logger->error( "Could not send post! " . $response->to_string . " " . $post->title );
 			}
-
-		sleep(2);    # throttle requests to avoid exceeding API limit
-
-		eval { $cache->save_post( $post ) }
-			or $logger->logdie( sprintf "Error caching [%s]: $@", $post->title );
+		unless( eval { $cache->save_post( $post ) } ) {
+			$logger->logcarp( sprintf "Error caching [%s]: $@", $post->title );
+			push @errors, $post;
+			}
 		}
 
-	return 1;
+	$logger->info( sprintf "[%d] errors for [%s]", scalar @errors, $post->title );
+
+	return \@errors;
 	}
 
 
