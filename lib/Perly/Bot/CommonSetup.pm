@@ -11,11 +11,12 @@ Somehow it's not all working out.
 
 =cut
 
-use feature qw(signatures postderef);
-no warnings qw(experimental::signatures experimental::postderef);
 use strict;
 use warnings;
+use feature qw(:5.22 signatures);
+no warnings qw(experimental::signatures);
 
+use Data::Dumper;
 use File::Spec::Functions;
 use Log::Log4perl;
 
@@ -29,6 +30,7 @@ sub import ( $self ) {
 	warnings->unimport( qw(experimental::signatures experimental::postderef) );
 	File::Spec::Functions->import;
 	Carp->import( qw(carp croak) );
+	Data::Dumper->import;
 	}
 
 1;
