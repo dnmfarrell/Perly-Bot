@@ -118,6 +118,7 @@ sub load_media ( $self ) {
 	}
 
 sub add_media_object ( $self, $module_name, $config_path ) {
+	$logger->debug( "Module name [$module_name] has config path [$config_path]" );
 	unless( $module_name =~ m/ \A [A-Z0-9_]+ ( :: [A-Z0-9_]+ )+ \z /xi ) {
 		$logger->warn( "Invalid namespace [$module_name]!" );
 		next;
@@ -132,7 +133,6 @@ sub add_media_object ( $self, $module_name, $config_path ) {
 
 	$this->{defaults} = $module_name->config_defaults;
 	$this->{media_config} = eval { YAML::XS::LoadFile( $config_path ) } // {};
-	$logger->debug( "Module name [$module_name} has config path [$config_path]" );
 
 	my %params = map { $this->{$_}->%* } qw(defaults media_config);
 
