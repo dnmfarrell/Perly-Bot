@@ -49,12 +49,12 @@ is not enough chars left (e.g. if the blog post title is extremely long). This i
 
 sub config_defaults ( $class, $config={} ) {
 	state $defaults = {
-		type                    => 'twitter',
-		class                   => __PACKAGE__,
-		twitter_consumer_key    => $ENV{PERLYBOT_TWITTER_CONSUMER_KEY}    // undef,
-		twitter_consumer_secret => $ENV{PERLYBOT_TWITTER_CONSUMER_SECRET} // undef,
-		twitter_access_token    => $ENV{PERLYBOT_TWITTER_ACCESS_TOKEN}    // undef,,
-		twitter_access_secret   => $ENV{PERLYBOT_TWITTER_ACCESS_SECRET}   // undef,
+		type                  => 'twitter',
+		class                 => __PACKAGE__,
+		consumer_key          => $ENV{PERLYBOT_TWITTER_CONSUMER_KEY}    // undef,
+		consumer_secret       => $ENV{PERLYBOT_TWITTER_CONSUMER_SECRET} // undef,
+		access_token          => $ENV{PERLYBOT_TWITTER_ACCESS_TOKEN}    // undef,
+		access_token_secret   => $ENV{PERLYBOT_TWITTER_ACCESS_SECRET}   // undef,
 		};
 
 	$defaults;
@@ -67,16 +67,29 @@ sub is_properly_configured ( $class, $config ) {
 	}
 
 sub new ( $class, $args = {} ) {
+	state $module = require Net::Twitter::Lite::WithAPIv1_1;
+
 	my $config = Perly::Bot::Config->get_config;
 
-    my $twitter = Net::Twitter::Lite::WithAPIv1_1->new(
-      consumer_key        => $args->{consumer_key}    // $config->twitter_consumer_key,
-      consumer_secret     => $args->{consumer_secret} // $config->twitter_consumer_secret,
-      access_token        => $args->{access_token}    // $config->twitter_access_token,
-      access_token_secret => $args->{access_secret}   // $config->twitter_access_secret,
-      user_agent          => $args->{agent_string}    // $config->agent_string,
-      ssl                 => 1,
-    );
+	my %params = (
+		consumer_key           => $args->{consumer_key}    || $config->twitter_consumer_key,
+		consumer_secret        => $args->{consumer_secret} || $config->twitter_consumer_secret,
+		access_token           => $args->{access_token}    || $config->twitter_access_token,
+		access_token_secret    => $args->{access_token_secret}   || $config->twitter_access_token_secret,
+		ssl                    => 1,
+		);
+
+	#$logger->debug( sub { "Twitter params are " . Dumper( \%params ) } );
+
+	if( grep { ! defined } values %params ) {
+
+
+
+
+
+		}
+
+    my $twitter = Net::Twitter::Lite::WithAPIv1_1->new( %params );
 
     return bless {
       twitter_api => $twitter,
