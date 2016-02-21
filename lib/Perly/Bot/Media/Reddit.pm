@@ -89,7 +89,6 @@ BEGIN {
 	sub _submit_link_specialized ($self, $params) {
 		#$logger->debug( "Snoo input submit params----\n" . Dumper( $params ) );
 
-		#$params->{url};
 		$params->{sr}       = $self->name;
 		$params->{api_type} = 'json';
 		$params->{kind}     = 'link';
@@ -98,9 +97,7 @@ BEGIN {
 
 		my $tx = $self->_do_request('POST', '/api/submit', $params->%*);
 
-		$logger->debug( "------------Request is\n" . $tx->req->to_string );
-		$logger->debug( "------------Response is\n" . $tx->res->to_string );
-
+		return $tx;
 		}
 
 
@@ -123,44 +120,6 @@ BEGIN {
 		return $self->agent->post($url => \%headers, form => \%params);
 		}
 
-sub Mojo::Snoo::Base::_create_access_token {
-    my $self = shift;
-    # update base URL
-    my %form = (
-        grant_type => 'password',
-        username => $self->username,
-        password => $self->password,
-    );
-    my $access_url =
-        'https://'
-      . $self->client_id . ':'
-      . $self->client_secret
-      . '@www.reddit.com/api/v1/access_token';
-
-$logger->debug( "Access URL: $access_url" );
-    my $tx = $self->agent->post($access_url => form => \%form);
-
-
-    my $res = $tx->res;
-$logger->debug( "------------Request\n" . $tx->req->to_string );
-$logger->debug( "------------Response\n" . $res->to_string );
-    # if a problem arises, it is most likely due to given auth being incorrect
-    # let the user know in this case
-    if (exists($res->json->{error})) {
-        my $msg =
-          $res->json->{error} == 401
-          ? '401 status code (Unauthorized)'
-          : 'error response of ' . $res->json->{error};
-        Carp::croak("Received $msg while attempting to create OAuth access token.");
-    }
-
-    # update the base URL for future endpoint calls
-    $self->base_url->host('oauth.reddit.com');
-
-    # TODO we will want to eventually keep track of token type, scope and expiration
-    #      when dealing with user authentication (not just a personal script)
-    return $res->json->{access_token};
-}
 	};
 
 sub new ( $class, $args ) {
@@ -184,7 +143,6 @@ sub new ( $class, $args ) {
 #	$logger->debug( "Snoo params: " . Dumper( \%params ) );
 
 	my $snoo = Mojo::Snoo::Subreddit->new( %params );
-
 
     my $self = bless { reddit_api => $snoo }, $class;
 
