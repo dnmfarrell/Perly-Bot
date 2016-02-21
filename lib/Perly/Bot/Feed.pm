@@ -141,6 +141,12 @@ sub _allowed_parsers {
   $allowed;
 }
 
+sub is_active ( $self ) {
+	return 0 if( defined $self->{active} and ! $self->{active} );
+	return 0 if( defined $self->{inactive} and $self->{inactive} );
+	return 1;
+	}
+
 sub trawl_blog ( $self ) {
   $logger->debug( "Trawling " . $self->url );
   my $config = Perly::Bot::Config->get_config;
