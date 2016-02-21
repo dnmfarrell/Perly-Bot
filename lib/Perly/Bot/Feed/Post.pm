@@ -50,7 +50,7 @@ sub root_url ( $self ) {
   # if we've already retrieved the root url, don't pull it again
   return $self->{_root_url} if exists $self->{_root_url};
 
-  if ( my $response = Perly::Bot::UserAgent->get_agent->get( $self->url ) ) {
+  if ( my $response = Perly::Bot::UserAgent->get_user_agent->get( $self->url ) ) {
     my $location = $response->headers->header( 'Location' );
     $logger->debug( sprintf "Location is [%s]", $location );
     $self->{_root_url} = $self->clean_url( $location );
