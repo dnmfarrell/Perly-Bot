@@ -245,7 +245,7 @@ sub reddit_client_secret ( $self ) { $self->reddit->{client_secret} }
 sub reddit_username      ( $self ) { $self->reddit->{username}      }
 sub reddit_password      ( $self ) { $self->reddit->{password}      }
 
-sub twitter                 ( $self ) { $self->{twitter} // {}   }
+sub twitter                 ( $self ) { $self->media->{'Perly::Bot::Media::Twitter'}{params} // {}   }
 sub twitter_consumer_key    ( $self ) { $self->{consumer_key}    }
 sub twitter_consumer_secret ( $self ) { $self->{consumer_secret} }
 sub twitter_access_token    ( $self ) { $self->{access_token}    }
