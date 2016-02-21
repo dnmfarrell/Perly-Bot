@@ -52,8 +52,19 @@ sub root_url ( $self ) {
 
   if ( my $response = Perly::Bot::UserAgent->get_user_agent->get( $self->url ) ) {
     my $location = $response->headers->header( 'Location' );
-    $logger->debug( sprintf "Location is [%s]", $location );
-    $self->{_root_url} = $self->clean_url( $location );
+
+    my $url = do {
+		if( my $location = $response->headers->header( 'Location' ) ) {
+			$logger->debug( sprintf "Location is [%s]", $location );
+			$location;
+			}
+		else {
+			$logger->debug( sprintf "No Location header from [%s]", $self->title );
+			$self->url;
+			}
+		};
+
+    $self->{_root_url} = $self->clean_url( $url );
     return $self->{_root_url};
   }
   else {
