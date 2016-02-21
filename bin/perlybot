@@ -34,12 +34,6 @@ sub process_args ( $class, @args )
   local @ARGV = @args;
 
   my %opts = ();
-  $opts{config} =
-    -e 'config.yml'
-    ? 'config.yml'
-    : "$ENV{HOME}.perlybot/config.yml";
-  $opts{feeds} = undef, $opts{log4perl} = undef, $opts{log_level} = 'INFO';
-  $opts{debug} = 0;
 
   GetOptions(
     "config|c=s"   => \$opts{config},
@@ -49,8 +43,8 @@ sub process_args ( $class, @args )
     "debug|d=s"    => \$opts{debug},
   );
 
-  $ENV{PERLYBOT_LOG_LEVEL} = $opts{log_level} // $ENV{PERLYBOT_LOG_LEVEL};
-  $ENV{PERLY_BOT_DEBUG}    = $opts{debug}     // $ENV{PERLY_BOT_DEBUG};
+  $ENV{PERLYBOT_LOG_LEVEL} = $opts{log_level} // $ENV{PERLYBOT_LOG_LEVEL} // 'INFO';
+  $ENV{PERLY_BOT_DEBUG}    = $opts{debug}     // $ENV{PERLY_BOT_DEBUG} // 0;
 
   return \%opts;
 }
