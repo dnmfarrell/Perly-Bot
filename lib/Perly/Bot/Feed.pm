@@ -181,7 +181,13 @@ sub fetch_feed ( $self ) {
 sub extract_posts ( $self, $xml ) {
   my @posts = ();
 
-  my @items = $self->{parser}->new( $xml, -type => 'string' )->get_item();
+  my @items = eval { $self->{parser}->new( $xml, -type => 'string' )->get_item() };
+
+  if( $@ ) {
+  	$logger->error( "Bad XML for " . $self->url );
+  	$logger->debug( $@ );
+  	return [];
+  	}
 
   foreach my $i (@items)
   {
