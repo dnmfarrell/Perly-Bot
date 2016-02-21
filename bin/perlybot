@@ -8,6 +8,7 @@ no warnings qw(experimental::signatures);
 
 use Perly::Bot 0.201;
 use Getopt::Long qw(GetOptions);
+use File::Spec::Functions qw(rel2abs);
 
 __PACKAGE__->run(@ARGV) unless caller;
 
@@ -21,10 +22,19 @@ Run summary
   feeds    $opts->{feeds}
   log4perl $opts->{log4perl}
   level    $opts->{log_level}
+  root     $opts->{root}
+  dry_run  $opts->{dry_run}
 
 PERLYBOT_LOG_LEVEL => $ENV{PERLYBOT_LOG_LEVEL}
 PERLY_BOT_DEBUG    => $ENV{PERLY_BOT_DEBUG}
 HERE
+
+  exit if $opts->{dry_run};
+
+  if( $opts->{root} ) {
+  	$opts->{config} = rel2abs( $opts->{config}, $opts->{root} );
+  	}
+  Perly::Bot->run( $opts->{config} );
 
   exit 0;
 }
@@ -41,6 +51,8 @@ sub process_args ( $class, @args )
     "log4perl|l=s" => \$opts{log4perl},
     "level|L=s"    => \$opts{log_level},
     "debug|d=s"    => \$opts{debug},
+    "dry_run|D"    => \$opts{dry_run},
+    "root|r=s"     => \$opts{root},
   );
 
   $ENV{PERLYBOT_LOG_LEVEL} = $opts{log_level} // $ENV{PERLYBOT_LOG_LEVEL} // 'INFO';
