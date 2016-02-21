@@ -18,7 +18,7 @@ my $logger = Log::Log4perl->get_logger();
 BEGIN {
 my $self;
 
-sub new ( $class, $file = catfile( $ENV{HOME}, '.perlybot', 'config' ) ) {
+sub new ( $class, $file = catfile( $ENV{HOME}, '.perlybot', 'config' ), $overrides = {} ) {
 	$logger->debug( "config file is [$file]" );
 	return $self if defined $self;
 
@@ -26,9 +26,13 @@ sub new ( $class, $file = catfile( $ENV{HOME}, '.perlybot', 'config' ) ) {
 
 	$self->load_config( $file );
 
+	foreach my $key ( keys %$overrides ) {
+		$logger->debug( "Overriding $key" );
+		$self->{$key} = $overrides->{$key};
+		}
+
 	$self->init_cache;
 	$self->load_media;
-
 
 	$self;
 	}
