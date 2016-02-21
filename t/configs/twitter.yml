@@ -1,6 +1,1 @@
 type: twitter
-agent_string: FooBar
-consumer_key: abcdef12345
-consumer_secret: abcdef12345
-access_token: abcdef12345
-access_secret: abcdef12345
