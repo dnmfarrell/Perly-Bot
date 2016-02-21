@@ -10,41 +10,48 @@ use Net::Twitter::Lite::WithAPIv1_1;
 
 use Data::Dumper;
 
-=pod
+my $bare = defined $ARGV[0];
 
+if( $bare ) {
 	my %params = (
 		consumer_key        => $ENV{PERLYBOT_TWITTER_CONSUMER_KEY},
 		consumer_secret     => $ENV{PERLYBOT_TWITTER_CONSUMER_SECRET},
 		access_token        => $ENV{PERLYBOT_TWITTER_ACCESS_TOKEN},
 		access_token_secret => $ENV{PERLYBOT_TWITTER_ACCESS_SECRET},
-		user_agent          => "PerlyBotTest",
 		ssl                 => 1,
 		);
 
-my $twitter = Net::Twitter::Lite::WithAPIv1_1->new( %params );
+say "Params: " , Dumper( \%params );
 
-die "No twitter" unless ref $twitter;
+	my $twitter = Net::Twitter::Lite::WithAPIv1_1->new( %params );
 
-my $status = $twitter->update( "This is a test " . rand( 137 ) );
+	die "No twitter" unless ref $twitter;
 
-=cut
+	my $status = $twitter->update( "This is a test " . rand( 137 ) );
+	}
+else {
+	my $config_file = 't/test_config.yml';
+	my $config = Perly::Bot::Config->new( $config_file );
 
-my $config_file = 't/test_config.yml';
-my $config = Perly::Bot::Config->new( $config_file );
+	my $logger = Log::Log4perl->get_logger();
+	$logger->level( 'DEBUG' );
 
-say Dumper( $config );
+	my $twitter = $config->media->{'Perly::Bot::Media::Twitter'}{'object'};
 
-my $logger = Log::Log4perl->get_logger();
-$logger->level( 'DEBUG' );
+	my $post = Perly::Bot::Feed::Post->new( {
+			delay_seconds => 0,
+			description   => "This is something about Perl",
+			datetime      => Time::Piece->strptime( "2016-01-01", "%Y-%m-%d" ),
+			title         => "$$: The Perl Link",
+			url           => 'http://www.perl.com/',
+		  } );
 
-my $twitter = $config->media->{'Perly::Bot::Media::Twitter'}{'object'};
+	my $tweet = $twitter->_build_tweet( $post );
+	$logger->debug( "Tweet is [$tweet]" );
 
-my $post = Perly::Bot::Feed::Post->new( {
-        delay_seconds => 0,
-        description   => "This is something about Perl",
-        datetime      => Time::Piece->strptime( "2016-01-01", "%Y-%m-%d" ),
-        title         => "The Perl Link",
-        url           => 'http://www.perl.com/',
-      } );
+	my $tw = $twitter->{twitter_api};
 
-$twitter->send( $post );
+#$tw->update(  "$$: 137: $tweet" );
+
+	$twitter->send( $post );
+	}
