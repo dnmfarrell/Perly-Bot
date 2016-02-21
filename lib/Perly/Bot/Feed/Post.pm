@@ -58,7 +58,7 @@ sub root_url ( $self ) {
   }
   else {
     $logger->logcroak( sprintf "Error requesting [%s] [%s] [%s]",
-    	$response->{url}. $response->code, $response->message
+    	$response->{url}, $response->code, $response->message
     );
   }
 }
