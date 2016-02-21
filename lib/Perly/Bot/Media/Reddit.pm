@@ -89,14 +89,14 @@ BEGIN {
 	package Mojo::Snoo::Subreddit;
 use Data::Dumper;
 	sub _submit_link_specialized ($self, $params) {
-		$logger->debug( "Snoo input submit params----\n" . Dumper( $params ) );
+		#$logger->debug( "Snoo input submit params----\n" . Dumper( $params ) );
 
 		#$params->{url};
 		$params->{sr}       = $self->name;
 		$params->{api_type} = 'json';
 		$params->{kind}     = 'link';
 		$params->{resubmit} //= 0;
-		$logger->debug( "Snoo processed submit params----\n" . Dumper( $params ) );
+		#$logger->debug( "Snoo processed submit params----\n" . Dumper( $params ) );
 
 		my $tx = $self->_do_request('POST', '/api/submit', $params->%*);
 
@@ -183,7 +183,7 @@ sub new ( $class, $args ) {
 		$logger->logcroak( "Missing required parameters (@missing) for $class" );
 		}
 
-	$logger->debug( "Snoo params: " . Dumper( \%params ) );
+#	$logger->debug( "Snoo params: " . Dumper( \%params ) );
 
 	my $snoo = Mojo::Snoo::Subreddit->new( %params );
 

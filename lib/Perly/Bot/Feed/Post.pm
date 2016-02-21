@@ -139,7 +139,6 @@ sub should_emit ( $post ) {
 
   my $points = sum( values %points );
 
-$logger->debug( "Got to end of should_emit" );
   return 1 if $points >= $post->threshold;
 
   return 0;
