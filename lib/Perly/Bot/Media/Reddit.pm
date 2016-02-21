@@ -23,10 +23,8 @@ Perly::Bot::Media::Reddit - Post to Reddit
   use Perly::Bot::Media::Reddit;
 
   my $poster = Perly::Bot::Media::Reddit->new(
-    agent_string     => ...,
     username         => ...,
     password         => ...,
-    session_filepath => ...,
     subreddit        => ...,
     );
 
@@ -34,7 +32,7 @@ Perly::Bot::Media::Reddit - Post to Reddit
 
 =head1 DESCRIPTION
 
-This class is for posting to Reddit
+This class is for posting to Reddit.
 
 =cut
 
@@ -46,10 +44,9 @@ Requires hashref containing these key values:
 
   agent_string => '...',
   reddit => {
-    username => '...',
-    password => '...',
-    session_filepath  => '...',
-    subreddit   => '...',
+    username          => '...',
+    password          => '...',
+    subreddit         => '...',
   }
 
 C<agent_string> can be any string you like, it will be sent to Reddit when posting.
@@ -87,7 +84,8 @@ sub is_properly_configured ( $class, $config ) {
 BEGIN {
 	use Mojo::Snoo::Subreddit;
 	package Mojo::Snoo::Subreddit;
-use Data::Dumper;
+	use Data::Dumper;
+
 	sub _submit_link_specialized ($self, $params) {
 		#$logger->debug( "Snoo input submit params----\n" . Dumper( $params ) );
 
