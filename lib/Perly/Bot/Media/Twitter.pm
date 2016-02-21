@@ -6,7 +6,8 @@ package Perly::Bot::Media::Twitter;
 use parent qw(Perly::Bot::Media::Base);
 
 use namespace::autoclean;
-use Net::Twitter::Lite::WithAPIv1_1;
+use Perly::Bot::CommonSetup;
+use Data::Dumper;
 
 my $logger = Log::Log4perl->get_logger();
 
