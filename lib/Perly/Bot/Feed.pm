@@ -147,10 +147,10 @@ sub trawl_blog ( $self ) {
   my $cache = $config->cache;
 
   my $ua = Perly::Bot::UserAgent->get_user_agent;
-  $logger->debug( "Got UA" );
+  $logger->trace( "Got UA" );
 
   if ( my $response = $ua->get( $self->url ) ) {
-  $logger->debug( "Got response" );
+  $logger->trace( "Got response" );
   	my $content = $response->text;
     my $blog_posts = $self->extract_posts( $content );
     return $blog_posts;
