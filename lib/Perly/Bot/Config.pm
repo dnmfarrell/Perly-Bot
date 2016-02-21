@@ -71,7 +71,7 @@ sub load_config ( $self,
 	my $file_hash = YAML::XS::LoadFile( Path::Tiny->new($file)->canonpath );
 	%$self = ( $self->%*, $file_hash->%* );
 
-    $self->{perlybot_home} = $self->perlybot_path
+    $self->{perlybot_path} = $self->perlybot_path
     	// catfile( $ENV{HOME}, '.perly_bot' );
 	}
 
@@ -106,7 +106,7 @@ sub load_media ( $self ) {
     		}
 
 		my $config_path = catfile(
-			$self->perlybot_home,
+			$self->perlybot_path,
 			$self->media->{$module_name}{config_path}
 			);
 
