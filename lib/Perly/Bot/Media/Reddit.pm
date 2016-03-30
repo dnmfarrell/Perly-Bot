@@ -126,11 +126,11 @@ sub new ( $class, $args ) {
 	my $config = Perly::Bot::Config->get_config;
 
 	my %params = (
-		name          => $args->{subreddit}     // $config->subreddit,
-        client_id     => $args->{client_id}     // $config->reddit_client_id,
-        client_secret => $args->{client_secret} // $config->reddit_client_secret,
-        username      => $args->{username}      // $config->reddit_username,
-        password      => $args->{password}      // $config->reddit_password,
+		name          => $args->{subreddit}     // $config->subreddit // '',
+        client_id     => $args->{client_id}     // $config->reddit_client_id // '',
+        client_secret => $args->{client_secret} // $config->reddit_client_secret // '',
+        username      => $args->{username}      // $config->reddit_username // '',
+        password      => $args->{password}      // $config->reddit_password // '',
 		);
 
 	my @missing = grep { ! (exists $params{$_} && defined $params{$_}) }

@@ -72,20 +72,14 @@ sub new ( $class, $args = {} ) {
 	my $config = Perly::Bot::Config->get_config;
 
 	my %params = (
-		consumer_key           => $args->{consumer_key}    || $config->twitter_consumer_key,
-		consumer_secret        => $args->{consumer_secret} || $config->twitter_consumer_secret,
-		access_token           => $args->{access_token}    || $config->twitter_access_token,
-		access_token_secret    => $args->{access_token_secret}   || $config->twitter_access_token_secret,
+		consumer_key           => ( $args->{consumer_key}        || $config->twitter_consumer_key || '' ),
+		consumer_secret        => ( $args->{consumer_secret}     || $config->twitter_consumer_secret || '' ),
+		access_token           => ( $args->{access_token}        || $config->twitter_access_token || '' ),
+		access_token_secret    => ( $args->{access_token_secret} || $config->twitter_access_token_secret || '' ),
 		ssl                    => 1,
 		);
 
-	#$logger->debug( sub { "Twitter params are " . Dumper( \%params ) } );
-
 	if( grep { ! defined } values %params ) {
-
-
-
-
 
 		}
 
