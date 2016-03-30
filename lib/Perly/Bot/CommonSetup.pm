@@ -24,6 +24,9 @@ use Perly::Bot::Config;
 use Perly::Bot::Feed::Post;
 use Perly::Bot::UserAgent;
 
+# we should load this from somewhere else
+use Perly::Bot::BlogsPerlOrg;
+
 sub import ( $self ) {
 	feature->import( qw(signatures postderef) );
 	warnings->import;
