@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Perly::Bot::Feed::Post;
+use Perly::Bot::Post;
 
 use_ok 'Perly::Bot::Media::Twitter', 'import module';
 
