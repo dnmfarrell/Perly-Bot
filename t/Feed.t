@@ -21,7 +21,7 @@ for my $args (@$feeds)
 		or diag( "Could not build feed: $@" );
 
     SKIP: {
-		state $methods = [qw(url type date_name date_format media)];
+		state $methods = [qw(url type date_name date_format media_targets)];
         skip "Unable to build feed, skipping tests", 6 + @$methods unless $feed;
 		can_ok( $feed, @$methods );
 		foreach my $method ( @$methods )
@@ -30,7 +30,7 @@ for my $args (@$feeds)
 		}
 
 		ok( $feed->type eq 'rss' || $feed->type eq 'atom' || $feed->type eq 'rdf', 'Feed type is either rss, atom or rdf (' . $feed->type . ')' );
-		isa_ok $feed->media, ref [];
+		isa_ok $feed->media_targets, ref [];
 
 		like $feed->active, qr/^[01]$/, "active field is 0 or 1 (" . $feed->active . ")";
 		like $feed->proxy, qr/^[01]$/, "proxy field is 0 or 1 (" . $feed->proxy . ")";
