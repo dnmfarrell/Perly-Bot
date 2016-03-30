@@ -17,7 +17,7 @@ Log::Log4perl->init( \ <<'LOG');
   layout_class   = Log::Log4perl::Layout::PatternLayout
     layout_pattern = %d %F{1} %L> %m%n
 
-    log4perl.rootLogger = WARN, Logfile, Screen
+    log4perl.rootLogger = WARN, Logfile
 
     log4perl.appender.Logfile  = Log::Log4perl::Appender::File
     log4perl.appender.Logfile.filename = perlybot.log
