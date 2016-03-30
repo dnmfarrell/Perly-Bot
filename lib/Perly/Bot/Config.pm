@@ -46,6 +46,11 @@ sub get_config ( $class ) {
 	}
 
 sub _config_setup ( $class ) { defined $self }
+
+sub remake_config ( $class, @args ) {
+	$self = undef;
+	$class->new( @args );
+	}
 }
 
 sub AUTOLOAD ( $self ) {
@@ -143,6 +148,7 @@ sub add_media_object ( $self, $module_name, $config_path ) {
 	$self->{media}{$module_name}{params} = \%params;
 
 	my $object = eval { $module_name->new( \%params ) };
+
 	unless( ref $object ) {
 		$logger->logcroak( "Media config is " . Dumper( \%params ) );
 		$logger->logcroak( "Could not make object for [$module_name]! $@" );
