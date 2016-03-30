@@ -4,7 +4,7 @@ use lib qw(lib);
 
 use Perly::Bot;
 use Perly::Bot::Media::Twitter;
-use Perly::Bot::Feed::Post;
+use Perly::Bot::Post;
 use Time::Piece;
 use Net::Twitter::Lite::WithAPIv1_1;
 
@@ -38,7 +38,7 @@ else {
 
 	my $twitter = $config->media->{'Perly::Bot::Media::Twitter'}{'object'};
 
-	my $post = Perly::Bot::Feed::Post->new( {
+	my $post = Perly::Bot::Post->new( {
 			delay_seconds => 0,
 			description   => "This is something about Perl",
 			datetime      => Time::Piece->strptime( "2016-01-01", "%Y-%m-%d" ),

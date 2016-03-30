@@ -66,28 +66,28 @@ sub new ( $class ) {
 
 =head2 has_posted ($post)
 
-Checks the cache to see if the C<Perly::Bot::Feed::Post> has already been posted.
+Checks the cache to see if the C<Perly::Bot::Post> has already been posted.
 
 =cut
 
 sub has_posted ( $self, $post ) {
   $logger->logdie(
-    'has_posted() requires a Perly::Bot::Feed::Post object as an argument')
-    unless $post && $post->isa('Perly::Bot::Feed::Post');
+    'has_posted() requires a Perly::Bot::Post object as an argument')
+    unless $post && $post->isa('Perly::Bot::Post');
 
   $self->{chi}->is_valid( $post->root_url );
 }
 
 =head2 save_post ($post)
 
-Saves the C<Perly::Bot::Feed::Post> object in the cache.
+Saves the C<Perly::Bot::Post> object in the cache.
 
 =cut
 
 sub save_post ( $self, $post ) {
   $logger->logdie(
-    'save_post() requires a Perly::Bot::Feed::Post object as an argument')
-    unless $post && $post->isa('Perly::Bot::Feed::Post');
+    'save_post() requires a Perly::Bot::Post object as an argument')
+    unless $post && $post->isa('Perly::Bot::Post');
 
   $self->{chi}->set( $post->root_url, $post );
 }

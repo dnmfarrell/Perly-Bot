@@ -19,9 +19,10 @@ no warnings qw(experimental::signatures);
 use Data::Dumper;
 use File::Spec::Functions;
 use Log::Log4perl;
+use Path::Tiny;
 
 use Perly::Bot::Config;
-use Perly::Bot::Feed::Post;
+use Perly::Bot::Post;
 use Perly::Bot::UserAgent;
 
 # we should load this from somewhere else

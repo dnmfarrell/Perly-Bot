@@ -8,7 +8,7 @@ use Time::Piece;
 
 # setup test data
 my $cache_path = tempdir;
-my $post = Perly::Bot::Feed::Post->new({
+my $post = Perly::Bot::Post->new({
   delay_seconds => 6000,
   description   => 'A short description of this post',
   datetime      => gmtime,

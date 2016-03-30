@@ -2,7 +2,7 @@
 # this might specialize in one or both classes
 package Perly::Bot::BlogsPerlOrg {
 	sub feed_class { 'Perly::Bot::Feed::BlogsPerlOrg' }
-	sub post_class { 'Perly::Bot::Feed::Post::BlogsPerlOrg' }
+	sub post_class { 'Perly::Bot::Post::BlogsPerlOrg' }
 	}
 
 # keep these together in one file?
@@ -15,7 +15,7 @@ package Perly::Bot::Feed::BlogsPerlOrg {
 	}
 
 package Perly::Bot::Feed::Post::BlogsPerlOrg {
-	use parent qw(Perly::Bot::Feed::Post);
+	use parent qw(Perly::Bot::Post);
 
 
 	}

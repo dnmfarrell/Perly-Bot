@@ -2,7 +2,9 @@ use v5.22;
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
-package Perly::Bot::Feed::Post;
+package Perly::Bot::Post;
+
+use Perly::Bot::CommonSetup;
 
 use namespace::autoclean;
 use Data::Dumper;
@@ -10,7 +12,7 @@ use HTML::Entities;
 use List::Util qw(sum any);
 
 use base 'Class::Accessor';
-Perly::Bot::Feed::Post->mk_accessors(
+__PACKAGE__->mk_accessors(
   qw/url title description datetime proxy delay_seconds twitter feed/);
 
 my $logger = Log::Log4perl->get_logger();
@@ -19,7 +21,7 @@ my $logger = Log::Log4perl->get_logger();
 
 =head1 NAME
 
-Perly::Bot::Feed::Post - process a social media post
+Perly::Bot::Post - process a social media post
 
 =head1 SYNOPSIS
 

@@ -13,7 +13,7 @@ use Time::Seconds;
 use XML::FeedPP;
 
 use base 'Class::Accessor';
-Perly::Bot::Feed->mk_accessors(
+__PACKAGE__->mk_accessors(
   qw/url type date_name date_format active
   	proxy media_targets delay_seconds twitter post_class/);
 
@@ -77,7 +77,7 @@ sub defaults ( $class ) {
     active        => 1,
     proxy         => 0,
     delay_seconds => 21600,
-    post_class    => 'Perly::Bot::Feed::Post',
+    post_class    => 'Perly::Bot::Post',
     media_targets =>
       [ 'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit' ],
     };
