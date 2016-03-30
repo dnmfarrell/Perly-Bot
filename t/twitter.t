@@ -16,7 +16,7 @@ subtest build_tweets => sub
     twitter       => 'perltricks',
   });
 
-  my $required_components_length = 
+  my $required_components_length =
     length (' via @' . $mock_post->{twitter}) + #via
     length ('... ') + # truncated title
     23; # url
