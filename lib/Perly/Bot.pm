@@ -1,29 +1,23 @@
+use v5.22;
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
+
 package Perly::Bot;
-use warnings;
-use strict;
-use 5.10.1;
 use open qw(:std :utf8);
 use lib 'lib';
 
-use List::Util 'any';
-use Log::Log4perl;
+use namespace::autoclean;
 use Log::Log4perl::Level;
-use Mojo::UserAgent;
 use Path::Tiny;
-use Perly::Bot::Cache;
-use Perly::Bot::Feed;
-use Time::Piece;
-use Time::Seconds;
-use Try::Tiny;
-use YAML::XS qw/LoadFile/;
+use Perly::Bot::CommonSetup;
 
-our $VERSION = 0.10;
+our $VERSION = '0.201';
 
 Log::Log4perl->init( \ <<'LOG');
   layout_class   = Log::Log4perl::Layout::PatternLayout
     layout_pattern = %d %F{1} %L> %m%n
 
-    log4perl.rootLogger = WARN, Logfile, Screen
+    log4perl.rootLogger = WARN, Logfile
 
     log4perl.appender.Logfile  = Log::Log4perl::Appender::File
     log4perl.appender.Logfile.filename = perlybot.log
@@ -41,7 +35,7 @@ my $logger = Log::Log4perl->get_logger();
 $logger->level( $ENV{PERLYBOT_LOG_LEVEL} // $INFO );
 
 # modulino pattern
-__PACKAGE__->run( load_config() ) unless caller();
+__PACKAGE__->run( @ARGV ) unless caller();
 
 =encoding utf8
 
@@ -55,167 +49,46 @@ Perly::Bot - repost Perl content to social media
 
 =head1 FUNCTIONS
 
-=head2 load_config ($path)
-
-Loads the variables in the config file and adds additionally
-required variables.
-
-=cut
-
-sub load_config
-{
-  # use local config or fallback on user config file
-  my $config_path =
-    -e 'config.yml'
-    ? 'config.yml'
-    : "$ENV{HOME}/.perly_bot/config.yml";
-
-  # use canonpath for cross platform support
-  my $config = LoadFile( Path::Tiny->new($config_path)->canonpath );
-
-  try
-  {
-    my $perlybot_home =
-      exists $config->{perlybot_path}
-      ? $config->{perlybot_path}
-      : "$ENV{HOME}/.perly_bot";
-
-    $config->{agent_string} = $config->{agent_string} . $VERSION;
-
-    # init cache
-    my $cache = Perly::Bot::Cache->new( "$perlybot_home/$config->{cache}{path}",
-      $config->{cache}{expiry_secs} );
-    $config->{cache} = $cache;
-
-    # load media objects
-    for my $module_name ( keys %{ $config->{media} } )
-    {
-      my $config_path =
-        "$perlybot_home/$config->{media}{$module_name}{config_path}";
-      my $args = LoadFile($config_path);
-      $config->{media}{$module_name} = $args;
-    }
-  }
-  catch
-  {
-    $logger->logdie("load_config encountered an error: $_");
-  };
-  return $config;
-}
-
-=head2 run ($package, $config)
+=head2 run ($package, $config_file)
 
 The main routine, trawls blog feeds for new posts.
 
 =cut
 
-sub run
-{
-  my ( $package, $config ) = @_;
+sub run ( $package, $config_file = catfile( $ENV{HOME}, '.perlybot', 'config.yml' ) ) {
+	$logger->debug( "Config file is [$config_file]" );
+	my $config = Perly::Bot::Config->new( $config_file );
+	unless( $config ) {
+		$logger->logdie( "Could not read configuration from [$config_file]" );
+		}
 
-  my $cache = $config->{cache};
-  my $feeds = LoadFile( $config->{feeds_path} );
+	# Loop through feeds, check for new posts
+	my $total_emitted = 0;
+	my $feeds_count   = 0;
 
-  $logger->debug( sprintf "Checking %s feeds\n", scalar @$feeds );
+	for my $feed ( $config->feeds->@* ) {
+		$feeds_count++;
+  		$logger->info( sprintf "Processing feed [%s]", $feed->url );
+		my $posts = $feed->trawl_blog;
+   		$logger->info( sprintf "Found %d posts in [%s]", scalar @$posts, $feed->url );
 
-  # Loop through feeds, check for new posts
-  for my $feed_args (@$feeds)
-  {
-    try
-    {
-      # inject the media config into the feed args
-      $feed_args->{media_config} = $config->{media};
-      my $feed = Perly::Bot::Feed->new($feed_args);
-      return unless $feed->active;
+   		my $emitted = 0;
+		for my $post ( $posts->@* ) {
+			my $should_emit = $post->should_emit;
+			# $logger->debug( sprintf "Should emit is [%s] for [%s]", $should_emit, $post->title );
+			# $logger->debug( "Post is " . $post->dump );
+			next unless $should_emit;
+			my $result = emit( $post );  # positive numbers are bad because they are errors
+			$emitted++;
+			sleep(2);    # be nice to APIs
+			}
 
-      trawl_blog( $feed, $cache, $config );
-    }
-    catch
-    {
-      $logger->error("Error processing $feed_args->{url} $_");
-    };
-  }
-}
+			$total_emitted += $emitted;
+			$logger->info( sprintf "Emitted [%d] posts for [%s]", $emitted, $feed->url );
+		}
 
-=head2 trawl_blog
-
-Walks through an arrayref of C<Perly::Bot::Feed::Post> objects and decides to post them
-or not.
-
-=cut
-
-sub trawl_blog
-{
-  my ( $feed, $cache, $config ) = @_;
-
-  my $ua = HTTP::Tiny->new( agent => $config->{agent_string} );
-  my $response = $ua->get( $feed->url );
-
-  if ( my $content = fetch_feed( $feed, $config ) )
-  {
-    my $blog_posts = $feed->get_posts($content);
-
-    $logger->debug( scalar @$blog_posts . ' posts found' );
-
-    foreach my $post (@$blog_posts)
-    {
-      try
-      {
-        $logger->debug( sprintf "Testing %s", $post->title );
-
-        if ( should_emit( $post, $cache, $config )
-          && emit( $post, $feed ) )
-        {
-          $cache->save_post($post);
-        }
-      }
-      catch
-      {
-        # exception thrown, cache the post so we dont
-        # try to emit it again
-        $cache->save_post($post);
-
-        # rethrow the exception
-        $logger->logdie($_);
-      }
-    }
-  }
-}
-
-=head2 should_emit
-
-The logic to decide if a blog post should be emitted or not. This is:
-
-- if the post is recent
-- not too new to exceed the delay (to allow authors to post their own links)
-- it looks Perl-related and is not already posted
-
-Feel free to subclass and override this logic with your own needs!
-
-=cut
-
-sub should_emit
-{
-  my ( $post, $cache, $config ) = @_;
-
-  # posts must mention a Perl keyword to be considered relevant
-  my $looks_perly =
-    qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
-
-  my $time_now = gmtime;
-
-  # is the post fresh enough?
-  $post->datetime > $time_now - $config->{should_emit}{age_threshold_secs}
-
-    # have we delayed posting enough for the owner to post themselves?
-    && $time_now - $post->datetime > $post->delay_seconds
-
-    # is the post cached?
-    && !$cache->has_posted($post)
-
-    # does it looks Perl related?
-    && any { ( $_ // '' ) =~ /$looks_perly/ } $post->title, $post->description;
-}
+	$logger->info( sprintf "Emitted [%d] posts in [%d] feeds", $total_emitted, $feeds_count );
+	}
 
 =head2 emit
 
@@ -223,41 +96,38 @@ Sends the blog post to C<Perly::Bot::Media> objects for posting.
 
 =cut
 
-sub emit
-{
-  my ( $post, $feed ) = @_;
+sub emit ( $post ) {
+	$logger->info( sprintf "Emitting [%s]", $post->title );
 
-  $logger->debug( sprintf "Not posting %s as program is in debug mode",
-    $post->root_url );
-  return 0 if $logger->is_debug;
+	if( ! $ENV{PERLYBOT_POST_ANYWAYS} && $logger->is_debug ) {
+		$logger->debug( sprintf "DEBUG MODE: Not posting [%s]", $post->title );
+		return 0;
+		}
 
-  $_->send($post) for values @{ $feed->media };
-  return 1;
-}
+	my $config = Perly::Bot::Config->get_config;
+	my $cache  = $config->cache;
 
-sub fetch_feed
-{
-  my ( $feed, $config ) = @_;
+	my @errors = ();
+	my $total_posts = 0;
 
-  state $ua = do
-  {
-    my $ua = Mojo::UserAgent->new;
-    $ua->transactor->name( $config->{agent_string} );
-    $ua;
-  };
+	foreach my $media_target ( $post->feed->media_targets->@* ) {
+		$logger->debug( sprintf "Media target is [%s]", $media_target );
+		my $media = $config->get_media_object( $media_target );
+		my $response = $media->send($post);
+		unless( $response->success ) {
+			$logger->error( "Could not send post! " . $response->to_string . " " . $post->title );
+			}
+		unless( eval { $cache->save_post( $post ) } ) {
+			$logger->logcarp( sprintf "Error caching [%s]: $@", $post->title );
+			push @errors, $post;
+			}
+		}
 
-  $logger->debug("Checking $feed->{url} ...");
-  my $tx = $ua->get( $feed->url );
+	$logger->info( sprintf "[%d] errors for [%s]", scalar @errors, $post->title );
 
-  if ( $tx->success )
-  {
-    my $content = $tx->res->text;    # decode
-    $logger->debug( sprintf 'Received content length: %s', length($content) );
-    return $content;
-  }
-  $logger->logdie( "Error requesting [%s]. [%s] [%s]",
-    $feed->url, $tx->res->code, $tx->res->message );
-}
+	return \@errors;
+	}
+
 
 =head1 TO DO
 

@@ -1,0 +1,13 @@
+# this is a collection of Perl blog feeds that Perly-Bot scans for new material
+-
+    url: http://blogs.perl.org/atom.xml
+    type: atom
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%SZ'
+    handler: Perly::Bot::BlogsPerlOrg
+-
+    url: https://www.nu42.com/nu42.atom.xml
+    type: atom
+    date_name: updated
+    date_format: '%Y-%m-%dT%T%z'
+    twitter: sinan_unur

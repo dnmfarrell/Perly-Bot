@@ -1,10 +1,15 @@
+use v5.22;
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
+
+use open qw(:std :utf8);
+
 package Perly::Bot::Cache;
-use strict;
-use warnings;
+
+use namespace::autoclean;
 use CHI;
-use Log::Log4perl;
-use Log::Log4perl::Level;
 use File::Path qw/make_path/;
+use Perly::Bot::CommonSetup;
 
 my $logger = Log::Log4perl->get_logger();
 
@@ -32,9 +37,10 @@ and the number of seconds to store a cache entry for.
 
 =cut
 
-sub new
-{
-  my ( $class, $cache_path, $expires_secs ) = @_;
+sub new ( $class ) {
+  my $config = Perly::Bot::Config->get_config;
+  my $cache_path   = $config->cache_path;
+  my $expires_secs = $config->cache_expiry;
 
   make_path($cache_path)
     unless !$cache_path
@@ -42,15 +48,12 @@ sub new
 
   $logger->logdie('new() requires a directory path with rwx permissions')
     unless $cache_path
-    && -x $cache_path
-    && -w $cache_path
-    && -r $cache_path;
+    && -x -w -r $cache_path;
 
   $logger->logdie(
     'new() requires a positive integer for the expiry duration of entries')
     unless $expires_secs
-    && $expires_secs =~ /^[0-9]+$/
-    && $expires_secs > 0;
+    && $expires_secs =~ /\A [1-9] [0-9]* \z/x;
 
   my $cache = CHI->new(
     driver     => 'File',
@@ -63,32 +66,28 @@ sub new
 
 =head2 has_posted ($post)
 
-Checks the cache to see if the C<Perly::Bot::Feed::Post> has already been posted.
+Checks the cache to see if the C<Perly::Bot::Post> has already been posted.
 
 =cut
 
-sub has_posted
-{
-  my ( $self, $post ) = @_;
+sub has_posted ( $self, $post ) {
   $logger->logdie(
-    'has_posted() requires a Perly::Bot::Feed::Post object as an argument')
-    unless $post && $post->isa('Perly::Bot::Feed::Post');
+    'has_posted() requires a Perly::Bot::Post object as an argument')
+    unless $post && $post->isa('Perly::Bot::Post');
 
   $self->{chi}->is_valid( $post->root_url );
 }
 
 =head2 save_post ($post)
 
-Saves the C<Perly::Bot::Feed::Post> object in the cache.
+Saves the C<Perly::Bot::Post> object in the cache.
 
 =cut
 
-sub save_post
-{
-  my ( $self, $post ) = @_;
+sub save_post ( $self, $post ) {
   $logger->logdie(
-    'save_post() requires a Perly::Bot::Feed::Post object as an argument')
-    unless $post && $post->isa('Perly::Bot::Feed::Post');
+    'save_post() requires a Perly::Bot::Post object as an argument')
+    unless $post && $post->isa('Perly::Bot::Post');
 
   $self->{chi}->set( $post->root_url, $post );
 }

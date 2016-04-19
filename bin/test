@@ -1,0 +1,22 @@
+use v5.22;
+use lib qw(lib);
+use Perly::Bot;
+
+use Data::Dumper;
+use Getopt::Long;
+use Perly::Bot::CommonSetup;
+
+my $config_file = 't/test_config.yml';
+my $config = Perly::Bot::Config->new( $config_file );
+
+# say Dumper( $config->media );
+
+say "Subreddit is ", $config->subreddit;
+
+my $reddit = $config->media->{'Perly::Bot::Media::Reddit'}{object};
+
+$reddit->{reddit_api}->_submit_link_specialized({
+	resubmit => 1,
+	url      => 'http://www.perl.org',
+	}
+	);

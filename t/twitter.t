@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 use Test::More;
-use Perly::Bot::Feed::Post;
+use Perly::Bot::Post;
 
 use_ok 'Perly::Bot::Media::Twitter', 'import module';
 
 subtest build_tweets => sub
 {
   my $mock_twitter = bless { hashtag => '#perl' }, 'Perly::Bot::Media::Twitter';
-  my $mock_post = Perly::Bot::Feed::Post->new({
+  my $mock_post = Perly::Bot::Post->new({
     delay_seconds => 10000,
     title         => 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz',
     url           => 'https://perltricks.com',
@@ -16,7 +16,7 @@ subtest build_tweets => sub
     twitter       => 'perltricks',
   });
 
-  my $required_components_length = 
+  my $required_components_length =
     length (' via @' . $mock_post->{twitter}) + #via
     length ('... ') + # truncated title
     23; # url

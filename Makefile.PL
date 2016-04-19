@@ -68,9 +68,11 @@ my %WriteMakefile = (
 		},
 
 	'PREREQ_PM'     => {
+		'namespace::autoclean'            => '0',
 		'CHI'                             => '0',
 		'Carp'                            => '0',
 		'Class::Accessor'                 => '0',
+		'File::Spec::Functions'           => '0',
 		'HTML::Entities'                  => '0',
 		'HTTP::Tiny'                      => '0',
 		'Log::Log4perl'                   => '0',

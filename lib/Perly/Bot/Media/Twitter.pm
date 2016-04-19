@@ -1,14 +1,13 @@
-package Perly::Bot::Media::Twitter;
-use strict;
-use warnings;
-use Carp;
-use Log::Log4perl;
-use Log::Log4perl::Level;
-use Try::Tiny;
-use Net::Twitter::Lite::WithAPIv1_1;
-use Role::Tiny::With;
+use v5.22;
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
 
-with 'Perly::Bot::Media';
+package Perly::Bot::Media::Twitter;
+use parent qw(Perly::Bot::Media::Base);
+
+use namespace::autoclean;
+use Perly::Bot::CommonSetup;
+use Data::Dumper;
 
 my $logger = Log::Log4perl->get_logger();
 
@@ -49,45 +48,50 @@ is not enough chars left (e.g. if the blog post title is extremely long). This i
 
 =cut
 
-sub new
-{
-  my ( $class, $args ) = @_;
+sub config_defaults ( $class, $config={} ) {
+	state $defaults = {
+		type                  => 'twitter',
+		class                 => __PACKAGE__,
+		consumer_key          => $ENV{PERLYBOT_TWITTER_CONSUMER_KEY}    // undef,
+		consumer_secret       => $ENV{PERLYBOT_TWITTER_CONSUMER_SECRET} // undef,
+		access_token          => $ENV{PERLYBOT_TWITTER_ACCESS_TOKEN}    // undef,
+		access_token_secret   => $ENV{PERLYBOT_TWITTER_ACCESS_SECRET}   // undef,
+		};
 
-  my @missing = grep { !exists $args->{$_} }
-    qw(agent_string consumer_key consumer_secret access_token access_secret);
+	$defaults;
+	}
 
-  if (@missing)
-  {
-    $logger->logcroak(
-      "args is missing required variables (@missing) for $class");
-  }
+sub is_properly_configured ( $class, $config ) {
 
-  try
-  {
-    my $twitter = Net::Twitter::Lite::WithAPIv1_1->new(
-      consumer_key        => $args->{consumer_key},
-      consumer_secret     => $args->{consumer_secret},
-      access_token        => $args->{access_token},
-      access_token_secret => $args->{access_secret},
-      user_agent          => $args->{agent_string},
-      ssl                 => 1,
-    );
+	0;
+
+	}
+
+sub new ( $class, $args = {} ) {
+	state $module = require Net::Twitter::Lite::WithAPIv1_1;
+	my $config = Perly::Bot::Config->get_config;
+
+	my %params = (
+		consumer_key           => ( $args->{consumer_key}        || $config->twitter_consumer_key || '' ),
+		consumer_secret        => ( $args->{consumer_secret}     || $config->twitter_consumer_secret || '' ),
+		access_token           => ( $args->{access_token}        || $config->twitter_access_token || '' ),
+		access_token_secret    => ( $args->{access_token_secret} || $config->twitter_access_token_secret || '' ),
+		ssl                    => 1,
+		);
+
+	if( grep { ! defined } values %params ) {
+
+		}
+
+    my $twitter = Net::Twitter::Lite::WithAPIv1_1->new( %params );
 
     return bless {
       twitter_api => $twitter,
       hashtag     => ( $args->{hashtag} || '' ),
     }, $class;
-  }
-  catch
-  {
-    $logger->logcroak("Error constructing Twitter API object: $_");
-  };
 }
 
-sub _build_tweet
-{
-  my ( $self, $blog_post ) = @_;
-
+sub _build_tweet ( $self, $blog_post ) {
   my $title   = $blog_post->decoded_title;
   my $url     = $blog_post->root_url;
   my $via     = $blog_post->twitter ? 'via @' . $blog_post->twitter : '';
@@ -113,22 +117,34 @@ sub _build_tweet
   }
 }
 
-sub send
-{
-  my ( $self, $blog_post ) = @_;
+sub send ( $self, $blog_post ) {
+	my $tweet = $self->_build_tweet($blog_post);
 
-  try
-  {
-    $self->{twitter_api}->update( $self->_build_tweet($blog_post) );
-  }
-  catch
-  {
-    $logger->logcroak( "Error tweeting $blog_post->{url} $blog_post->{title} "
-        . $_->code . " "
-        . $_->message . " "
-        . $_->error );
-  };
+	$logger->debug( sprintf "Tweet is [%s]", $tweet );
+
+	my $twitter = $self->{twitter_api};
+	$logger->debug( "Twitter is [$twitter]" );
+	my $status = eval { $twitter->update( $tweet ) } // $@;
+	$logger->debug( sprintf "Twitter status is [%s] for [%s]",
+		$status, $blog_post->title );
+
+	unless( ref $status ) {
+		$logger->logcarp(
+			sprintf "Error tweeting [%s] [%s] [%d]",
+				$blog_post->{url},
+				$blog_post->{title},
+				$status
+				);
+		}
+
+	# fake the mojo::useragent api
+	return bless { result => $status }, 'Perly::Bot::Media::Twitter::Response';
 }
+
+package Perly::Bot::Media::Twitter::Response {
+	sub new ( $class, $args = {} ) { $args->{result} //= 0; bless $args, $class }
+	sub success ( $self ) { !! $self->{result} }
+	};
 
 =head1 TO DO
 

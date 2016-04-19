@@ -1,21 +1,22 @@
+use v5.22;
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
+
 package Perly::Bot::Feed;
-use strict;
-use warnings;
-use v5.10;
 use utf8;
 
-use Carp;
-use Data::Dumper;
-use Log::Log4perl;
-use Log::Log4perl::Level;
-use Perly::Bot::Feed::Post;
-use Role::Tiny;
+use namespace::autoclean;
+use Perly::Bot::CommonSetup;
+use Scalar::Util qw(weaken);
 use Time::Piece;
+use Time::Seconds;
 use XML::FeedPP;
 
 use base 'Class::Accessor';
-Perly::Bot::Feed->mk_accessors(
-  qw/url type date_name date_format active proxy media delay_seconds twitter/);
+__PACKAGE__->mk_accessors(
+  qw/url type date_name date_format active
+  	proxy media_targets delay_seconds twitter post_class/);
+
 
 my $logger = Log::Log4perl->get_logger();
 
@@ -33,71 +34,103 @@ Perly::Bot::Feed - represent a feed
 
 =head2 get_posts ($xml)
 
-This method requires an xml string of the blog feed and returns an arrayref of L<Perl::Bot::Feed::Blog> objects.
+This method requires an xml string of the blog feed and returns an
+arrayref of L<Perl::Bot::Feed::Blog> objects.
 
 =cut
 
-sub new
-{
+sub type_defaults ( $self ) {
   state $type_defaults = {
     rdf => {
       date_name   => 'dc:date',
       date_format => '%Y-%m-%dT%T%z',
       parser      => 'XML::FeedPP::RDF',
-    },
+      },
     rss => {
       date_name   => 'pubDate',
       date_format => '%a, %d %b %Y %T %z',
       parser      => 'XML::FeedPP::RSS',
-    },
+      },
     atom => {
       date_name   => 'published',
       date_format => '%Y-%m-%dT%TZ',
       parser      => 'XML::FeedPP::Atom',
-    },
-  };
+      },
+    };
 
-  state $defaults = {
-    active => 1,
-    proxy  => 0,
-    media_targets =>
-      [ 'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit' ],
-    delay_seconds => 21600,
-  };
-
-  my ( $class, $args ) = @_;
-
-  unless ( defined $args->{type} )
-  {
-    $args->{type} = 'rss';
-    $logger->debug(
-      "Config for $args->{url} did not specify a source type. Assuming RSS");
+  return $type_defaults;
   }
 
-  my %config = ( %{ $type_defaults->{ $args->{type} } }, %$defaults, %$args );
+sub defaults_for_type ( $self, $type='rss' ) {
+  state $type_defaults = $self->type_defaults;
 
-  # load media objects
-  for my $class ( @{ $config{media_targets} } )
+  unless( exists $type_defaults->{$type} ) {
+    $logger->warn( "No defaults for media type [$type]!" );
+    return;
+    }
+
+  return $self->type_defaults->{$type}
+  }
+
+sub defaults ( $class ) {
+  state $defaults = {
+    active        => 1,
+    proxy         => 0,
+    delay_seconds => 21600,
+    post_class    => 'Perly::Bot::Post',
+    media_targets =>
+      [ 'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit' ],
+    };
+
+  $defaults;
+  }
+
+sub new ( $class, $args ) {
+  my %feed = ( $class->defaults->%*, $args->%* );
+  my $self = bless \%feed, $class;
+
+  unless ( defined $self->{type} )
   {
-    $logger->debug("Loading $class");
-    eval "require $class";
-    push @{ $config{media} }, $class->new( $config{media_config}->{$class} );
+    $self->{type} = 'rss';
+    $logger->debug(
+      "Config for $self->{url} did not specify a source type. Assuming RSS");
+  }
+
+
+  while( my( $k, $v ) = each $self->defaults_for_type( $self->{type} )->%* )
+  {
+    next if defined $self->{$k};
+    $self->{$k} = $v;
   }
 
   state $required = [
-    qw(url type date_name date_format active media proxy delay_seconds parser)];
-  my @missing = grep { !exists $config{$_} } @$required;
-  $logger->logcroak("Missing fields (@missing) in call to $class")
+    qw(url type date_name date_format active media_targets proxy delay_seconds parser)];
+  my @missing = grep { ! exists $self->{ $_ } } $required->@*;
+  $logger->logcroak("Missing fields (@missing) for feed $self->{url}")
     if @missing;
 
-  $logger->logcroak("Unallowed content parser $config{parser}")
-    unless exists $class->_allowed_parsers->{ $config{parser} };
+  $logger->logcroak("Unallowed content parser $self->{parser}")
+    unless $self->parser_allowed( $self->{parser} );
 
-  bless \%config, $class;
+  unless( $self->post_class =~ m/ \A [A-Z0-9_]+ (?: :: [A-Z0-9_]+ )+ \z /xi )
+  {
+  $logger->logcroak( "Invalid post class " . $self->post_class . " for " . $self->url );
+  }
+  else
+  {
+  unless( eval "require " . $self->post_class . "; 1" ) {
+    $logger->logcroak( "Could not load post class " . $self->post_class . ": $@" );
+  	}
+  }
+
+  $self;
 }
 
-sub _allowed_parsers
-{
+sub parser_allowed ( $self, $parser ) {
+  return exists $self->_allowed_parsers->{$parser}
+}
+
+sub _allowed_parsers {
   state $allowed = {
     map { $_ => 1 }
       qw(
@@ -108,15 +141,60 @@ sub _allowed_parsers
   $allowed;
 }
 
-sub get_posts
-{
-  my ( $self, $xml ) = @_;
+sub is_active ( $self ) {
+	return 0 if( defined $self->{active} and ! $self->{active} );
+	return 0 if( defined $self->{inactive} and $self->{inactive} );
+	return 1;
+	}
 
-  $logger->logcroak('Error get_posts() requires an $xml argument') unless $xml;
+sub trawl_blog ( $self ) {
+  $logger->debug( "Trawling " . $self->url );
+  my $config = Perly::Bot::Config->get_config;
+  my $cache = $config->cache;
 
+  my $ua = Perly::Bot::UserAgent->get_user_agent;
+  $logger->trace( "Got UA" );
+
+  if ( my $response = $ua->get( $self->url ) ) {
+  $logger->trace( "Got response" );
+  	my $content = $response->text;
+    my $blog_posts = $self->extract_posts( $content );
+    return $blog_posts;
+  }
+  else {
+    $logger->logwarn( "Received nothing for feed " . $self->url );
+    return [];
+  }
+  $logger->debug( "Trawled " . $self->url );
+}
+
+sub fetch_feed ( $self ) {
+  $logger->debug("Checking $self->{url} ...");
+
+  my $ua = Perly::Bot::UserAgent->get_user_agent;
+  my $response = $ua->get( $self->url );
+
+  if ( my $response = $ua->get( $self->url ) ) {
+    my $content = $response->text;    # decode
+    $logger->debug( sprintf 'Received content length: %s', length($content) );
+    $self->{content} =  $content;
+    return $content;
+  }
+
+  return;
+}
+
+sub extract_posts ( $self, $xml ) {
   my @posts = ();
 
-  my @items = $self->{parser}->new( $xml, -type => 'string' )->get_item();
+  my @items = eval { $self->{parser}->new( $xml, -type => 'string' )->get_item() };
+
+  if( $@ ) {
+  	$logger->error( "Bad XML for " . $self->url );
+  	$logger->debug( $@ );
+  	return [];
+  	}
+
   foreach my $i (@items)
   {
     # extract the post date
@@ -140,15 +218,18 @@ sub get_posts
     }
 
     # save some useful debugging info, datetimes are weird
-    if ( $logger->is_debug )
+    if( 0 && $logger->is_debug )
     {
       $logger->debug( sprintf 'Parsing %s changed to %s using format %s',
         $datetime_raw, $datetime_clean, $date_format );
     }
 
+	my $weak_self = $self;
+	weaken( $weak_self );
+
     my $post = eval {
       my $datetime = Time::Piece->strptime( $datetime_clean, $date_format );
-      Perly::Bot::Feed::Post->new( {
+      $self->post_class->new( {
         delay_seconds => $self->delay_seconds,
         description   => $i->description,
         datetime      => $datetime,
@@ -156,6 +237,7 @@ sub get_posts
         url           => $i->link,
         proxy         => $self->proxy,
         twitter       => $self->twitter,
+        feed          => $weak_self,  # we have a reference to the feed
       } );
     };
 

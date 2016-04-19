@@ -1,14 +1,20 @@
+use v5.22;
+use feature qw(signatures postderef);
+no warnings qw(experimental::signatures experimental::postderef);
+
+use Perly::Bot;
+
 use Test::More;
-use strict;
-use warnings;
 use Path::Tiny 'tempdir';
 use Test::Exception;
-use Perly::Bot::Feed::Post;
+use Perly::Bot::Post;
 use Time::Piece;
+use File::Temp qw(tempfile);
+
 
 # setup test data
 my $cache_path = tempdir;
-my $post = Perly::Bot::Feed::Post->new({
+my $post = Perly::Bot::Post->new({
   delay_seconds => 6000,
   description   => 'A short description of this post',
   datetime      => gmtime,
@@ -19,20 +25,99 @@ my $post = Perly::Bot::Feed::Post->new({
 
 use_ok 'Perly::Bot::Cache', 'load module';
 
-# check fails
-dies_ok { Perly::Bot::Cache->new() } 'Missing args';
-dies_ok { Perly::Bot::Cache->new('/') } 'Dir but wrong permissions';
-dies_ok { Perly::Bot::Cache->new($cache_path) } 'Missing expiry seconds';
-dies_ok { Perly::Bot::Cache->new($cache_path, 0) } 'Expiry seconds must be greater than zero';
-dies_ok { Perly::Bot::Cache->new($cache_path, -10) } 'Expiry seconds must be greater the zero';
-dies_ok { Perly::Bot::Cache->new($cache_path, 1.1) } 'Expriry seconds must be an integer';
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+subtest dir_permissions => sub {
+	my $yaml =<<YAML;
+perlybot_path: 'test_setups/full_monty'
+cache: {
+  expiry_secs: 137,
+  path: '/'
+}
+YAML
 
-ok my $cache = Perly::Bot::Cache->new($cache_path->canonpath, 2), 'constructor';
-ok $cache->save_post($post), 'save post';
-ok $cache->has_posted($post), 'cache is storing the post';
+	my $config = eval { setup_config( $yaml ) };
+	like( $@, qr/path with rwx permissions/ );
+	};
 
-sleep(2); # to expire cache
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+subtest missing_expiry => sub {
+	my $yaml =<<YAML;
+perlybot_path: 'test_setups/full_monty'
+cache: {
+  path: 'cache'
+}
+YAML
+	my $config = eval { setup_config( $yaml ) };
+	like( $@, qr/positive integer/ );
+	};
 
-ok !$cache->has_posted($post), 'post is no longer cached';
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+subtest zero_expiry => sub {
+	my $yaml =<<YAML;
+perlybot_path: 'test_setups/full_monty'
+cache: {
+  expiry_secs: 0,
+  path: 't'
+}
+YAML
+	my $config = eval { setup_config( $yaml ) };
+	like( $@, qr/positive integer/ );
+	};
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+subtest negative_expiry => sub {
+	my $yaml =<<YAML;
+perlybot_path: 'test_setups/full_monty'
+cache: {
+  expiry_secs: -37,
+  path: 't'
+}
+YAML
+	my $config = eval { setup_config( $yaml ) };
+	like( $@, qr/positive integer/ );
+	};
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+subtest fractional_expiry => sub {
+	my $yaml =<<YAML;
+perlybot_path: 'test_setups/full_monty'
+cache: {
+  expiry_secs: 1.1,
+  path: 't'
+}
+YAML
+	my $config = eval { setup_config( $yaml ) };
+	like( $@, qr/positive integer/ );
+	};
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+subtest save => sub {
+	my $yaml =<<YAML;
+perlybot_path: 'test_setups/full_monty'
+cache: {
+  expiry_secs: 2,
+  path: 't'
+}
+media: {
+}
+YAML
+	my $config = eval { setup_config( $yaml ) };
+
+	ok my $cache =$config->cache, 'constructor';
+	ok $cache->save_post($post), 'save post';
+	ok $cache->has_posted($post), 'cache is storing the post';
+
+	note( "Sleeping to expire cache" );
+	sleep(4); # to expire cache
+
+	ok !$cache->has_posted($post), 'post is no longer cached';
+	};
+
+sub setup_config ( $yaml ) {
+	my( $fh, $filename ) = tempfile( DIR => 't', SUFFIX => '.yml' );
+	$fh->autoflush;
+	print { $fh } $yaml;
+	Perly::Bot::Config->remake_config( $filename );
+	}
 
 done_testing;

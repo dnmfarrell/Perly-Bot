@@ -1,0 +1,20 @@
+agent_string: 'Perly_Bot/v'
+feeds_path: 'feeds.yml'
+session_path: 'logs/session_data.json'
+error_log_path: 'logs/errors.log'
+perlybot_path: 'test_setups/full_monty'
+cache: {
+  expiry_secs: 604800,
+  path: 'cache'
+}
+should_emit: {
+  age_threshold_secs: 86400
+}
+media: {
+  'Perly::Bot::Media::Reddit': {
+    config_path: 'reddit.yml'
+  },
+  'Perly::Bot::Media::Twitter': {
+    config_path: 'twitter.yml'
+  }
+}
