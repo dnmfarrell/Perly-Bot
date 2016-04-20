@@ -2,15 +2,12 @@
 
 =head1 Perly-Bot
 
-A Perl modulino class that tracks Perl blogs and posts them on social media.
+A social media broadcaster written in Perl. See C<bin/perlybot> for the command
+line program.
 
-=head2 SYNOPSIS
+=head2 Authors
 
-  $ perl lib/Perly/Bot.pm
-
-=head2 Author
-
-© David Farrell, 2015
+© David Farrell, brian d foy 2015
 
 =head2 License
 
