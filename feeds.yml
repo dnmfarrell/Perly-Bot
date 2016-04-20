@@ -29,7 +29,6 @@
 - 
     url: http://perltricks.com/feed/rss
     type: rss
-    date_format: '%Y-%m-%dT%T'
     delay_seconds: 0
     media_targets: ['Perly::Bot::Media::Reddit']
 - 
