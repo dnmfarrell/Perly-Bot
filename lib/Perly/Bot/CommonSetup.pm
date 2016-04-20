@@ -1,6 +1,5 @@
 use v5.22;
 
-
 =pod
 
 I mean for this module to have all the stupid stuff we'd want to be at
@@ -29,12 +28,12 @@ use Perly::Bot::UserAgent;
 use Perly::Bot::BlogsPerlOrg;
 
 sub import ( $self ) {
-	feature->import( qw(signatures postderef) );
-	warnings->import;
-	warnings->unimport( qw(experimental::signatures experimental::postderef) );
-	File::Spec::Functions->import;
-	Carp->import( qw(carp croak) );
-	Data::Dumper->import;
-	}
+  feature->import(qw(signatures postderef));
+  warnings->import;
+  warnings->unimport(qw(experimental::signatures experimental::postderef));
+  File::Spec::Functions->import;
+  Carp->import(qw(carp croak));
+  Data::Dumper->import;
+}
 
 1;

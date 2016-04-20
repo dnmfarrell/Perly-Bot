@@ -12,8 +12,7 @@ use File::Spec::Functions qw(rel2abs);
 
 __PACKAGE__->run(@ARGV) unless caller;
 
-sub run ( $class, @args )
-{
+sub run ( $class, @args ) {
   my $opts = $class->process_args(@args);
 
   say <<"HERE";
@@ -31,16 +30,15 @@ HERE
 
   exit if $opts->{dry_run};
 
-  if( $opts->{root} ) {
-  	$opts->{config} = rel2abs( $opts->{config}, $opts->{root} );
-  	}
+  if ( $opts->{root} ) {
+    $opts->{config} = rel2abs( $opts->{config}, $opts->{root} );
+  }
   Perly::Bot->run( $opts->{config} );
 
   exit 0;
 }
 
-sub process_args ( $class, @args )
-{
+sub process_args ( $class, @args ) {
   local @ARGV = @args;
 
   my %opts = ();
@@ -55,8 +53,9 @@ sub process_args ( $class, @args )
     "root|r=s"     => \$opts{root},
   );
 
-  $ENV{PERLYBOT_LOG_LEVEL} = $opts{log_level} // $ENV{PERLYBOT_LOG_LEVEL} // 'INFO';
-  $ENV{PERLY_BOT_DEBUG}    = $opts{debug}     // $ENV{PERLY_BOT_DEBUG} // 0;
+  $ENV{PERLYBOT_LOG_LEVEL} = $opts{log_level} // $ENV{PERLYBOT_LOG_LEVEL}
+    // 'INFO';
+  $ENV{PERLY_BOT_DEBUG} = $opts{debug} // $ENV{PERLY_BOT_DEBUG} // 0;
 
   return \%opts;
 }

@@ -1,5 +1,7 @@
+-b
+-bext='/'
 -i=2
--bl
+-nbl
 -sot
 -sct
 -nolq

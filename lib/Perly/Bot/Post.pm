@@ -52,27 +52,27 @@ sub root_url ( $self ) {
   # if we've already retrieved the root url, don't pull it again
   return $self->{_root_url} if exists $self->{_root_url};
 
-  if ( my $response = Perly::Bot::UserAgent->get_user_agent->get( $self->url ) ) {
-    my $location = $response->headers->header( 'Location' );
+  if ( my $response = Perly::Bot::UserAgent->get_user_agent->get( $self->url ) )
+  {
+    my $location = $response->headers->header('Location');
 
     my $url = do {
-		if( my $location = $response->headers->header( 'Location' ) ) {
-			$logger->debug( sprintf "Location is [%s]", $location );
-			$location;
-			}
-		else {
-			$logger->debug( sprintf "No Location header from [%s]", $self->title );
-			$self->url;
-			}
-		};
+      if ( my $location = $response->headers->header('Location') ) {
+        $logger->debug( sprintf "Location is [%s]", $location );
+        $location;
+      }
+      else {
+        $logger->debug( sprintf "No Location header from [%s]", $self->title );
+        $self->url;
+      }
+    };
 
-    $self->{_root_url} = $self->clean_url( $url );
+    $self->{_root_url} = $self->clean_url($url);
     return $self->{_root_url};
   }
   else {
     $logger->logcroak( sprintf "Error requesting [%s] [%s] [%s]",
-    	$response->{url}, $response->code, $response->message
-    );
+      $response->{url}, $response->code, $response->message );
   }
 }
 
@@ -98,38 +98,40 @@ post type!
 =cut
 
 sub _content_exclusion_methods ( $self ) {
-	qw(
-	has_no_perlybot_tag
-	has_no_perlybot_comment
-  	);
-  	}
+  qw(
+    has_no_perlybot_tag
+    has_no_perlybot_comment
+  );
+}
 
 sub _content_metric_methods ( $self ) {
-	qw(
-  	description_length
-  	description_looks_perly
-  	description_author
-  	perly_links
-  	keywords
-  	);
-  	}
+  qw(
+    description_length
+    description_looks_perly
+    description_author
+    perly_links
+    keywords
+  );
+}
 
 sub fails_by_policy ( $post ) {
-	my $config = Perly::Bot::Config->get_config;
-	my $cache  = $config->cache;
-	my $time_now = gmtime;
+  my $config   = Perly::Bot::Config->get_config;
+  my $cache    = $config->cache;
+  my $time_now = gmtime;
 
-	my $policy = {
-		fresh   => ($post->datetime > $time_now - $post->age_threshold_secs) ? 0 : 1,
-		embargo => ($time_now - $post->datetime > $post->delay_seconds)      ? 2 : 0,
-		cached  => $cache->has_posted($post) ? 4 : 0,
-		};
+  my $policy = {
+    fresh => ( $post->datetime > $time_now - $post->age_threshold_secs )
+    ? 0
+    : 1,
+    embargo => ( $time_now - $post->datetime > $post->delay_seconds ) ? 2 : 0,
+    cached => $cache->has_posted($post) ? 4 : 0,
+  };
 
-	$post->{policy} = $policy;
-	$post->{policy}{_sum} = sum( values %$policy );
+  $post->{policy} = $policy;
+  $post->{policy}{_sum} = sum( values %$policy );
 
-    return $post->{policy}{_sum};
-	}
+  return $post->{policy}{_sum};
+}
 
 sub threshold ( $self ) { 2 }
 
@@ -174,38 +176,40 @@ you can override this in specialized post types.
 =cut
 
 sub looks_perly ( $post, $scalar_ref ) {
-	state $looks_perly =
-		qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
+  state $looks_perly =
+    qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
 
-	$$scalar_ref =~ $looks_perly;
-	}
+  $$scalar_ref =~ $looks_perly;
+}
 
-sub has_no_perlybot_tag     ( $self ) { 0 }
+sub has_no_perlybot_tag ( $self )     { 0 }
 sub has_no_perlybot_comment ( $self ) { 0 }
 
-sub description_length      ( $self ) { ( length( $self->description ) / 1000 ) % 3 }
-sub description_looks_perly ( $self ) { $self->looks_perly( \ $self->description ) }
-sub description_author      ( $self ) { 0 }
-sub perly_links             ( $self ) { 0 }
-sub keywords                ( $self ) { 0 }
+sub description_length ( $self ) { ( length( $self->description ) / 1000 ) % 3 }
+
+sub description_looks_perly ( $self ) {
+  $self->looks_perly( \$self->description );
+}
+sub description_author ( $self ) { 0 }
+sub perly_links ( $self )        { 0 }
+sub keywords ( $self )           { 0 }
 
 sub clone ( $self ) {
-	state $storable = require Storable;
-	my $clone = Storable::dclone( $self );
-	}
-
+  state $storable = require Storable;
+  my $clone = Storable::dclone($self);
+}
 
 sub dump ( $self ) {
-	my $clone = $self->clone;
-	$clone->{description} =~ s/ \A \s+ //x;
-	$clone->{description} = substr $clone->{description}, 0, 50;
-	$clone->{description} =~ s/ \s+ \z//x;
-	$clone->{description} =~ s/ \v+ / /x;
+  my $clone = $self->clone;
+  $clone->{description} =~ s/ \A \s+ //x;
+  $clone->{description} = substr $clone->{description}, 0, 50;
+  $clone->{description} =~ s/ \s+ \z//x;
+  $clone->{description} =~ s/ \v+ / /x;
 
-	$clone->{datetime} = '...';
+  $clone->{datetime} = '...';
 
-	Dumper( $clone );
-	}
+  Dumper($clone);
+}
 
 =head1 TO DO
 

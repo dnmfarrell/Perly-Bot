@@ -48,47 +48,54 @@ is not enough chars left (e.g. if the blog post title is extremely long). This i
 
 =cut
 
-sub config_defaults ( $class, $config={} ) {
-	state $defaults = {
-		type                  => 'twitter',
-		class                 => __PACKAGE__,
-		consumer_key          => $ENV{PERLYBOT_TWITTER_CONSUMER_KEY}    // undef,
-		consumer_secret       => $ENV{PERLYBOT_TWITTER_CONSUMER_SECRET} // undef,
-		access_token          => $ENV{PERLYBOT_TWITTER_ACCESS_TOKEN}    // undef,
-		access_token_secret   => $ENV{PERLYBOT_TWITTER_ACCESS_SECRET}   // undef,
-		};
+sub config_defaults ( $class, $config = {} ) {
+  state $defaults = {
+    type                => 'twitter',
+    class               => __PACKAGE__,
+    consumer_key        => $ENV{PERLYBOT_TWITTER_CONSUMER_KEY} // undef,
+    consumer_secret     => $ENV{PERLYBOT_TWITTER_CONSUMER_SECRET} // undef,
+    access_token        => $ENV{PERLYBOT_TWITTER_ACCESS_TOKEN} // undef,
+    access_token_secret => $ENV{PERLYBOT_TWITTER_ACCESS_SECRET} // undef,
+  };
 
-	$defaults;
-	}
+  $defaults;
+}
 
 sub is_properly_configured ( $class, $config ) {
 
-	0;
+  0;
 
-	}
+}
 
 sub new ( $class, $args = {} ) {
-	state $module = require Net::Twitter::Lite::WithAPIv1_1;
-	my $config = Perly::Bot::Config->get_config;
+  state $module = require Net::Twitter::Lite::WithAPIv1_1;
+  my $config = Perly::Bot::Config->get_config;
 
-	my %params = (
-		consumer_key           => ( $args->{consumer_key}        || $config->twitter_consumer_key || '' ),
-		consumer_secret        => ( $args->{consumer_secret}     || $config->twitter_consumer_secret || '' ),
-		access_token           => ( $args->{access_token}        || $config->twitter_access_token || '' ),
-		access_token_secret    => ( $args->{access_token_secret} || $config->twitter_access_token_secret || '' ),
-		ssl                    => 1,
-		);
+  my %params = (
+    consumer_key =>
+      ( $args->{consumer_key} || $config->twitter_consumer_key || '' ),
+    consumer_secret =>
+      ( $args->{consumer_secret} || $config->twitter_consumer_secret || '' ),
+    access_token =>
+      ( $args->{access_token} || $config->twitter_access_token || '' ),
+    access_token_secret => (
+           $args->{access_token_secret}
+        || $config->twitter_access_token_secret
+        || ''
+    ),
+    ssl => 1,
+  );
 
-	if( grep { ! defined } values %params ) {
+  if ( grep { !defined } values %params ) {
 
-		}
+  }
 
-    my $twitter = Net::Twitter::Lite::WithAPIv1_1->new( %params );
+  my $twitter = Net::Twitter::Lite::WithAPIv1_1->new(%params);
 
-    return bless {
-      twitter_api => $twitter,
-      hashtag     => ( $args->{hashtag} || '' ),
-    }, $class;
+  return bless {
+    twitter_api => $twitter,
+    hashtag     => ( $args->{hashtag} || '' ),
+  }, $class;
 }
 
 sub _build_tweet ( $self, $blog_post ) {
@@ -100,16 +107,13 @@ sub _build_tweet ( $self, $blog_post ) {
   my $char_count = 140;
   $char_count -= $url =~ /^https/ ? 23 : 22;
 
-  if ( length( join ' ', $title, $via, $hashtag ) < $char_count )
-  {
+  if ( length( join ' ', $title, $via, $hashtag ) < $char_count ) {
     return join ' ', $title, $via, $hashtag, $url;
   }
-  elsif ( length( join ' ', $title, $via ) < $char_count )
-  {
+  elsif ( length( join ' ', $title, $via ) < $char_count ) {
     return join ' ', $title, $via, $url;
   }
-  else
-  {
+  else {
     # 5 chars = 3 ellipses plus 2 spaces
     my $shortened_title =
       substr( $title, 0, $char_count - 5 - length($via) ) . '...';
@@ -118,33 +122,33 @@ sub _build_tweet ( $self, $blog_post ) {
 }
 
 sub send ( $self, $blog_post ) {
-	my $tweet = $self->_build_tweet($blog_post);
+  my $tweet = $self->_build_tweet($blog_post);
 
-	$logger->debug( sprintf "Tweet is [%s]", $tweet );
+  $logger->debug( sprintf "Tweet is [%s]", $tweet );
 
-	my $twitter = $self->{twitter_api};
-	$logger->debug( "Twitter is [$twitter]" );
-	my $status = eval { $twitter->update( $tweet ) } // $@;
-	$logger->debug( sprintf "Twitter status is [%s] for [%s]",
-		$status, $blog_post->title );
+  my $twitter = $self->{twitter_api};
+  $logger->debug("Twitter is [$twitter]");
+  my $status = eval { $twitter->update($tweet) } // $@;
+  $logger->debug( sprintf "Twitter status is [%s] for [%s]",
+    $status, $blog_post->title );
 
-	unless( ref $status ) {
-		$logger->logcarp(
-			sprintf "Error tweeting [%s] [%s] [%d]",
-				$blog_post->{url},
-				$blog_post->{title},
-				$status
-				);
-		}
+  unless ( ref $status ) {
+    $logger->logcarp( sprintf "Error tweeting [%s] [%s] [%d]",
+      $blog_post->{url}, $blog_post->{title}, $status );
+  }
 
-	# fake the mojo::useragent api
-	return bless { result => $status }, 'Perly::Bot::Media::Twitter::Response';
+  # fake the mojo::useragent api
+  return bless { result => $status }, 'Perly::Bot::Media::Twitter::Response';
 }
 
 package Perly::Bot::Media::Twitter::Response {
-	sub new ( $class, $args = {} ) { $args->{result} //= 0; bless $args, $class }
-	sub success ( $self ) { !! $self->{result} }
-	};
+
+  sub new ( $class, $args = {} ) {
+    $args->{result} //= 0;
+    bless $args, $class;
+  }
+  sub success ( $self ) { !!$self->{result} }
+};
 
 =head1 TO DO
 

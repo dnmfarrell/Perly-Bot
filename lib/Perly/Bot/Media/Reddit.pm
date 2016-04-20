@@ -61,107 +61,110 @@ karama (it's a bot filter).
 
 =cut
 
-sub config_defaults ( $class, $config={} ) {
-	state $defaults = {
-		type          => 'reddit',
-		class         => __PACKAGE__,
-		username      => $ENV{PERLYBOT_REDDIT_USER}          // 'perlybotng',
-		password      => $ENV{PERLYBOT_REDDIT_PASS}          // undef,
-		client_id     => $ENV{PERLYBOT_REDDIT_CLIENT_ID}     // undef,
-		client_secret => $ENV{PERLYBOT_REDDIT_CLIENT_SECRET} // undef,
-		subreddit     => $ENV{PERLYBOT_SUBREDDIT}            // 'perlybot',
-		};
+sub config_defaults ( $class, $config = {} ) {
+  state $defaults = {
+    type          => 'reddit',
+    class         => __PACKAGE__,
+    username      => $ENV{PERLYBOT_REDDIT_USER} // 'perlybotng',
+    password      => $ENV{PERLYBOT_REDDIT_PASS} // undef,
+    client_id     => $ENV{PERLYBOT_REDDIT_CLIENT_ID} // undef,
+    client_secret => $ENV{PERLYBOT_REDDIT_CLIENT_SECRET} // undef,
+    subreddit     => $ENV{PERLYBOT_SUBREDDIT} // 'perlybot',
+  };
 
-	$defaults;
-	}
+  $defaults;
+}
 
 sub is_properly_configured ( $class, $config ) {
 
-	1;
+  1;
 
-	}
+}
 
 BEGIN {
-	use Mojo::Snoo::Subreddit;
-	package Mojo::Snoo::Subreddit;
-	use Data::Dumper;
+  use Mojo::Snoo::Subreddit;
 
-	sub _submit_link_specialized ($self, $params) {
-		#$logger->debug( "Snoo input submit params----\n" . Dumper( $params ) );
+  package Mojo::Snoo::Subreddit;
+  use Data::Dumper;
 
-		$params->{sr}       = $self->name;
-		$params->{api_type} = 'json';
-		$params->{kind}     = 'link';
-		$params->{resubmit} //= 0;
-		#$logger->debug( "Snoo processed submit params----\n" . Dumper( $params ) );
+  sub _submit_link_specialized ( $self, $params ) {
 
-		my $tx = $self->_do_request('POST', '/api/submit', $params->%*);
+    #$logger->debug( "Snoo input submit params----\n" . Dumper( $params ) );
 
-		return $tx;
-		}
+    $params->{sr}       = $self->name;
+    $params->{api_type} = 'json';
+    $params->{kind}     = 'link';
+    $params->{resubmit} //= 0;
 
+    #$logger->debug( "Snoo processed submit params----\n" . Dumper( $params ) );
 
-	sub Mojo::Snoo::Base::_do_request {
-		my ($self, $method, $path, %params) = @_;
+    my $tx = $self->_do_request( 'POST', '/api/submit', $params->%* );
 
-		my %headers;
-		if ($self->_token_required($path)) {
-			$headers{Authorization} = 'bearer ' . $self->access_token;
-			}
+    return $tx;
+  }
 
-		my $url = $self->base_url;
+  sub Mojo::Snoo::Base::_do_request {
+    my ( $self, $method, $path, %params ) = @_;
 
-		$url->path("$path.json");
+    my %headers;
+    if ( $self->_token_required($path) ) {
+      $headers{Authorization} = 'bearer ' . $self->access_token;
+    }
 
-		if ($method eq 'GET') {
-			$url->query(%params) if %params;
-			return $self->agent->get($url => \%headers);
-			}
-		return $self->agent->post($url => \%headers, form => \%params);
-		}
+    my $url = $self->base_url;
 
-	};
+    $url->path("$path.json");
+
+    if ( $method eq 'GET' ) {
+      $url->query(%params) if %params;
+      return $self->agent->get( $url => \%headers );
+    }
+    return $self->agent->post( $url => \%headers, form => \%params );
+  }
+
+}
 
 sub new ( $class, $args ) {
-	my $config = Perly::Bot::Config->get_config;
+  my $config = Perly::Bot::Config->get_config;
 
-	my %params = (
-		name          => $args->{subreddit}     // $config->subreddit // '',
-        client_id     => $args->{client_id}     // $config->reddit_client_id // '',
-        client_secret => $args->{client_secret} // $config->reddit_client_secret // '',
-        username      => $args->{username}      // $config->reddit_username // '',
-        password      => $args->{password}      // $config->reddit_password // '',
-		);
+  my %params = (
+    name      => $args->{subreddit} // $config->subreddit        // '',
+    client_id => $args->{client_id} // $config->reddit_client_id // '',
+    client_secret => $args->{client_secret} // $config->reddit_client_secret
+      // '',
+    username => $args->{username} // $config->reddit_username // '',
+    password => $args->{password} // $config->reddit_password // '',
+  );
 
-	my @missing = grep { ! (exists $params{$_} && defined $params{$_}) }
-		qw(username password client_id client_secret name);
+  my @missing = grep { !( exists $params{$_} && defined $params{$_} ) }
+    qw(username password client_id client_secret name);
 
-	if (@missing) {
-		$logger->logcroak( "Missing required parameters (@missing) for $class" );
-		}
+  if (@missing) {
+    $logger->logcroak("Missing required parameters (@missing) for $class");
+  }
 
-#	$logger->debug( "Snoo params: " . Dumper( \%params ) );
+  #	$logger->debug( "Snoo params: " . Dumper( \%params ) );
 
-	my $snoo = Mojo::Snoo::Subreddit->new( %params );
+  my $snoo = Mojo::Snoo::Subreddit->new(%params);
 
-    my $self = bless { reddit_api => $snoo }, $class;
+  my $self = bless { reddit_api => $snoo }, $class;
 
-    $logger->logcroak("Error constructing Reddit API object: $_")
-    	unless ref $self;
+  $logger->logcroak("Error constructing Reddit API object: $_")
+    unless ref $self;
 
-    return $self;
-	}
+  return $self;
+}
 
 sub send ( $self, $blog_post ) {
-	my $config = Perly::Bot::Config->get_config;
-	my $res = $self->{reddit_api}->_submit_link_specialized( {
-		title => $blog_post->decoded_title,
-		url   => $blog_post->root_url,
-		sr    => $config->subreddit
-		} );
-	$logger->debug( "Reddit send returns [$res]" );
-	$res;
-	}
+  my $config = Perly::Bot::Config->get_config;
+  my $res    = $self->{reddit_api}->_submit_link_specialized( {
+    title => $blog_post->decoded_title,
+    url   => $blog_post->root_url,
+    sr    => $config->subreddit
+  } );
+  $logger->debug("Reddit send returns [$res]");
+  $res;
+}
 
 =head1 TO DO
 

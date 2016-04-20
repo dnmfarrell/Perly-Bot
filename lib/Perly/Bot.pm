@@ -35,7 +35,7 @@ my $logger = Log::Log4perl->get_logger();
 $logger->level( $ENV{PERLYBOT_LOG_LEVEL} // $INFO );
 
 # modulino pattern
-__PACKAGE__->run( @ARGV ) unless caller();
+__PACKAGE__->run(@ARGV) unless caller();
 
 =encoding utf8
 
@@ -55,40 +55,50 @@ The main routine, trawls blog feeds for new posts.
 
 =cut
 
-sub run ( $package, $config_file = catfile( $ENV{HOME}, '.perlybot', 'config.yml' ) ) {
-	$logger->debug( "Config file is [$config_file]" );
-	my $config = Perly::Bot::Config->new( $config_file );
-	unless( $config ) {
-		$logger->logdie( "Could not read configuration from [$config_file]" );
-		}
+sub run ( $package,
+  $config_file = catfile( $ENV{HOME}, '.perlybot', 'config.yml' ) )
+{
+  $logger->debug("Config file is [$config_file]");
+  my $config = Perly::Bot::Config->new($config_file);
+  unless ($config) {
+    $logger->logdie("Could not read configuration from [$config_file]");
+  }
 
-	# Loop through feeds, check for new posts
-	my $total_emitted = 0;
-	my $feeds_count   = 0;
+  # Loop through feeds, check for new posts
+  my $total_emitted = 0;
+  my $feeds_count   = 0;
 
-	for my $feed ( $config->feeds->@* ) {
-		$feeds_count++;
-  		$logger->info( sprintf "Processing feed [%s]", $feed->url );
-		my $posts = $feed->trawl_blog;
-   		$logger->info( sprintf "Found %d posts in [%s]", scalar @$posts, $feed->url );
+  for my $feed ( $config->feeds->@* ) {
+    $feeds_count++;
+    $logger->info( sprintf "Processing feed [%s]", $feed->url );
+    my $posts = $feed->trawl_blog;
+    $logger->info(
+      sprintf "Found %d posts in [%s]",
+      scalar @$posts,
+      $feed->url
+    );
 
-   		my $emitted = 0;
-		for my $post ( $posts->@* ) {
-			my $should_emit = $post->should_emit;
-			# $logger->debug( sprintf "Should emit is [%s] for [%s]", $should_emit, $post->title );
-			# $logger->debug( "Post is " . $post->dump );
-			next unless $should_emit;
-			my $result = emit( $post );  # positive numbers are bad because they are errors
-			$emitted++;
-			sleep(2);    # be nice to APIs
-			}
+    my $emitted = 0;
+    for my $post ( $posts->@* ) {
+      my $should_emit = $post->should_emit;
 
-			$total_emitted += $emitted;
-			$logger->info( sprintf "Emitted [%d] posts for [%s]", $emitted, $feed->url );
-		}
+# $logger->debug( sprintf "Should emit is [%s] for [%s]", $should_emit, $post->title );
+# $logger->debug( "Post is " . $post->dump );
+      next unless $should_emit;
+      my $result =
+        emit($post);    # positive numbers are bad because they are errors
+      $emitted++;
+      sleep(2);         # be nice to APIs
+    }
 
-	$logger->info( sprintf "Emitted [%d] posts in [%d] feeds", $total_emitted, $feeds_count );
-	}
+    $total_emitted += $emitted;
+    $logger->info( sprintf "Emitted [%d] posts for [%s]", $emitted,
+      $feed->url );
+  }
+
+  $logger->info( sprintf "Emitted [%d] posts in [%d] feeds",
+    $total_emitted, $feeds_count );
+}
 
 =head2 emit
 
@@ -97,37 +107,37 @@ Sends the blog post to C<Perly::Bot::Media> objects for posting.
 =cut
 
 sub emit ( $post ) {
-	$logger->info( sprintf "Emitting [%s]", $post->title );
+  $logger->info( sprintf "Emitting [%s]", $post->title );
 
-	if( ! $ENV{PERLYBOT_POST_ANYWAYS} && $logger->is_debug ) {
-		$logger->debug( sprintf "DEBUG MODE: Not posting [%s]", $post->title );
-		return 0;
-		}
+  if ( !$ENV{PERLYBOT_POST_ANYWAYS} && $logger->is_debug ) {
+    $logger->debug( sprintf "DEBUG MODE: Not posting [%s]", $post->title );
+    return 0;
+  }
 
-	my $config = Perly::Bot::Config->get_config;
-	my $cache  = $config->cache;
+  my $config = Perly::Bot::Config->get_config;
+  my $cache  = $config->cache;
 
-	my @errors = ();
-	my $total_posts = 0;
+  my @errors      = ();
+  my $total_posts = 0;
 
-	foreach my $media_target ( $post->feed->media_targets->@* ) {
-		$logger->debug( sprintf "Media target is [%s]", $media_target );
-		my $media = $config->get_media_object( $media_target );
-		my $response = $media->send($post);
-		unless( $response->success ) {
-			$logger->error( "Could not send post! " . $response->to_string . " " . $post->title );
-			}
-		unless( eval { $cache->save_post( $post ) } ) {
-			$logger->logcarp( sprintf "Error caching [%s]: $@", $post->title );
-			push @errors, $post;
-			}
-		}
+  foreach my $media_target ( $post->feed->media_targets->@* ) {
+    $logger->debug( sprintf "Media target is [%s]", $media_target );
+    my $media    = $config->get_media_object($media_target);
+    my $response = $media->send($post);
+    unless ( $response->success ) {
+      $logger->error(
+        "Could not send post! " . $response->to_string . " " . $post->title );
+    }
+    unless ( eval { $cache->save_post($post) } ) {
+      $logger->logcarp( sprintf "Error caching [%s]: $@", $post->title );
+      push @errors, $post;
+    }
+  }
 
-	$logger->info( sprintf "[%d] errors for [%s]", scalar @errors, $post->title );
+  $logger->info( sprintf "[%d] errors for [%s]", scalar @errors, $post->title );
 
-	return \@errors;
-	}
-
+  return \@errors;
+}
 
 =head1 TO DO
 
