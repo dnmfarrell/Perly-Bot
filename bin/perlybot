@@ -25,7 +25,6 @@ sub run ( $class, @args ) {
   dry_run  %s
 
 PERLYBOT_LOG_LEVEL => %s
-PERLY_BOT_DEBUG    => %s
 ",
   $opts->{config}   || '',
   $opts->{feeds}    || '',
@@ -33,8 +32,7 @@ PERLY_BOT_DEBUG    => %s
   $opts->{log_level}|| '',
   $opts->{root}     || '',
   $opts->{dry_run}  || '',
-  $ENV{PERLYBOT_LOG_LEVEL},
-  $ENV{PERLY_BOT_DEBUG};
+  $ENV{PERLYBOT_LOG_LEVEL};
 
   exit if $opts->{dry_run};
 
@@ -63,7 +61,6 @@ sub process_args ( $class, @args ) {
 
   $ENV{PERLYBOT_LOG_LEVEL} = $opts{log_level} // $ENV{PERLYBOT_LOG_LEVEL}
     // 'INFO';
-  $ENV{PERLY_BOT_DEBUG} = $opts{debug} // $ENV{PERLY_BOT_DEBUG} // 0;
 
   return \%opts;
 }
