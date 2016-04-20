@@ -15,18 +15,26 @@ __PACKAGE__->run(@ARGV) unless caller;
 sub run ( $class, @args ) {
   my $opts = $class->process_args(@args);
 
-  say <<"HERE";
-Run summary
-  config   $opts->{config}
-  feeds    $opts->{feeds}
-  log4perl $opts->{log4perl}
-  level    $opts->{log_level}
-  root     $opts->{root}
-  dry_run  $opts->{dry_run}
+  say sprintf
+"Run summary
+  config   %s
+  feeds    %s
+  log4perl %s
+  level    %s
+  root     %s
+  dry_run  %s
 
-PERLYBOT_LOG_LEVEL => $ENV{PERLYBOT_LOG_LEVEL}
-PERLY_BOT_DEBUG    => $ENV{PERLY_BOT_DEBUG}
-HERE
+PERLYBOT_LOG_LEVEL => %s
+PERLY_BOT_DEBUG    => %s
+",
+  $opts->{config}   || '',
+  $opts->{feeds}    || '',
+  $opts->{log4perl} || '',
+  $opts->{log_level}|| '',
+  $opts->{root}     || '',
+  $opts->{dry_run}  || '',
+  $ENV{PERLYBOT_LOG_LEVEL},
+  $ENV{PERLY_BOT_DEBUG};
 
   exit if $opts->{dry_run};
 
