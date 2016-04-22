@@ -120,12 +120,15 @@ sub fails_by_policy ( $post ) {
   my $time_now = gmtime;
 
   my $policy = {
-    fresh => ( $post->datetime > $time_now - $post->age_threshold_secs )
-    ? 0
-    : 1,
-    embargo => ( $time_now - $post->datetime > $post->delay_seconds ) ? 2 : 0,
+    fresh => ( $post->datetime - $time_now > $post->age_threshold_secs )
+    ? 1
+    : 0,
+    embargo => ( $time_now - $post->datetime > $post->delay_seconds ) ? 0 : 2,
     cached => $cache->has_posted($post) ? 4 : 0,
   };
+
+  $logger->debug( 'Policy results: ' . join ',',
+    map { "$_=>$policy->{$_}" } sort keys %$policy );
 
   $post->{policy} = $policy;
   $post->{policy}{_sum} = sum( values %$policy );
@@ -137,6 +140,8 @@ sub threshold ( $self ) { 2 }
 
 sub should_emit ( $post ) {
   my $config = Perly::Bot::Config->get_config;
+
+  $logger->debug( sprintf 'Evaluating %s for emittal', $post->title );
 
   # these checks are for non-content things we configured
   return 0 if $post->fails_by_policy;
