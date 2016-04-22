@@ -85,8 +85,9 @@ sub run ( $package,
 # $logger->debug( sprintf "Should emit is [%s] for [%s]", $should_emit, $post->title );
 # $logger->debug( "Post is " . $post->dump );
       next unless $should_emit;
-      my $result =
-        emit($post);    # positive numbers are bad because they are errors
+
+      # positive numbers are bad because they are errors
+      my $result = emit($post);
       $emitted++;
       sleep(2);         # be nice to APIs
     }
@@ -111,13 +112,13 @@ sub emit ( $post ) {
 
   if ( !$ENV{PERLYBOT_POST_ANYWAYS} && $logger->is_debug ) {
     $logger->debug( sprintf "DEBUG MODE: Not posting [%s]", $post->title );
-    return 0;
+    return [];
   }
 
   my $config = Perly::Bot::Config->get_config;
   my $cache  = $config->cache;
 
-  my @errors      = ();
+  my @failed_posts= ();
   my $total_posts = 0;
 
   foreach my $media_target ( $post->feed->media_targets->@* ) {
@@ -130,13 +131,12 @@ sub emit ( $post ) {
     }
     unless ( eval { $cache->save_post($post) } ) {
       $logger->logcarp( sprintf "Error caching [%s]: $@", $post->title );
-      push @errors, $post;
     }
   }
 
-  $logger->info( sprintf "[%d] errors for [%s]", scalar @errors, $post->title );
+  $logger->info( sprintf "[%d] errors for [%s]", scalar @failed_posts, $post->title );
 
-  return \@errors;
+  return \@failed_posts;
 }
 
 =head1 TO DO
