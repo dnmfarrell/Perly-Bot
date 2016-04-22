@@ -119,7 +119,6 @@ sub emit ( $post ) {
   my $cache  = $config->cache;
 
   my @failed_posts= ();
-  my $total_posts = 0;
 
   foreach my $media_target ( $post->feed->media_targets->@* ) {
     $logger->debug( sprintf "Media target is [%s]", $media_target );
