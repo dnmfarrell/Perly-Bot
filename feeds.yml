@@ -2,6 +2,7 @@
 - 
     url: http://cpanpr.tumblr.com/rss
     type: rss
+    active: 0 # inactive
 - 
     url: https://rjbs.manxome.org/rubric/entries/tags/perl?format=rss
     type: rdf
@@ -27,7 +28,7 @@
     type: rss
     twitter: briandfoy_perl
 - 
-    url: http://perltricks.com/feed/rss
+    url: http://perltricks.com/index.xml
     type: rss
     delay_seconds: 0
     media_targets: ['Perly::Bot::Media::Reddit']
@@ -130,3 +131,15 @@
     url: https://perl6advent.wordpress.com/feed/atom/
     type: atom
     date_name: published
+- 
+    url: http://perlmodulesnet.tumblr.com/rss
+    type: rss
+- 
+    url: https://www.activestate.com/blog/rss.xml
+    type: rss
+- 
+    url: http://blog.geekuni.com/feeds/posts/default?alt=rss
+    type: rss
+- 
+    url:  https://feeds.feedburner.com/techbeacon/rss
+    type: rss
