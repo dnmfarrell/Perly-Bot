@@ -80,16 +80,11 @@ sub run ( $package,
 
     my $emitted = 0;
     for my $post ( $posts->@* ) {
-      my $should_emit = $post->should_emit;
+      next unless $post->should_emit;
+      $emitted += emit($post);
 
-# $logger->debug( sprintf "Should emit is [%s] for [%s]", $should_emit, $post->title );
-# $logger->debug( "Post is " . $post->dump );
-      next unless $should_emit;
-
-      # positive numbers are bad because they are errors
-      my $result = emit($post);
-      $emitted++;
-      sleep(2);         # be nice to APIs
+      # be nice to APIs
+      sleep(2);
     }
 
     $total_emitted += $emitted;
@@ -112,30 +107,36 @@ sub emit ( $post ) {
 
   if ( !$ENV{PERLYBOT_POST_ANYWAYS} && $logger->is_debug ) {
     $logger->debug( sprintf "DEBUG MODE: Not posting [%s]", $post->title );
-    return [];
+    return 0;
   }
 
   my $config = Perly::Bot::Config->get_config;
   my $cache  = $config->cache;
+  my @errors = ();
+  my $emitted= 0;
 
-  my @failed_posts= ();
-
-  foreach my $media_target ( $post->feed->media_targets->@* ) {
+  for my $media_target ( $post->feed->media_targets->@* ) {
     $logger->debug( sprintf "Media target is [%s]", $media_target );
     my $media    = $config->get_media_object($media_target);
     my $response = $media->send($post);
-    unless ( $response->success ) {
-      $logger->error(
-        "Could not send post! " . $response->to_string . " " . $post->title );
+
+    if ( $response->success ) {
+      $emitted = 1;
+    }
+    else {
+      my $error = sprintf 'Could not send post! %s %s',
+        $response->to_string, $post->title;
+      $logger->error($error);
+      push @errors, $error;
     }
     unless ( eval { $cache->save_post($post) } ) {
-      $logger->logcarp( sprintf "Error caching [%s]: $@", $post->title );
+      my $error = sprintf "Error caching [%s]: $@", $post->title;
+      $logger->error($error);
+      push @errors, $error;
     }
   }
-
-  $logger->info( sprintf "[%d] errors for [%s]", scalar @failed_posts, $post->title );
-
-  return \@failed_posts;
+  $logger->info( sprintf "[%d] errors for [%s]", scalar @errors, $post->title );
+  return $emitted;
 }
 
 =head1 TO DO
