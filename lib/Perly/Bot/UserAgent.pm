@@ -5,7 +5,6 @@ no warnings qw(experimental::signatures experimental::postderef);
 package Perly::Bot::UserAgent;
 
 use parent qw(Mojo::UserAgent);
-use Perly::Bot::CommonSetup;
 
 my $logger = Log::Log4perl->get_logger();
 

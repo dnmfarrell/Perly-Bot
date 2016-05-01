@@ -7,9 +7,11 @@ use open qw(:std :utf8);
 use lib 'lib';
 
 use namespace::autoclean;
+use Log::Log4perl;
 use Log::Log4perl::Level;
 use Path::Tiny;
-use Perly::Bot::CommonSetup;
+use Perly::Bot::Config;
+use Data::Dumper;
 
 our $VERSION = '0.201';
 
@@ -17,7 +19,7 @@ Log::Log4perl->init( \ <<'LOG');
   layout_class   = Log::Log4perl::Layout::PatternLayout
     layout_pattern = %d %F{1} %L> %m%n
 
-    log4perl.rootLogger = WARN, Logfile
+    log4perl.rootLogger = WARN, Logfile, Screen
 
     log4perl.appender.Logfile  = Log::Log4perl::Appender::File
     log4perl.appender.Logfile.filename = perlybot.log
@@ -30,12 +32,7 @@ Log::Log4perl->init( \ <<'LOG');
     log4perl.appender.Screen.layout.ConversionPattern = ${layout_pattern}
     log4perl.appender.Screen.utf8 = 1
 LOG
-
 my $logger = Log::Log4perl->get_logger();
-$logger->level( $ENV{PERLYBOT_LOG_LEVEL} // $INFO );
-
-# modulino pattern
-__PACKAGE__->run(@ARGV) unless caller();
 
 =encoding utf8
 
@@ -55,13 +52,16 @@ The main routine, trawls blog feeds for new posts.
 
 =cut
 
-sub run ( $package,
-  $config_file = catfile( $ENV{HOME}, '.perlybot', 'config.yml' ) )
-{
-  $logger->debug("Config file is [$config_file]");
-  my $config = Perly::Bot::Config->new($config_file);
+my $logger = Log::Log4perl->get_logger();
+
+sub run ( $package, $opts ) {
+  $logger->level( $opts->{log_level} || $INFO );
+  $logger->debug( sprintf "logger level: %s\n", $logger->level );
+  $logger->debug("Config file is [$opts->{config}]");
+
+  my $config = Perly::Bot::Config->new( $opts->{config} );
   unless ($config) {
-    $logger->logdie("Could not read configuration from [$config_file]");
+    $logger->logdie("Could not read configuration from [$opts->{config}]");
   }
 
   # Loop through feeds, check for new posts
@@ -105,30 +105,31 @@ Sends the blog post to C<Perly::Bot::Media> objects for posting.
 sub emit ( $post ) {
   $logger->info( sprintf "Emitting [%s]", $post->title );
 
-  if ( !$ENV{PERLYBOT_POST_ANYWAYS} && $logger->is_debug ) {
-    $logger->debug( sprintf "DEBUG MODE: Not posting [%s]", $post->title );
+  if ( $logger->is_trace ) {
+    $logger->debug( sprintf "TRACE MODE: Not posting [%s]", $post->title );
     return 0;
   }
 
-  my $config = Perly::Bot::Config->get_config;
-  my $cache  = $config->cache;
-  my @errors = ();
-  my $emitted= 0;
+  my $config  = Perly::Bot::Config->get_config;
+  my $cache   = $config->cache;
+  my @errors  = ();
+  my $emitted = 0;
 
   for my $media_target ( $post->feed->media_targets->@* ) {
-    $logger->debug( sprintf "Media target is [%s]", $media_target );
-    my $media    = $config->get_media_object($media_target);
-    my $response = $media->send($post);
+    next unless $config->has_media_object($media_target);
+    $logger->info( sprintf "Media target is [%s]", $media_target );
+    my $media = $config->get_media_object($media_target);
+    my $res = eval { $media->send($post) };
 
-    if ( $response->success ) {
-      $emitted = 1;
-    }
-    else {
-      my $error = sprintf 'Could not send post! %s %s',
-        $response->to_string, $post->title;
+    if ( $@ || !$res ) {
+      my $error = sprintf 'Could not send post! [%s] %s', $post->title, $@;
       $logger->error($error);
       push @errors, $error;
     }
+    else {
+      $emitted = 1;
+    }
+
     unless ( eval { $cache->save_post($post) } ) {
       my $error = sprintf "Error caching [%s]: $@", $post->title;
       $logger->error($error);
@@ -138,10 +139,6 @@ sub emit ( $post ) {
   $logger->info( sprintf "[%d] errors for [%s]", scalar @errors, $post->title );
   return $emitted;
 }
-
-=head1 TO DO
-
-=head1 SEE ALSO
 
 =head1 SOURCE AVAILABILITY
 

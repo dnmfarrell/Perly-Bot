@@ -5,8 +5,8 @@ no warnings qw(experimental::signatures experimental::postderef);
 package Perly::Bot::Feed;
 use utf8;
 
+use Perly::Bot::UserAgent;
 use namespace::autoclean;
-use Perly::Bot::CommonSetup;
 use Scalar::Util qw(weaken);
 use Time::Piece;
 use Time::Seconds;
@@ -78,8 +78,10 @@ sub defaults ( $class ) {
     proxy         => 0,
     delay_seconds => 21600,
     post_class    => 'Perly::Bot::Post',
-    media_targets =>
-      [ 'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit' ],
+    media_targets => [
+      'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit',
+      'Perly::Bot::Media::JSON'
+    ],
   };
 
   $defaults;

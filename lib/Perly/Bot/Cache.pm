@@ -9,7 +9,6 @@ package Perly::Bot::Cache;
 use namespace::autoclean;
 use CHI;
 use File::Path qw/make_path/;
-use Perly::Bot::CommonSetup;
 
 my $logger = Log::Log4perl->get_logger();
 

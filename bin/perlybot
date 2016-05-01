@@ -15,33 +15,27 @@ __PACKAGE__->run(@ARGV) unless caller;
 sub run ( $class, @args ) {
   my $opts = $class->process_args(@args);
 
-  say sprintf
-"Run summary
-  config   %s
-  feeds    %s
-  log4perl %s
-  level    %s
-  root     %s
-  dry_run  %s
-
-PERLYBOT_LOG_LEVEL => %s
-",
+  say sprintf "Run summary
+    config   %s
+    feeds    %s
+    log4perl %s
+    level    %s
+    root     %s
+    dry_run  %s
+  ",
   $opts->{config}   || '',
   $opts->{feeds}    || '',
   $opts->{log4perl} || '',
   $opts->{log_level}|| '',
   $opts->{root}     || '',
-  $opts->{dry_run}  || '',
-  $ENV{PERLYBOT_LOG_LEVEL};
+  $opts->{dry_run}  || '';
 
   exit if $opts->{dry_run};
 
   if ( $opts->{root} ) {
     $opts->{config} = rel2abs( $opts->{config}, $opts->{root} );
   }
-  Perly::Bot->run( $opts->{config} );
-
-  exit 0;
+  Perly::Bot->run($opts);
 }
 
 sub process_args ( $class, @args ) {
@@ -58,9 +52,6 @@ sub process_args ( $class, @args ) {
     "dry_run|D"    => \$opts{dry_run},
     "root|r=s"     => \$opts{root},
   );
-
-  $ENV{PERLYBOT_LOG_LEVEL} = $opts{log_level} // $ENV{PERLYBOT_LOG_LEVEL}
-    // 'INFO';
 
   return \%opts;
 }

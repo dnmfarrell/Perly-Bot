@@ -4,12 +4,11 @@ no warnings qw(experimental::signatures experimental::postderef);
 
 package Perly::Bot::Post;
 
-use Perly::Bot::CommonSetup;
-
 use namespace::autoclean;
 use Data::Dumper;
 use HTML::Entities;
 use List::Util qw(sum any);
+use Time::Piece;
 
 use base 'Class::Accessor';
 __PACKAGE__->mk_accessors(
@@ -36,8 +35,10 @@ Removes the query component of the url. This is to reduce the risk of posting du
 =cut
 
 sub clean_url ( $self, $url ) {
-  my $uri = Mojo::URL->new($url);
-  return $uri->scheme . '://' . $uri->host . $uri->path;
+  my $uri       = Mojo::URL->new($url);
+  my $clean_url = $uri->scheme . '://' . $uri->host . $uri->path;
+  $logger->logcroak("Error cleaning [$url], got back undef") unless $clean_url;
+  return $clean_url;
 }
 
 =head2 root_url
@@ -52,6 +53,7 @@ sub root_url ( $self ) {
   # if we've already retrieved the root url, don't pull it again
   return $self->{_root_url} if exists $self->{_root_url};
 
+  $logger->debug( sprintf 'Finding the root url for [%s]', $self->url );
   if ( my $response = Perly::Bot::UserAgent->get_user_agent->get( $self->url ) )
   {
     my $location = $response->headers->header('Location');
@@ -119,15 +121,21 @@ sub fails_by_policy ( $post ) {
   my $cache    = $config->cache;
   my $time_now = gmtime;
 
+  $logger->trace(
+    sprintf 'Fresh calculaton post age %d threshold %d',
+    $time_now - $post->datetime,
+    $post->age_threshold_secs
+  );
+
   my $policy = {
-    fresh => ( $post->datetime - $time_now > $post->age_threshold_secs )
+    stale => ( $time_now - $post->datetime > $post->age_threshold_secs )
     ? 1
     : 0,
-    embargo => ( $time_now - $post->datetime > $post->delay_seconds ) ? 0 : 2,
+    embargo => ( $time_now - $post->datetime < $post->delay_seconds ) ? 2 : 0,
     cached => $cache->has_posted($post) ? 4 : 0,
   };
 
-  $logger->debug( 'Policy results: ' . join ',',
+  $logger->trace( 'Policy results: ' . join ',',
     map { "$_=>$policy->{$_}" } sort keys %$policy );
 
   $post->{policy} = $policy;

@@ -4,7 +4,7 @@ package Perly::Bot::Media::Base;
 use Carp qw(croak);
 
 BEGIN {
-  my %required_methods = map { $_, undef } qw(send config_defaults);
+  my %required_methods = map { $_, undef } qw(send);
 
   sub AUTOLOAD ( $self, @* ) {
     our $AUTOLOAD;
