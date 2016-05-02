@@ -79,7 +79,8 @@ sub defaults ( $class ) {
     delay_seconds => 21600,
     post_class    => 'Perly::Bot::Post',
     media_targets => [
-      'Perly::Bot::Media::Twitter', 'Perly::Bot::Media::Reddit',
+      'Perly::Bot::Media::Twitter',
+      'Perly::Bot::Media::Reddit',
       'Perly::Bot::Media::JSON'
     ],
   };
