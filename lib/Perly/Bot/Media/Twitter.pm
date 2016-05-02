@@ -3,7 +3,6 @@ use v5.22;
 use warnings;
 no warnings qw(experimental::signatures experimental::postderef);
 use feature qw(signatures postderef);
-use parent qw(Perly::Bot::Media::Base);
 use Net::Twitter::Lite::WithAPIv1_1;
 use Carp 'croak';
 
@@ -21,20 +20,20 @@ Constructor, returns a new C<Perly::Bot::Media::Twitter> object.
 
 Requires hashref containing these key values:
 
-  agent_string    => '...',
-  consumer_key    => '...',
-  consumer_secret => '...',
-  access_token    => '...',
-  access_secret   => '...',
-  hashtag         => '...', # optional
+  agent_string          => '...',
+  consumer_key          => '...',
+  consumer_secret       => '...',
+  access_token          => '...',
+  access_token_secret   => '...',
+  hashtag               => '...', # optional
 
 C<agent_string> can be any string you like, it will be sent to Twitter when tweeting.
 
-The Twitter key/secrets come from the Twitter API. You need to register an application
+The Twitter key/secrets come from the Twitter API. You need to L<register|http://apps.twitter.com> an application
 with Twitter in order to obtain them.
 
 C<hashtag> is the hashtag to append to any tweets issued. This will be omitted if there
-is not enough chars left (e.g. if the blog post title is extremely long). This is optional.
+is not enough chars left (e.g. if the blog post title is extremely long). Optional.
 
 =cut
 
@@ -54,20 +53,24 @@ sub _build_tweet ( $self, $blog_post ) {
   my $char_count = 140;
   $char_count -= $url =~ /^https/ ? 23 : 22;
 
+  my $tweet;
+
   if ( length( join ' ', $title, $via, $hashtag ) < $char_count ) {
-    return $hashtag
-      ? join ' ', $title, $via, $url
-      : join ' ', $title, $via, $url, $hashtag;
+    $tweet = join ' ', $title, $via, $url, $hashtag;
   }
   elsif ( length( join ' ', $title, $via ) < $char_count ) {
-    return join ' ', $title, $via, $url;
+    $tweet = join ' ', $title, $via, $url;
   }
   else {
     # 5 chars = 3 ellipses plus 2 spaces
     my $shortened_title =
       substr( $title, 0, $char_count - 5 - length($via) ) . '...';
-    return join ' ', $shortened_title, $via, $url;
+    $tweet = join ' ', $shortened_title, $via, $url;
   }
+
+  # remove double spaces caused by empty hashref
+  $tweet =~ s/ \+/ /g;
+  return $tweet;
 }
 
 sub send ( $self, $blog_post ) {
