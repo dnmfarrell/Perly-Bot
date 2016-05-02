@@ -6,8 +6,6 @@ use feature qw(signatures postderef);
 use Mojo::Snoo::Subreddit;
 use Carp 'croak';
 
-use parent qw(Perly::Bot::Media::Base);
-
 my $logger = Log::Log4perl->get_logger();
 
 =encoding utf8
