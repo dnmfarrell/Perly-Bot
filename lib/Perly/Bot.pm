@@ -13,7 +13,7 @@ use Path::Tiny;
 use Perly::Bot::Config;
 use Data::Dumper;
 
-our $VERSION = '0.201';
+our $VERSION = '0.202';
 
 Log::Log4perl->init( \ <<'LOG');
   layout_class   = Log::Log4perl::Layout::PatternLayout
