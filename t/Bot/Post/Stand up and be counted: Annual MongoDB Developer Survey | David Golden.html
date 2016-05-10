@@ -1,0 +1,486 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Stand up and be counted: Annual MongoDB Developer Survey | David Golden</title>
+<link rel="pingback" href="http://www.dagolden.com/xmlrpc.php" />
+
+<!-- All in One SEO Pack 2.3.4.1 by Michael Torbert of Semper Fi Web Design[289,355] -->
+<link rel="author" href="https://plus.google.com/u/0/103238260903205100949" />
+<meta name="description"  content="If you use Perl and MongoDB, I need your help. Every year, we put out a survey to developers to find out what languages they use, what features they need, what" />
+
+<meta name="keywords"  content="ironman,mongodb,perl,perl programming" />
+
+<link rel="canonical" href="http://www.dagolden.com/index.php/2661/stand-up-and-be-counted-annual-mongodb-developer-survey/" />
+<!-- /all in one seo pack -->
+<link rel="alternate" type="application/rss+xml" title="dagolden &raquo; Feed" href="http://www.dagolden.com/index.php/feed/" />
+<link rel="alternate" type="application/rss+xml" title="dagolden &raquo; Comments Feed" href="http://www.dagolden.com/index.php/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/www.dagolden.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=88475d6c8012363acd06f9206b8b8697"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='openid-css'  href='http://www.dagolden.com/wp-content/plugins/openid/f/openid.css?ver=519' type='text/css' media='all' />
+<link rel='stylesheet' id='Tippy-css'  href='http://www.dagolden.com/wp-content/plugins/tippy/jquery.tippy.css?ver=88475d6c8012363acd06f9206b8b8697' type='text/css' media='all' />
+<link rel='stylesheet' id='thematic_style-css'  href='http://www.dagolden.com/wp-content/themes/autothematic/style.css?ver=88475d6c8012363acd06f9206b8b8697' type='text/css' media='all' />
+<link rel='stylesheet' id='jetpack_css-css'  href='http://www.dagolden.com/wp-content/plugins/jetpack/css/jetpack.css?ver=4.0.2' type='text/css' media='all' />
+<link rel='stylesheet' id='Annie-css'  href='http://www.dagolden.com/wp-content/plugins/annie/annie.css?ver=88475d6c8012363acd06f9206b8b8697' type='text/css' media='all' />
+<script type='text/javascript' src='http://www.dagolden.com/wp-includes/js/jquery/jquery.js?ver=1.12.3'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-content/plugins/tippy/jquery.tippy.js?ver=6.0.0'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-content/plugins/annie/annie.js?ver=88475d6c8012363acd06f9206b8b8697'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-content/plugins/google-analyticator/external-tracking.min.js?ver=6.4.9'></script>
+<link rel='https://api.w.org/' href='http://www.dagolden.com/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.dagolden.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.dagolden.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='When RFCs attack: HTTP::Tiny is getting stricter' href='http://www.dagolden.com/index.php/2657/when-rfcs-attack-httptiny-is-getting-stricter/' />
+
+<link rel='shortlink' href='http://wp.me/pvxIN-GV' />
+<link rel="alternate" type="application/json+oembed" href="http://www.dagolden.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.dagolden.com%2Findex.php%2F2661%2Fstand-up-and-be-counted-annual-mongodb-developer-survey%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://www.dagolden.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.dagolden.com%2Findex.php%2F2661%2Fstand-up-and-be-counted-annual-mongodb-developer-survey%2F&#038;format=xml" />
+
+	
+	<link rel="stylesheet" type="text/css" media="print" href="http://www.dagolden.com/wp-content/plugins/bunnys-print-css/print.css" />
+
+
+            <script type="text/javascript">
+                jQuery(document).ready(function() {
+                    jQuery('.tippy').tippy({ position: "link", offsetx: 0, offsety: 10, closetext: "X", hidedelay: 250, showdelay: 100, calcpos: "parent", showspeed: 100, hidespeed: 50, showtitle: true, hoverpopup: true, draggable: true, dragheader: true, multitip: false, autoshow: false, showheader: true, showclose: false, htmlentities: false });
+                });
+            </script>
+        <script type="text/javascript">
+(function(url){
+	if(/(?:Chrome\/26\.0\.1410\.63 Safari\/537\.31|WordfenceTestMonBot)/.test(navigator.userAgent)){ return; }
+	var addEvent = function(evt, handler) {
+		if (window.addEventListener) {
+			document.addEventListener(evt, handler, false);
+		} else if (window.attachEvent) {
+			document.attachEvent('on' + evt, handler);
+		}
+	};
+	var removeEvent = function(evt, handler) {
+		if (window.removeEventListener) {
+			document.removeEventListener(evt, handler, false);
+		} else if (window.detachEvent) {
+			document.detachEvent('on' + evt, handler);
+		}
+	};
+	var evts = 'contextmenu dblclick drag dragend dragenter dragleave dragover dragstart drop keydown keypress keyup mousedown mousemove mouseout mouseover mouseup mousewheel scroll'.split(' ');
+	var logHuman = function() {
+		var wfscr = document.createElement('script');
+		wfscr.type = 'text/javascript';
+		wfscr.async = true;
+		wfscr.src = url + '&r=' + Math.random();
+		(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(wfscr);
+		for (var i = 0; i < evts.length; i++) {
+			removeEvent(evts[i], logHuman);
+		}
+	};
+	for (var i = 0; i < evts.length; i++) {
+		addEvent(evts[i], logHuman);
+	}
+})('//www.dagolden.com/?wordfence_logHuman=1&hid=AE6D517B98C48DB461CF28A391F0BD00');
+</script>
+<link rel='dns-prefetch' href='//v0.wordpress.com'>
+    <link rel="shortcut icon" href="http://www.dagolden.com/wp-content/themes/autothematic/images/favicon.ico" />
+
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Stand up and be counted: Annual MongoDB Developer Survey" />
+<meta property="og:url" content="http://www.dagolden.com/index.php/2661/stand-up-and-be-counted-annual-mongodb-developer-survey/" />
+<meta property="og:description" content="If you use Perl and MongoDB, I need your help. Every year, we put out a survey to developers to find out what languages they use, what features they need, what problems they have, and so on. We hav…" />
+<meta property="article:published_time" content="2016-04-28T20:59:23+00:00" />
+<meta property="article:modified_time" content="2016-04-28T20:59:23+00:00" />
+<meta property="og:site_name" content="dagolden" />
+<meta property="og:image" content="http://s2.quickmeme.com/img/a1/a12e550f70ad95e684c2f97a5b861449c41f12d9e77e98317e38cd13725a71fb.jpg" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary" />
+<style type="text/css" id="syntaxhighlighteranchor"></style>
+<!-- Google Analytics Tracking by Google Analyticator 6.4.9: http://www.videousermanuals.com/google-analyticator/ -->
+<script type="text/javascript">
+    var analyticsFileTypes = [''];
+    var analyticsSnippet = 'disabled';
+    var analyticsEventTracking = 'enabled';
+</script>
+<script type="text/javascript">
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-33706715-2', 'auto');
+ 
+	ga('send', 'pageview');
+</script>
+</head>
+
+<body class="single single-post postid-2661 single-format-standard unknown-os unknown-browser">
+
+	<div id="wrapper" class="hfeed">
+
+		<div id="header">
+
+        		<div id="branding">
+    
+    	<div id="blog-title"><span><a href="http://www.dagolden.com/" title="dagolden" rel="home">dagolden</a></span></div>
+    
+    	<div id="blog-description">Whatever comes to mind</div>
+
+		</div><!--  #branding -->
+    
+    <div id="access">
+    
+    	<div class="skip-link"><a href="#content" title="Skip navigation to the content">Skip to content</a></div><!-- .skip-link -->
+    	
+    	<div class="menu"><li ><a href="http://www.dagolden.com/">Home</a></li><li class="page_item page-item-2"><a href="http://www.dagolden.com/index.php/about/">About Me</a></li><li class="page_item page-item-7"><a href="http://www.dagolden.com/index.php/projects/">My Projects</a></li><li class="page_item page-item-10"><a href="http://www.dagolden.com/index.php/talks/">My Talks</a></li><li class="page_item page-item-12"><a href="http://www.dagolden.com/index.php/code/">My Code</a></li><li class="page_item page-item-2478"><a href="http://www.dagolden.com/index.php/qa-hackathon-reports/">QA Hackathon Reports</a></li></div>
+    	
+    </div><!-- #access -->
+    <div id="bannerlet"></div>
+       		
+    	</div><!-- #header-->		        
+    	    	
+	<div id="main">
+
+		<div id="container">
+			
+			<div id="content">
+
+				<div id="nav-above" class="navigation">
+				
+					<div class="nav-previous"><a href="http://www.dagolden.com/index.php/2657/when-rfcs-attack-httptiny-is-getting-stricter/" rel="prev"><span class="meta-nav">&laquo;</span> When RFCs attack: HTTP::Tiny is getting stricter</a></div>
+					
+					<div class="nav-next"></div>
+					
+				</div>
+					
+				<div id="post-2661" class="post-2661 post type-post status-publish format-standard hentry category-perl-programming tag-ironman tag-mongodb tag-perl tag-perl-programming" > 
+
+				
+
+					<h1 class="entry-title">Stand up and be counted: Annual MongoDB Developer Survey</h1>
+
+					<div class="entry-meta">
+
+	<span class="meta-prep meta-prep-author">By </span><span class="author vcard"><a class="url fn n" href="https://plus.google.com/u/0/103238260903205100949?rel=author" title="View all posts by dagolden">dagolden</a></span>
+
+	<span class="meta-sep meta-sep-entry-date"> | </span>
+
+	<span class="meta-prep meta-prep-entry-date">Published: </span><span class="entry-date"><abbr class="published" title="2016-04-28T16:59:23-0400">April 28, 2016</abbr></span>
+
+	
+
+</div><!-- .entry-meta -->
+     				
+					<div class="entry-content">
+					
+						<p>If you use Perl and MongoDB, I need your help.  Every year, we put out a survey to developers to find out what languages they use, what features they need, what problems they have, and so on.</p>
+<p><strong>We have very few Perl responses. ☹️</strong></p>
+<p>Be an ally!  Take the <a href="https://www.research.net/r/LPXG5K6">MongoDB Developer Experience Survey</a>.</p>
+<p><img width="50%" src="http://s2.quickmeme.com/img/a1/a12e550f70ad95e684c2f97a5b861449c41f12d9e77e98317e38cd13725a71fb.jpg" alt="Camel" /></p>
+
+												
+					</div><!-- .entry-content -->
+					
+					<div class="entry-utility">
+
+						<span class="cat-links">This entry was posted in <a href="http://www.dagolden.com/index.php/category/perl-programming/" rel="category tag">perl programming</a></span><span class="tag-links"> and tagged  <a href="http://www.dagolden.com/index.php/tag/ironman/" rel="tag">ironman</a>, <a href="http://www.dagolden.com/index.php/tag/mongodb/" rel="tag">mongodb</a>, <a href="http://www.dagolden.com/index.php/tag/perl/" rel="tag">perl</a>, <a href="http://www.dagolden.com/index.php/tag/perl-programming/" rel="tag">perl programming</a></span>. Bookmark the <a title="Permalink to Stand up and be counted: Annual MongoDB Developer Survey" href="http://www.dagolden.com/index.php/2661/stand-up-and-be-counted-annual-mongodb-developer-survey/">permalink</a>. Both comments and trackbacks are currently closed.
+
+					</div><!-- .entry-utility -->
+					
+				</div><!-- #post -->
+		
+			<div id="nav-below" class="navigation">
+				<div class="nav-previous"><a href="http://www.dagolden.com/index.php/2657/when-rfcs-attack-httptiny-is-getting-stricter/" rel="prev"><span class="meta-nav">&laquo;</span> When RFCs attack: HTTP::Tiny is getting stricter</a></div>
+				<div class="nav-next"></div>
+			</div>
+
+								
+				<div id="comments">
+	
+					
+											
+				
+				</div><!-- #comments -->
+				
+						
+			</div><!-- #content -->
+			
+			 
+		</div><!-- #container -->
+		
+
+		<div id="primary" class="aside main-aside">
+
+			<ul class="xoxo">
+
+				<li id="search-2" class="widgetcontainer widget_search"><h3 class="widgettitle"><label for="s">Search</label></h3>
+
+						<form id="searchform" method="get" action="http://www.dagolden.com/">
+
+							<div>
+								<input id="s" name="s" type="text" value="To search, type and hit enter" onfocus="if (this.value == 'To search, type and hit enter') {this.value = '';}" onblur="if (this.value == '') {this.value = 'To search, type and hit enter';}" size="32" tabindex="1" />
+
+								<input id="searchsubmit" name="searchsubmit" type="submit" value="Search" tabindex="2" />
+							</div>
+
+						</form>
+
+					</li>		<li id="recent-posts-2" class="widgetcontainer widget_recent_entries">		<h3 class="widgettitle">Recent Posts</h3>
+		<ul>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2661/stand-up-and-be-counted-annual-mongodb-developer-survey/">Stand up and be counted: Annual MongoDB Developer Survey</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2657/when-rfcs-attack-httptiny-is-getting-stricter/">When RFCs attack: HTTP::Tiny is getting stricter</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2641/at-sign-nick-completion-for-weechat-and-slack/">At-sign nick completion for Weechat and Slack</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2633/no-more-dirty-reads-with-mongodb/">No more dirty reads with MongoDB</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2624/please-test-path-tiny-0-081-trial/">Please test Path-Tiny-0.081-TRIAL</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2613/my-github-dashboard-of-neglect/">My Github dashboard of neglect</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2602/a-parallel-mongodb-client-with-perl-and-fork/">A parallel MongoDB client with Perl and fork</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2589/perl-5-and-perl-6-are-mortal-enemies/">Perl 5 and Perl 6 are mortal enemies</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2585/book-review-the-go-programming-language/">Book Review: The Go Programming Language</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2577/finally-a-streaming-perl-filehandle-api-for-mongodb-gridfs/">Finally, a streaming Perl filehandle API for MongoDB GridFS</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2567/getting-ready-for-mongodb-3-2-new-features-new-perl-driver-beta/">Getting ready for MongoDB 3.2: new features, new Perl driver beta</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2550/if-you-use-mongodb-and-perl-i-want-your-feedback/">If you use MongoDB and Perl, I want your feedback!</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2547/mongodb-perl-driver-v1-0-2-released/">MongoDB Perl Driver v1.0.2 released</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2543/github-name-changed-to-xdg/">My Github name has changed from dagolden to xdg</a>
+						</li>
+					<li>
+				<a href="http://www.dagolden.com/index.php/2536/how-to-trim-pdf-margins-and-edit-metadata/">How to trim PDF margins and edit metadata</a>
+						</li>
+				</ul>
+		</li>				<li id="jpp_widget-2" class="widgetcontainer widget_jpp_widget">		<h3 class="widgettitle">Popular Posts</h3>
+		<ul>
+			<li><a href="http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/" title="Version numbers should be boring">Version numbers should be boring</a></li>
+			<li><a href="http://www.dagolden.com/index.php/1322/five-testmore-features-you-might-not-be-using-yet/" title="Five Test::More features you might not be using yet">Five Test::More features you might not be using yet</a></li>
+			<li><a href="http://www.dagolden.com/index.php/1913/is-perl-6-pointless-hopeless-or-just-not-done/" title="Is Perl 6 pointless, hopeless or just not done?">Is Perl 6 pointless, hopeless or just not done?</a></li>
+			<li><a href="http://www.dagolden.com/index.php/998/how-to-script-git-with-perl-and-gitwrapper/" title="How to script git with perl and Git::Wrapper">How to script git with perl and Git::Wrapper</a></li>
+			<li><a href="http://www.dagolden.com/index.php/1212/why-httptiny/" title="Why HTTP::Tiny?">Why HTTP::Tiny?</a></li>
+			<li><a href="http://www.dagolden.com/index.php/1711/how-to-build-mongodb-with-ssl-for-linux/" title="How to build MongoDB with SSL for Linux">How to build MongoDB with SSL for Linux</a></li>
+			<li><a href="http://www.dagolden.com/index.php/2134/how-i-manage-new-perls-with-perlbrew/" title="How I manage new perls with perlbrew">How I manage new perls with perlbrew</a></li>
+			<li><a href="http://www.dagolden.com/index.php/1361/fixing-screen-brightness-on-thinkpad-x201-and-ubuntu-10-10/" title="Fixing screen brightness on Thinkpad X201 and Ubuntu 10.10">Fixing screen brightness on Thinkpad X201 and Ubuntu 10.10</a></li>
+			<li><a href="http://www.dagolden.com/index.php/1446/is-javascript-the-new-perl/" title="Is Javascript the new Perl?">Is Javascript the new Perl?</a></li>
+			<li><a href="http://www.dagolden.com/index.php/1245/coming-soon-in-perl-cpan-locallib-bootstrap/" title="Coming soon in Perl: CPAN local::lib bootstrap">Coming soon in Perl: CPAN local::lib bootstrap</a></li>
+		</ul>
+		</li><li id="categories-420015381" class="widgetcontainer widget_categories"><h3 class="widgettitle">Categories</h3>
+		<ul>
+	<li class="cat-item cat-item-25"><a href="http://www.dagolden.com/index.php/category/books/" >books</a>
+</li>
+	<li class="cat-item cat-item-64"><a href="http://www.dagolden.com/index.php/category/chef/" >chef</a>
+</li>
+	<li class="cat-item cat-item-50"><a href="http://www.dagolden.com/index.php/category/coding/" >coding</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="http://www.dagolden.com/index.php/category/cpan/" >cpan</a>
+</li>
+	<li class="cat-item cat-item-21"><a href="http://www.dagolden.com/index.php/category/cpan-meta-spec/" >cpan-meta-spec</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="http://www.dagolden.com/index.php/category/cpan-testers/" >cpan-testers</a>
+</li>
+	<li class="cat-item cat-item-53"><a href="http://www.dagolden.com/index.php/category/devops/" >devops</a>
+</li>
+	<li class="cat-item cat-item-20"><a href="http://www.dagolden.com/index.php/category/dzil/" >dzil</a>
+</li>
+	<li class="cat-item cat-item-61"><a href="http://www.dagolden.com/index.php/category/fixes/" >fixes</a>
+</li>
+	<li class="cat-item cat-item-12"><a href="http://www.dagolden.com/index.php/category/git/" >git</a>
+</li>
+	<li class="cat-item cat-item-65"><a href="http://www.dagolden.com/index.php/category/hacks/" >hacks</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://www.dagolden.com/index.php/category/meta/" >meta</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="http://www.dagolden.com/index.php/category/metabase/" >metabase</a>
+</li>
+	<li class="cat-item cat-item-57"><a href="http://www.dagolden.com/index.php/category/mongodb/" >mongodb</a>
+</li>
+	<li class="cat-item cat-item-42"><a href="http://www.dagolden.com/index.php/category/nosql/" >nosql</a>
+</li>
+	<li class="cat-item cat-item-60"><a href="http://www.dagolden.com/index.php/category/p5p/" >p5p</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="http://www.dagolden.com/index.php/category/parrot/" >parrot</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="http://www.dagolden.com/index.php/category/perl-programming/" >perl programming</a>
+</li>
+	<li class="cat-item cat-item-22"><a href="http://www.dagolden.com/index.php/category/perl6/" >perl6</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="http://www.dagolden.com/index.php/category/toolchain/" >toolchain</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="http://www.dagolden.com/index.php/category/uncategorized/" >Uncategorized</a>
+</li>
+		</ul>
+</li><li id="archives-2" class="widgetcontainer widget_archive"><h3 class="widgettitle">Archives</h3>
+		<ul>
+			<li><a href='http://www.dagolden.com/index.php/date/2016/04/'>April 2016</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2016/03/'>March 2016</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2016/02/'>February 2016</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2016/01/'>January 2016</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/12/'>December 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/11/'>November 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/10/'>October 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/09/'>September 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/08/'>August 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/07/'>July 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/05/'>May 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/04/'>April 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/03/'>March 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/02/'>February 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2015/01/'>January 2015</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2014/05/'>May 2014</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2014/03/'>March 2014</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2014/02/'>February 2014</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2014/01/'>January 2014</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/11/'>November 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/10/'>October 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/09/'>September 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/07/'>July 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/06/'>June 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/05/'>May 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/04/'>April 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/03/'>March 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/02/'>February 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2013/01/'>January 2013</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2012/12/'>December 2012</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2012/11/'>November 2012</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2012/10/'>October 2012</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2012/04/'>April 2012</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2012/02/'>February 2012</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2012/01/'>January 2012</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/10/'>October 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/09/'>September 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/08/'>August 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/07/'>July 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/06/'>June 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/05/'>May 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/04/'>April 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/03/'>March 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/02/'>February 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2011/01/'>January 2011</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/12/'>December 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/11/'>November 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/10/'>October 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/09/'>September 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/08/'>August 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/07/'>July 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/06/'>June 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/05/'>May 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/04/'>April 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/03/'>March 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/02/'>February 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2010/01/'>January 2010</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2009/12/'>December 2009</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2009/11/'>November 2009</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2009/10/'>October 2009</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2009/09/'>September 2009</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2009/08/'>August 2009</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2009/07/'>July 2009</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2009/06/'>June 2009</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2009/05/'>May 2009</a></li>
+	<li><a href='http://www.dagolden.com/index.php/date/2009/04/'>April 2009</a></li>
+		</ul>
+		</li><li id="rss-links-2" class="widgetcontainer widget_rss-links"><h3 class="widgettitle">RSS Links</h3>
+			<ul>
+				<li><a href="http://www.dagolden.com/index.php/feed/" title="dagolden Posts RSS feed" rel="alternate nofollow" type="application/rss+xml">All posts</a></li>
+				<li><a href="http://www.dagolden.com/index.php/comments/feed/" title="dagolden Comments RSS feed" rel="alternate nofollow" type="application/rss+xml">All comments</a></li>
+			</ul>
+</li><li id="meta-2" class="widgetcontainer widget_meta"><h3 class="widgettitle">Meta</h3>
+			<ul>
+						<li><a href="http://www.dagolden.com/wp-login.php">Log in</a></li>
+						</ul>
+</li>
+				</ul>
+
+		</div><!-- #primary .aside -->
+
+
+		<div id="secondary" class="aside main-aside">
+
+			<ul class="xoxo">
+
+				<li id="text-3" class="widgetcontainer widget_text">			<div class="textwidget"></div>
+		</li>
+				</ul>
+
+		</div><!-- #secondary .aside -->
+
+				
+		</div><!-- #main -->
+    	
+    	<div id="footer">	
+        	
+        	    
+	<div id="siteinfo">        
+
+   			Powered by <a class="wp-link" href="http://WordPress.org/" title="WordPress" rel="generator">WordPress</a>. Built on the <a class="theme-link" href="http://thematictheme.com" title="Thematic Theme Framework" rel="home">Thematic Theme Framework</a>.
+
+	</div><!-- #siteinfo -->
+	
+   	        	
+		</div><!-- #footer -->
+    	
+	</div><!-- #wrapper .hfeed -->
+<p>&copy; 2009-2016 <a href="http://www.dagolden.com"><strong>David Golden</strong></a> All Rights Reserved</p>	<div style="display:none">
+	</div>
+<script type='text/javascript' src='http://www.dagolden.com/wp-includes/js/jquery/ui/core.min.js?ver=1.11.4'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-includes/js/jquery/ui/widget.min.js?ver=1.11.4'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-includes/js/jquery/ui/mouse.min.js?ver=1.11.4'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-includes/js/jquery/ui/draggable.min.js?ver=1.11.4'></script>
+<script type='text/javascript' src='http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201619'></script>
+<script type='text/javascript' src='http://s.gravatar.com/js/gprofiles.js?ver=2016Mayaa'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-content/plugins/jetpack/modules/wpgroho.js?ver=88475d6c8012363acd06f9206b8b8697'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-includes/js/hoverIntent.js?ver=88475d6c8012363acd06f9206b8b8697'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-content/themes/thematic/library/scripts/superfish.js?ver=1.4.8'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-content/themes/thematic/library/scripts/supersubs.js?ver=0.2b'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-content/themes/thematic/library/scripts/thematic-dropdowns.js?ver=1.0'></script>
+<script type='text/javascript' src='http://www.dagolden.com/wp-includes/js/wp-embed.min.js?ver=88475d6c8012363acd06f9206b8b8697'></script>
+<script type='text/javascript' src='http://stats.wp.com/e-201619.js' async defer></script>
+<script type='text/javascript'>
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:4.0.2',blog:'7517797',post:'2661',tz:'-4',srv:'www.dagolden.com'} ]);
+	_stq.push([ 'clickTrackerInit', '7517797', '2661' ]);
+</script>
+
+</body>
+</html>
+<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
+
+ Served from: www.dagolden.com @ 2016-05-09 21:31:07 by W3 Total Cache -->

@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<!--[if IE 6]>
+<html id="ie6" lang="en">
+<![endif]-->
+<!--[if IE 7]>
+<html id="ie7" lang="en">
+<![endif]-->
+<!--[if IE 8]>
+<html id="ie8" lang="en">
+<![endif]-->
+<!--[if !(IE 6) | !(IE 7) | !(IE 8)]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+<meta charset="UTF-8" />
+<title>Refactoring and torture | 6guts</title>
+<link rel="profile" href="http://gmpg.org/xfn/11" />
+<link rel="stylesheet" type="text/css" media="all" href="https://s0.wp.com/wp-content/themes/pub/twentyten/style.css" />
+<link rel="pingback" href="https://6guts.wordpress.com/xmlrpc.php" />
+<link rel="alternate" type="application/rss+xml" title="6guts &raquo; Feed" href="https://6guts.wordpress.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="6guts &raquo; Comments Feed" href="https://6guts.wordpress.com/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="6guts &raquo; Refactoring and torture Comments Feed" href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/feed/" />
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<link rel='stylesheet' id='all-css-0' href='https://s0.wp.com/_static/??-eJyNkdtOwzAMhl8IYw2V0wXiWdLGS7M5ddS4RHt73E2wwkTETeTD/8UnrBkGmZQmxbRA5iXEqSDHIxU8kGY3HOHs3Q+l3OFG3rOEKyAhkJdFYS/MUrFGH0jbUJXZO18wsPSO/6fVaqmT5eHj4YbYTDATOyUPWYr+8lrYIDNZPGWnqyKRj46YkslaWMpPX9Rqjra1ZpmaTQ19n2cqBexNcUmgoxW65S5hzEt/nR6Lnpjg/M8FiDiJRmPKt9HqIJAAy+A0yvTDgT27OLdXu17GzICm2rh/dT52mxO/p7dd9/jadS/Pu+7wCQRQ8JE=' type='text/css' media='all' />
+<script type='text/javascript'>
+/* <![CDATA[ */
+var LoggedOutFollow = {"invalid_email":"Your subscription did not succeed, please try again with a valid email address."};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://s1.wp.com/_static/??-eJyFj+sKwjAMhV/Irk50+Ed8lrlmJbVtatNa9OntQAXnUAjk9p1DIksQ6AebFbA0NS4Z4u2ZGsMr+QsQDnXsEzQO/QseyCfwaWIdndCCyAyx13VWjUZa4AJxcsBcoYXt50norwjlL2YghX44iwiM9y/XkyUtgs0aPctaa1CUkxjJWiqyoNKQ5hqX34oItj6txHT3rKuqozu0265d79tNtzMPcaOEUA=='></script>
+<link rel='stylesheet' id='all-css-0' href='https://s1.wp.com/wp-content/mu-plugins/highlander-comments/style.css?m=1377793621h' type='text/css' media='all' />
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='highlander-comments-ie7-css'  href='https://s1.wp.com/wp-content/mu-plugins/highlander-comments/style-ie7.css?m=1351637563h&#038;ver=20110606' type='text/css' media='all' />
+<![endif]-->
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://6guts.wordpress.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://s1.wp.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Framing the problem' href='https://6guts.wordpress.com/2016/04/21/framing-the-problem/' />
+<meta name="generator" content="WordPress.com" />
+<link rel="canonical" href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/" />
+<link rel='shortlink' href='http://wp.me/pZfpP-78' />
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/1.0/?format=json&amp;url=https%3A%2F%2F6guts.wordpress.com%2F2016%2F04%2F30%2Frefactoring-and-torture%2F&amp;for=wpcom-auto-discovery" /><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/1.0/?format=xml&amp;url=https%3A%2F%2F6guts.wordpress.com%2F2016%2F04%2F30%2Frefactoring-and-torture%2F&amp;for=wpcom-auto-discovery" />
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Refactoring and torture" />
+<meta property="og:url" content="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/" />
+<meta property="og:description" content="This post covers the previous two weeks of my Perl 6 grant work. Last time I wrote here, I plotted changes to call frames in MoarVM. Or, as the wonderful Perl Weekly put it, provided way too much i…" />
+<meta property="article:published_time" content="2016-04-30T15:14:59+00:00" />
+<meta property="article:modified_time" content="2016-04-30T15:14:59+00:00" />
+<meta property="og:site_name" content="6guts" />
+<meta property="og:image" content="https://s0.wp.com/i/blank.jpg" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:site" content="@wordpressdotcom" />
+<meta name="twitter:card" content="summary" />
+<meta property="fb:app_id" content="249643311490" />
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom" />
+<link rel="shortcut icon" type="image/x-icon" href="https://s2.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48" />
+<link rel="icon" type="image/x-icon" href="https://s2.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48" />
+<link rel="apple-touch-icon-precomposed" href="https://s0.wp.com/i/webclip.png" />
+<link rel='openid.server' href='https://6guts.wordpress.com/?openidserver=1' />
+<link rel='openid.delegate' href='https://6guts.wordpress.com/' />
+<link rel="search" type="application/opensearchdescription+xml" href="https://6guts.wordpress.com/osd.xml" title="6guts" />
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com" />
+		<style type="text/css">
+			.recentcomments a {
+				display: inline !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+			table.recentcommentsavatartop img.avatar, table.recentcommentsavatarend img.avatar {
+				border: 0px;
+				margin: 0;
+			}
+
+			table.recentcommentsavatartop a, table.recentcommentsavatarend a {
+				border: 0px !important;
+				background-color: transparent !important;
+			}
+
+			td.recentcommentsavatarend, td.recentcommentsavatartop {
+				padding: 0px 0px 1px 0px;
+				margin: 0px;
+			}
+
+			td.recentcommentstextend {
+				border: none !important;
+				padding: 0px 0px 2px 10px;
+			}
+
+			.rtl td.recentcommentstextend {
+				padding: 0px 10px 2px 0px;
+			}
+
+			td.recentcommentstexttop {
+				border: none;
+				padding: 0px 0px 0px 10px;
+			}
+
+			.rtl td.recentcommentstexttop {
+				padding: 0px 10px 0px 0px;
+			}
+		</style>
+		<meta name="application-name" content="6guts" /><meta name="msapplication-window" content="width=device-width;height=device-height" /><meta name="msapplication-tooltip" content="Tales of Perl 6 guts hacking" /><meta name="msapplication-task" content="name=Subscribe;action-uri=https://6guts.wordpress.com/feed/;icon-uri=https://s2.wp.com/i/favicon.ico" /><meta name="msapplication-task" content="name=Sign up for a free blog;action-uri=http://wordpress.com/signup/;icon-uri=https://s2.wp.com/i/favicon.ico" /><meta name="msapplication-task" content="name=WordPress.com Support;action-uri=http://support.wordpress.com/;icon-uri=https://s2.wp.com/i/favicon.ico" /><meta name="msapplication-task" content="name=WordPress.com Forums;action-uri=http://forums.wordpress.com/;icon-uri=https://s2.wp.com/i/favicon.ico" /><meta name="title" content="Refactoring and torture | 6guts on WordPress.com" />
+<meta name="description" content="This post covers the previous two weeks of my Perl 6 grant work. Last time I wrote here, I plotted changes to call frames in MoarVM. Or, as the wonderful Perl Weekly put it, provided way too much information about call frames. :-) That there is so much to say about call frames reflects their&hellip;" />
+		<script type="text/javascript" src="//c.amazon-adsystem.com/aax2/amzn_ads.js"></script>
+		<script type="text/javascript">
+		try { amznads.getAds("3033"); } catch(e) { /* ignore */ }
+		</script>
+		<script type="text/javascript">
+		try {
+			var a9_p = amznads.getKeys(),
+			_ipw_custom = {
+				wordAds: '0',
+				adSafe: '1',
+				domain: '6guts.wordpress.com',
+				pageURL: 'https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/'
+			};
+			if("undefined"!=typeof a9_p&&""!=a9_p&&null!==a9_p&&"[object Array]"===Object.prototype.toString.call(a9_p)){var a="",b=0,c=a9_p.length;a9_p.sort();for(var d=0;d<c;d++){a9_p[d-b]=a9_p[d-b].replace(/a1x6p/,"a160x600p");var e=a9_p[d-b].split("p");e[0]==a&&(a9_p.splice(d-b,1),b++);a=e[0]}_ipw_custom.amznPay=a9_p};document.close();
+		} catch(e) {}
+		</script>		<!-- IPONWEB header script -->
+		<script type="text/javascript">
+			window.__ATA = {
+				scriptSrc: '//s.pubmine.com/showad.js',
+				slotPrefix: 'automattic-id-',
+				initAd: function(o) {
+					var o = o || {},
+						g = window,
+						d = g.document,
+						wr = d.write,
+						id = g.__ATA.id();
+					wr.call(d, '<div id="' + id + '" data-section="' + (o.sectionId || 0) + '"' + (o.type ? ('data-type="' + o.type + '"') : '') + ' ' + (o.forcedUrl ? ('data-forcedurl="' + o.forcedUrl + '"') : '') + ' style="width:' + (o.width || 0) + 'px; height:' + (o.height || 0) + 'px;">');
+					g.__ATA.displayAd(id);
+					wr.call(d, '</div>');
+				},
+				displayAd: function(id) {
+					window.__ATA.ids = window.__ATA.ids || {};
+					window.__ATA.ids[id] = 1;
+				},
+				customParams: _ipw_custom,
+				id: function() {
+					return window.__ATA.slotPrefix + (parseInt(Math.random() * 10000, 10) + 1 + (new Date()).getMilliseconds());
+				}
+			};
+			(function(d, ata) {
+				var pr = "https:" === d.location.protocol ? "https:" : "http:",
+					src = pr + ata.scriptSrc,
+					st = "text/javascript";
+				d.write('<scr' + 'ipt type="' + st + '" src="' + src + '"><\/scr' + 'ipt>');
+			})(window.document, window.__ATA);
+		</script>
+		<script type="text/javascript">
+		jQuery(window).ready(function () {
+			jQuery("a.wpa-about").text("About these ads");
+		});
+		</script><link rel="amphtml" href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/amp/" /><style type="text/css" id="syntaxhighlighteranchor"></style>
+<script type="text/javascript">
+	window.google_analytics_uacct = "UA-52447-2";
+</script>
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-52447-2']);
+	_gaq.push(['_setDomainName', 'wordpress.com']);
+	_gaq.push(['_initData']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+	})();
+</script>
+</head>
+
+<body class="single single-post postid-442 single-format-standard mp6 customizer-styles-applied single-author highlander-enabled highlander-light">
+<div id="wrapper" class="hfeed">
+	<div id="header">
+		<div id="masthead">
+			<div id="branding" role="banner">
+								<div id="site-title">
+					<span>
+						<a href="https://6guts.wordpress.com/" title="6guts" rel="home">6guts</a>
+					</span>
+				</div>
+				<div id="site-description">Tales of Perl 6 guts hacking</div>
+
+										<a class="home-link" href="https://6guts.wordpress.com/" title="6guts" rel="home">
+							<img src="https://6guts.files.wordpress.com/2010/07/cropped-30141.jpg" width="940" height="198" alt="" />
+						</a>
+								</div><!-- #branding -->
+
+			<div id="access" role="navigation">
+			  				<div class="skip-link screen-reader-text"><a href="#content" title="Skip to content">Skip to content</a></div>
+								<div class="menu"><ul><li ><a href="https://6guts.wordpress.com/">Home</a></li><li class="page_item page-item-2"><a href="https://6guts.wordpress.com/about/">About</a></li><li class="page_item page-item-24"><a href="https://6guts.wordpress.com/interesting-papers/">Interesting Papers</a></li></ul></div>
+			</div><!-- #access -->
+		</div><!-- #masthead -->
+	</div><!-- #header -->
+
+	<div id="main">
+
+		<div id="container">
+			<div id="content" role="main">
+
+			
+
+				<div id="nav-above" class="navigation">
+					<div class="nav-previous"><a href="https://6guts.wordpress.com/2016/04/21/framing-the-problem/" rel="prev"><span class="meta-nav">&larr;</span> Framing the problem</a></div>
+					<div class="nav-next"></div>
+				</div><!-- #nav-above -->
+
+				<div id="post-442" class="post-442 post type-post status-publish format-standard hentry category-uncategorized">
+											<h2 class="entry-title"><a href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/" rel="bookmark">Refactoring and torture</a></h2>					
+					<div class="entry-meta">
+						<span class="meta-prep meta-prep-author">Posted on</span> <a href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/" title="4:14 PM" rel="bookmark"><span class="entry-date">April 30, 2016</span></a>						<span class="by-author"><span class="sep">by</span> <span class="author vcard"><a class="url fn n" href="https://6guts.wordpress.com/author/jnthnwrthngtn/" title="View all posts by jnthnwrthngtn" rel="author">jnthnwrthngtn</a></span> </span>					</div><!-- .entry-meta -->
+
+					<div class="entry-content">
+						<p>This post covers the previous two weeks of my Perl 6 grant work. Last time I wrote here, I <a href="https://6guts.wordpress.com/2016/04/21/framing-the-problem/">plotted changes to call frames in MoarVM</a>. Or, as the wonderful <a href="http://perlweekly.com/">Perl Weekly</a> put it, provided way too much information about call frames. :-)</p>
+<p>That there is so much to say about call frames reflects their rather central role. They play a big part in supporting numerous language features (function calls, recursion, closures, continuations, dynamic variables, and pseudo-packages like <code>OUTER </code>and <code>CALLER</code>). The garbage collector scans them to find live objects. Both the interpreter and JIT compiler have to relate to them in various ways. The dynamic optimizer performs transforms over them when doing OSR (On Stack Replacement) and uninlining (the deoptimization that enables us to speculatively perform inlining optimizations).</p>
+<p>All of which makes a major refactor of call frames a rather scary prospect. While they have picked up additional bits of state as MoarVM has evolved, they have been reference counted since, well, the day I first implemented call frames, which means &#8220;before MoarVM could even run any code&#8221;. Being reference counted, rather than handled by the garbage collector, gave them a property that is easy to rely on, and rather less easy to discover reliance on: that they never move over their lifetime.</p>
+<h3><a id="user-content-i-like-to-move-it-move-it" class="anchor" href="https://gist.github.com/jnthn/f59c89815f70769d7bf4cab075a869a0#i-like-to-move-it-move-it"></a>I like to move it move it</h3>
+<p>Wait, what, move? Why <em>would</em> they even move?</p>
+<p>Here&#8217;s a little Perl 6 program to illustrate. It declares a class, makes an instance of it, prints its memory address, does a load of further, throwaway, memory allocations, and then again prints the address of the object instance we made.</p>
+<pre><code>class A { }
+my $obj = A.new;
+say $obj.WHERE;
+A.new for ^10000;
+say $obj.WHERE;
+</code></pre>
+<p>When I ran this locally just now, I got:</p>
+<pre><code>39391392
+95466848
+</code></pre>
+<p>If you get the same number twice, just make the <code>10000</code> something bigger. What&#8217;s interesting to note here is that an object&#8217;s location in memory can change over time. This is a consequence of MoarVM&#8217;s garbage collector, which is both generational and manages its young generation using semi-space copying. (This is nothing special to MoarVM; many modern VMs do it.)</p>
+<p>Being able to move objects relies on being able to find and update all of the references to them. And, since MoarVM is written in C, that includes those references on the C stack. Consider this bit of code, which is the (general, unoptimized) path for boxing strings:</p>
+<pre><code>MVMObject * MVM_repr_box_str(MVMThreadContext *tc, MVMObject *type, MVMString *val) {
+    MVMObject *res;
+    MVMROOT(tc, val, {
+        res = MVM_repr_alloc_init(tc, type);
+        MVM_repr_set_str(tc, res, val);
+    });
+    return res;
+}
+</code></pre>
+<p>It receives <code>val</code>, which is a string to box. Note that strings are garbage-collectable objects in MoarVM, and so may move. It then allocates a box of the specified <code>type</code> (for example, Perl 6&#8217;s <code>Str</code>), and puts the string inside of it. Since <code>MVM_repr_alloc_init</code> allocates an object, it may trigger garbage collection. And that in turn may move the object pointed to by <code>val</code> &#8211; meaning that the <code>val</code> pointer needs updating. The <code>MVMROOT</code> macro is used in order to add the memory address of <code>val</code> on the C stack to the set of roots that the GC considers and updates, thus ensuring that even if the allocation of the box triggers garbage collection, this code won&#8217;t end up with an old <code>val</code> pointer.</p>
+<h3><a id="user-content-coping-with-moving-frames" class="anchor" href="https://gist.github.com/jnthn/f59c89815f70769d7bf4cab075a869a0#coping-with-moving-frames"></a>Coping with moving frames</h3>
+<p>Last time, I discussed how reference counting could be eliminated in favor of a &#8220;linear&#8221; call stack for frames that don&#8217;t escape (that is, become heap referenced), and promoting those that do escape to being garbage collected. As an intermediate step there, I&#8217;ve been working to make all frames GC-managed. This means that frames can move, and that they are part of the generational scheme. Therefore, every piece of code that both holds a reference to a frame and takes a code path that can allocate would need updating with <code>MVMROOT</code>. Further, all assignments of frames into other objects, and other objects into frames, would need write barriers (aside from the working area, which is handled specially).</p>
+<p>In part, this just needs a lot of care. Going through the places frames show up, updating things as needed, and so forth. But even then, would that really be enough to be confident things weren&#8217;t broken? After all, my refactor was changing the rules for one of the most important data structures in the VM.</p>
+<p>Of course, building NQP and Rakudo and passing the spectest suite is one good way to exercise MoarVM after the changes. Doing this showed up some issues, which I fixed. But even that doesn&#8217;t offer a huge amount of confidence. A simple script, or a short test, might trigger no garbage collections at all, or just the odd one. And the collections are highly likely to be triggered on the most common code paths in the VM.</p>
+<h3><a id="user-content-gc-torture-testing" class="anchor" href="https://gist.github.com/jnthn/f59c89815f70769d7bf4cab075a869a0#gc-torture-testing"></a>GC torture testing</h3>
+<p>When faced with something scary, a surprisingly good approach is to tackle it by doing it <em>really often</em>. For example, are software releases scary? If yes, then do time-based releases every month, and with time they&#8217;ll become automatic and boring enough not to be scary. Is deploying changes to a production system scary? If yes, then adopt continuous delivery, deploying lots of times in a day and with easy rollback if things don&#8217;t go well.</p>
+<p>Garbage collection is pretty scary. I mean, we take this world of objects the program has created, move them around, throw a bunch of them out, and then have the program continue running as if nothing happened. So&#8230;let&#8217;s try doing it really often!</p>
+<p>This is exactly what GC torture testing involves.</p>
+<pre><code>--- a/src/gc/collect.h
++++ b/src/gc/collect.h
+@@ -1,7 +1,7 @@
+ /* How big is the nursery area? Note that since it's semi-space copying, we
+  * actually have double this amount allocated. Also it is per thread. (In
+  * the future, we'll make this adaptive rather than a constant.) */
+-#define MVM_NURSERY_SIZE 4194304
++#define MVM_NURSERY_SIZE 13000
+</code></pre>
+<p>Rather than doing a collection every 4MB worth of allocations, let&#8217;s do one every 13KB worth of allocations! That&#8217;s around 320 times more often. Combined with a few debugging checks enabled, to catch references to objects that are out of date, bugs resulting from missing <code>MVMROOT</code>s and write barriers can be driven out of their hiding places into the light of day.</p>
+<p>It&#8217;s a rather effective technique. It&#8217;s also a very time-consuming one. The NQP and Rakudo builds easily take an hour between them, and running spectest this way takes over 12 hours. It&#8217;s cheap compared to shipping a MoarVM with new and nasty bugs that waste a bunch of people&#8217;s time, of course!</p>
+<p>It&#8217;s been a while since we did such a torture test. I&#8217;ve decided we should do them more often. It found issues. So far, from the spectest run torture test results, I&#8217;ve fixed 9 bugs (I didn&#8217;t go back and count those discovered while building NQP and Rakudo). What&#8217;s interesting is that of the 9, only 3 of them were clearly attributable to my refactors, one was potentially related to them, and 5 were bugs that must have been around a good while. One of the bugs that did relate to the frames changes caused deadlocks in multi-threaded code quite reliably under torture testing, but would have likely caused them very rarely under normal use (and so been extremely frustrating to reproduce and track down if it made it into the wild). 2 of the fixed non-frame bugs exclusively affected multi-threaded programs and would have doomed them. One was in the <code>CUnion </code>representation, and probably was the cause of some previously unresolved occasional failures of the NativeCall union tests.</p>
+<h3><a id="user-content-what-next" class="anchor" href="https://gist.github.com/jnthn/f59c89815f70769d7bf4cab075a869a0#what-next"></a>What next?</h3>
+<p>By this point, I&#8217;m reasonably confident that regressions due to the first step of the frame changes have been shaken out. The GC torture testing has, however, shed light on some other issues that will want addressing in the near future.</p>
+<p>I intend to put those aside for a little while, and complete the frame changes, introducing the linear stack. Compared with the first step, this feels like a lower risk change, in that mistakes should be a lot easier and cheaper to detect. I&#8217;d like to try and land this in the next week or so, in order that it can get some real-world testing before it makes it into a MoarVM and Rakudo release.</p>
+<p>Once that&#8217;s out the way, I&#8217;ll be returning to other issues turned up in GC torture testing. I&#8217;d also like to look into a way to be able to run it automatically and regularly (once a week, perhaps). It&#8217;s a good bit too intensive to be able to farm it out to Travis. The sensible solution is probably to do it in the cloud, on some elastic compute thing where it just uses a machine once a week for a day or so. The silly but fun way is to build a Raspberry Pi cluster on my desk, and hack up something to distribute the tests across them. :-)</p>
+		<div class="wpcnt">
+			<div class="wpa wpmrec">
+				<a class="wpa-about" href="https://wordpress.com/about-these-ads/" rel="nofollow"></a>
+				<div class="u">
+					<script type='text/javascript'>
+					(function(g){g.__ATA.initAd({sectionId:26942, width:300, height:250});})(window);
+					</script>
+				</div>
+			</div>
+		</div><div id="jp-post-flair" class="sharedaddy sd-like-enabled"><div class='sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded' id='like-post-wrapper-14597269-442-57313c3624dab' data-src='//widgets.wp.com/likes/#blog_id=14597269&amp;post_id=442&amp;origin=6guts.wordpress.com&amp;obj_id=14597269-442-57313c3624dab' data-name='like-post-frame-14597269-442-57313c3624dab'><h3 class='sd-title'>Like this:</h3><div class='likes-widget-placeholder post-likes-widget-placeholder' style='height: 55px;'><span class='button'><span>Like</span></span> <span class="loading">Loading...</span></div><span class='sd-text-color'></span><a class='sd-link-color'></a></div>
+<div id='jp-relatedposts' class='jp-relatedposts' >
+	<h3 class="jp-relatedposts-headline"><em>Related</em></h3>
+</div></div>											</div><!-- .entry-content -->
+
+
+					<div class="entry-utility">
+												This entry was posted in <a href="https://6guts.wordpress.com/category/uncategorized/" rel="category tag">Uncategorized</a>. Bookmark the <a href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/" title="Permalink to Refactoring and torture" rel="bookmark">permalink</a>.											</div><!-- .entry-utility -->
+				</div><!-- #post-## -->
+
+				<div id="nav-below" class="navigation">
+					<div class="nav-previous"><a href="https://6guts.wordpress.com/2016/04/21/framing-the-problem/" rel="prev"><span class="meta-nav">&larr;</span> Framing the problem</a></div>
+					<div class="nav-next"></div>
+				</div><!-- #nav-below -->
+
+				
+			<div id="comments">
+
+
+			<h3 id="comments-title">3 Responses to <em>Refactoring and torture</em></h3>
+
+
+			<ol class="commentlist">
+					<li class="comment even thread-even depth-1 highlander-comment" id="li-comment-2450">
+		<div id="comment-2450">
+			<div class="comment-author vcard">
+				<img alt='' src='https://2.gravatar.com/avatar/81730346a1abd1b0e6e3b2798ca16c2c?s=40&#038;d=identicon&#038;r=G' class='avatar avatar-40' height='40' width='40' />				<cite class="fn">Anonymous</cite> <span class="says">says:</span>			</div><!-- .comment-author .vcard -->
+			
+			<div class="comment-meta commentmetadata"><a href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/#comment-2450">
+				April 30, 2016 at 7:17 PM</a>			</div><!-- .comment-meta .commentmetadata -->
+
+			<div class="comment-body"><p>Thanks for these fascinating posts Jonathan! It&#8217;s nice to see all the on-going progress on compiler optimizations. I was wondering how one can best pick up the necessary background to even attempt digging into the MoarVM/ other P6 internals? I can get a decent understanding of the CLR with Jeffrey Richter&#8217;s book, but i wouldn&#8217;t know where to start with P6. I&#8217;m not suggesting a massive book, but is there a high-medium level page on either the P6 or MoarVM website with some good information in an outline form? Something like what the design decisions are and why with how they map to where in the code. Thanks for all the hard work.</p>
+</div>
+
+			<div class="reply">
+				<a rel='nofollow' class='comment-reply-link' href='https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/?replytocom=2450#respond' onclick='return addComment.moveForm( "comment-2450", "2450", "respond", "442" )' aria-label='Reply to Anonymous'>Reply</a>			</div><!-- .reply -->
+		</div><!-- #comment-##  -->
+
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 highlander-comment" id="li-comment-2452">
+		<div id="comment-2452">
+			<div class="comment-author vcard">
+				<img alt='' src='https://0.gravatar.com/avatar/c6b297bd0b0e9695ace8e3501aeca372?s=40&#038;d=identicon&#038;r=G' class='avatar avatar-40' height='40' width='40' />				<cite class="fn">Alan Rocker</cite> <span class="says">says:</span>			</div><!-- .comment-author .vcard -->
+			
+			<div class="comment-meta commentmetadata"><a href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/#comment-2452">
+				May 2, 2016 at 5:10 PM</a>			</div><!-- .comment-meta .commentmetadata -->
+
+			<div class="comment-body"><p>Possibly another stupid question, but how about using Hadoop as a distributed-test controller? It seems to be a meta-operating system suitable for that. (Similar to distributed calculations, but with the processes rather than the results per se being the purpose.)</p>
+</div>
+
+			<div class="reply">
+				<a rel='nofollow' class='comment-reply-link' href='https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/?replytocom=2452#respond' onclick='return addComment.moveForm( "comment-2452", "2452", "respond", "442" )' aria-label='Reply to Alan Rocker'>Reply</a>			</div><!-- .reply -->
+		</div><!-- #comment-##  -->
+
+	</li><!-- #comment-## -->
+	<li class="post pingback">
+		<p>Pingback: <a href='https://p6weekly.wordpress.com/2016/05/02/2016-18-long-awaited-landings/' rel='external nofollow' class='url'>2016.18 Long Awaited Landings | Weekly changes in and around Perl 6</a></p>
+	</li><!-- #comment-## -->
+			</ol>
+
+
+	
+
+				<div id="respond" class="comment-respond">
+			<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2016/04/30/refactoring-and-torture/#respond" style="display:none;">Cancel reply</a></small></h3>				<form action="https://6guts.wordpress.com/wp-comments-post.php" method="post" id="commentform" class="comment-form">
+					<input type="hidden" id="highlander_comment_nonce" name="highlander_comment_nonce" value="41cf8a767f" /><input type="hidden" name="_wp_http_referer" value="/2016/04/30/refactoring-and-torture/" />
+<input type="hidden" name="hc_post_as" id="hc_post_as" value="guest" />
+
+<div class="comment-form-field comment-textarea">
+	<label for="comment">Enter your comment here...</label>
+	<div id="comment-form-comment"><textarea id="comment" name="comment" title="Enter your comment here..."></textarea></div>
+</div>
+
+<div id="comment-form-identity">
+
+	<div id="comment-form-nascar">
+		<p>Fill in your details below or click an icon to log in:</p>
+		<ul>
+			<li class="selected" style="display:none;">
+				<a href="#comment-form-guest" id="postas-guest" title="Guest">
+					<span></span>
+				</a>
+			</li>
+			<li>
+				<a href="#comment-form-load-service:WordPress.com" id="postas-wordpress" title="WordPress.com">
+					<span></span>
+				</a>
+			</li>
+			<li>
+				<a href="#comment-form-load-service:Twitter" id="postas-twitter" title="Twitter">
+					<span></span>
+				</a>
+			</li>
+			<li>
+				<a href="#comment-form-load-service:Facebook" id="postas-facebook" title="Facebook">
+					<span></span>
+				</a>
+			</li>
+			<li>
+			<iframe id="googleplus-sign-in" name="googleplus-sign-in" src="https://public-api.wordpress.com/connect/?googleplus-sign-in=https%3A%2F%2F6guts.wordpress.com" width="24" height="24" scrolling="no" allowtransparency="true" seamless="seamless" frameborder="0"></iframe>
+			</li>
+		</ul>
+	</div>
+
+	<div id="comment-form-guest" class="comment-form-service selected">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+<a href="https://gravatar.com/site/signup/" target="_blank">				<img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=identicon&amp;forcedefault=y&amp;r=G" alt="Gravatar" width="25" class="no-grav" />
+</a>			</div>
+
+				<div class="comment-form-fields">
+				<div class="comment-form-field comment-form-email">
+					<label for="email">Email <span class="required">(required)</span> <span class="nopublish">(Address never made public)</span></label>
+					<div class="comment-form-input"><input id="email" name="email" type="email" value="" /></div>
+				</div>
+				<div class="comment-form-field comment-form-author">
+					<label for="author">Name <span class="required">(required)</span></label>
+					<div class="comment-form-input"><input id="author" name="author" type="text" value="" /></div>
+				</div>
+				<div class="comment-form-field comment-form-url">
+					<label for="url">Website</label>
+					<div class="comment-form-input"><input id="url" name="url" type="text" value="" /></div>
+				</div>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-wordpress" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=identicon&amp;forcedefault=y&amp;r=G" alt="WordPress.com Logo" width="25" class="no-grav" />
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="wp_avatar" id="wordpress-avatar" class="comment-meta-wordpress" value="" />
+				<input type="hidden" name="wp_user_id" id="wordpress-user_id" class="comment-meta-wordpress" value="" />
+				<input type="hidden" name="wp_access_token" id="wordpress-access_token" class="comment-meta-wordpress" value="" />
+				<p class="comment-form-posting-as pa-wordpress"><strong></strong> You are commenting using your WordPress.com account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'wordpress' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-twitter" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=identicon&amp;forcedefault=y&amp;r=G" alt="Twitter picture" width="25" class="no-grav" />
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="twitter_avatar" id="twitter-avatar" class="comment-meta-twitter" value="" />
+				<input type="hidden" name="twitter_user_id" id="twitter-user_id" class="comment-meta-twitter" value="" />
+				<input type="hidden" name="twitter_access_token" id="twitter-access_token" class="comment-meta-twitter" value="" />
+				<p class="comment-form-posting-as pa-twitter"><strong></strong> You are commenting using your Twitter account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'twitter' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-facebook" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=identicon&amp;forcedefault=y&amp;r=G" alt="Facebook photo" width="25" class="no-grav" />
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="fb_avatar" id="facebook-avatar" class="comment-meta-facebook" value="" />
+				<input type="hidden" name="fb_user_id" id="facebook-user_id" class="comment-meta-facebook" value="" />
+				<input type="hidden" name="fb_access_token" id="facebook-access_token" class="comment-meta-facebook" value="" />
+				<p class="comment-form-posting-as pa-facebook"><strong></strong> You are commenting using your Facebook account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'facebook' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-googleplus" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=identicon&amp;forcedefault=y&amp;r=G" alt="Google+ photo" width="25" class="no-grav" />
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="googleplus_avatar" id="googleplus-avatar" class="comment-meta-googleplus" value="" />
+				<input type="hidden" name="googleplus_user_id" id="googleplus-user_id" class="comment-meta-googleplus" value="" />
+				<input type="hidden" name="googleplus_access_token" id="googleplus-access_token" class="comment-meta-googleplus" value="" />
+				<p class="comment-form-posting-as pa-googleplus"><strong></strong> You are commenting using your Google+ account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'googleplus' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+
+	<div id="comment-form-load-service" class="comment-form-service">
+		<div class="comment-form-posting-as-cancel"><a href="javascript:HighlanderComments.cancelExternalWindow();">Cancel</a></div>
+		<p>Connecting to %s</p>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+var highlander_expando_javascript = function(){
+	var input = document.createElement( 'input' ),
+	    comment = jQuery( '#comment' );
+
+	if ( 'placeholder' in input ) {
+		comment.attr( 'placeholder', jQuery( '.comment-textarea label' ).remove().text() );
+	}
+
+	// Expando Mode: start small, then auto-resize on first click + text length
+	jQuery( '#comment-form-identity' ).hide();
+	jQuery( '#comment-form-subscribe' ).hide();
+	jQuery( '#commentform .form-submit' ).hide();
+
+	comment.css( { 'height':'10px' } ).one( 'focus', function() {
+		var timer = setInterval( HighlanderComments.resizeCallback, 10 )
+		jQuery( this ).animate( { 'height': HighlanderComments.initialHeight } ).delay( 100 ).queue( function(n) { clearInterval( timer ); HighlanderComments.resizeCallback(); n(); } );
+		jQuery( '#comment-form-identity' ).slideDown();
+		jQuery( '#comment-form-subscribe' ).slideDown();
+		jQuery( '#commentform .form-submit' ).slideDown();
+	});
+}
+jQuery(document).ready( highlander_expando_javascript );
+</script>
+
+<div id="comment-form-subscribe">
+	<p class="comment-subscription-form"><input type="checkbox" name="subscribe" id="subscribe" value="subscribe" style="width: auto;" tabindex="6"/> <label class="subscribe-label" id="subscribe-label" for="subscribe" style="display: inline;">Notify me of new comments via email.</label></p></div>
+
+
+
+
+<p class="form-submit"><input name="submit" type="submit" id="comment-submit" class="submit" value="Post Comment" /> <input type='hidden' name='comment_post_ID' value='442' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="456542b5a8" /></p>
+<input type="hidden" name="genseq" value="1462844470" />
+<p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="225"/></p>				</form>
+					</div><!-- #respond -->
+		<div style="clear: both"></div>
+</div><!-- #comments -->
+
+
+			</div><!-- #content -->
+		</div><!-- #container -->
+
+
+		<div id="primary" class="widget-area" role="complementary">
+						<ul class="xoxo">
+
+<li id="search-2" class="widget-container widget_search"><form role="search" method="get" id="searchform" class="searchform" action="https://6guts.wordpress.com/">
+				<div>
+					<label class="screen-reader-text" for="s">Search for:</label>
+					<input type="text" value="" name="s" id="s" />
+					<input type="submit" id="searchsubmit" value="Search" />
+				</div>
+			</form></li>		<li id="recent-posts-2" class="widget-container widget_recent_entries">		<h3 class="widget-title">Recent Posts</h3>		<ul>
+					<li>
+				<a href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/">Refactoring and torture</a>
+						</li>
+					<li>
+				<a href="https://6guts.wordpress.com/2016/04/21/framing-the-problem/">Framing the problem</a>
+						</li>
+					<li>
+				<a href="https://6guts.wordpress.com/2016/04/15/heap-heap-hooray/">Heap heap hooray!</a>
+						</li>
+					<li>
+				<a href="https://6guts.wordpress.com/2016/04/05/small-but-welcome-fixes/">Small, but welcome,&nbsp;fixes</a>
+						</li>
+					<li>
+				<a href="https://6guts.wordpress.com/2016/03/27/happy-heapster/">Happy heapster!</a>
+						</li>
+				</ul>
+		</li>		<li id="recent-comments-2" class="widget-container widget_recent_comments"><h3 class="widget-title">Recent Comments</h3>				<table class="recentcommentsavatar" cellspacing="0" cellpadding="0" border="0">
+					<tr><td title="jnthnwrthngtn" class="recentcommentsavatartop" style="height:48px; width:48px;"><a href="https://6guts.wordpress.com" rel="nofollow"><img alt='' src='https://2.gravatar.com/avatar/5999d5d26089eb4019867dc7705c41a9?s=48&#038;d=identicon&#038;r=G' class='avatar avatar-48' height='48' width='48' /></a></td><td class="recentcommentstexttop" style=""><a href="https://6guts.wordpress.com" rel="nofollow">jnthnwrthngtn</a> on <a href="https://6guts.wordpress.com/2016/04/21/framing-the-problem/#comment-2456">Framing the problem</a></td></tr><tr><td title="cognominal" class="recentcommentsavatarend" style="height:48px; width:48px;"><img alt='' src='https://2.gravatar.com/avatar/e90908cec1a8edde6f43618be62eaf50?s=48&#038;d=identicon&#038;r=G' class='avatar avatar-48' height='48' width='48' /></td><td class="recentcommentstextend" style="">cognominal on <a href="https://6guts.wordpress.com/2016/04/21/framing-the-problem/#comment-2455">Framing the problem</a></td></tr><tr><td title="2016.18 Long Awaited Landings | Weekly changes in and around Perl 6" class="recentcommentsavatarend" style="height:48px; width:48px;"><a href="https://p6weekly.wordpress.com/2016/05/02/2016-18-long-awaited-landings/" rel="nofollow"></a></td><td class="recentcommentstextend" style=""><a href="https://p6weekly.wordpress.com/2016/05/02/2016-18-long-awaited-landings/" rel="nofollow">2016.18 Long Awaited&hellip;</a> on <a href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/#comment-2453">Refactoring and torture</a></td></tr><tr><td title="Alan Rocker" class="recentcommentsavatarend" style="height:48px; width:48px;"><img alt='' src='https://0.gravatar.com/avatar/c6b297bd0b0e9695ace8e3501aeca372?s=48&#038;d=identicon&#038;r=G' class='avatar avatar-48' height='48' width='48' /></td><td class="recentcommentstextend" style="">Alan Rocker on <a href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/#comment-2452">Refactoring and torture</a></td></tr><tr><td title="Anonymous" class="recentcommentsavatarend" style="height:48px; width:48px;"><img alt='' src='https://2.gravatar.com/avatar/81730346a1abd1b0e6e3b2798ca16c2c?s=48&#038;d=identicon&#038;r=G' class='avatar avatar-48' height='48' width='48' /></td><td class="recentcommentstextend" style="">Anonymous on <a href="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/#comment-2450">Refactoring and torture</a></td></tr>				</table>
+				</li><li id="archives-2" class="widget-container widget_archive"><h3 class="widget-title">Archives</h3>		<ul>
+			<li><a href='https://6guts.wordpress.com/2016/04/'>April 2016</a></li>
+	<li><a href='https://6guts.wordpress.com/2016/03/'>March 2016</a></li>
+	<li><a href='https://6guts.wordpress.com/2016/02/'>February 2016</a></li>
+	<li><a href='https://6guts.wordpress.com/2016/01/'>January 2016</a></li>
+	<li><a href='https://6guts.wordpress.com/2015/12/'>December 2015</a></li>
+	<li><a href='https://6guts.wordpress.com/2015/11/'>November 2015</a></li>
+	<li><a href='https://6guts.wordpress.com/2015/10/'>October 2015</a></li>
+	<li><a href='https://6guts.wordpress.com/2015/09/'>September 2015</a></li>
+	<li><a href='https://6guts.wordpress.com/2015/08/'>August 2015</a></li>
+	<li><a href='https://6guts.wordpress.com/2015/07/'>July 2015</a></li>
+	<li><a href='https://6guts.wordpress.com/2015/06/'>June 2015</a></li>
+	<li><a href='https://6guts.wordpress.com/2015/05/'>May 2015</a></li>
+	<li><a href='https://6guts.wordpress.com/2015/04/'>April 2015</a></li>
+	<li><a href='https://6guts.wordpress.com/2014/06/'>June 2014</a></li>
+	<li><a href='https://6guts.wordpress.com/2014/04/'>April 2014</a></li>
+	<li><a href='https://6guts.wordpress.com/2014/01/'>January 2014</a></li>
+	<li><a href='https://6guts.wordpress.com/2013/12/'>December 2013</a></li>
+	<li><a href='https://6guts.wordpress.com/2013/10/'>October 2013</a></li>
+	<li><a href='https://6guts.wordpress.com/2013/09/'>September 2013</a></li>
+	<li><a href='https://6guts.wordpress.com/2013/08/'>August 2013</a></li>
+	<li><a href='https://6guts.wordpress.com/2013/07/'>July 2013</a></li>
+	<li><a href='https://6guts.wordpress.com/2013/05/'>May 2013</a></li>
+	<li><a href='https://6guts.wordpress.com/2013/04/'>April 2013</a></li>
+	<li><a href='https://6guts.wordpress.com/2013/02/'>February 2013</a></li>
+	<li><a href='https://6guts.wordpress.com/2013/01/'>January 2013</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/11/'>November 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/10/'>October 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/09/'>September 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/08/'>August 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/07/'>July 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/06/'>June 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/05/'>May 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/04/'>April 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/03/'>March 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/02/'>February 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2012/01/'>January 2012</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/11/'>November 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/10/'>October 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/09/'>September 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/08/'>August 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/07/'>July 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/06/'>June 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/05/'>May 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/04/'>April 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/02/'>February 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2011/01/'>January 2011</a></li>
+	<li><a href='https://6guts.wordpress.com/2010/11/'>November 2010</a></li>
+	<li><a href='https://6guts.wordpress.com/2010/10/'>October 2010</a></li>
+	<li><a href='https://6guts.wordpress.com/2010/09/'>September 2010</a></li>
+	<li><a href='https://6guts.wordpress.com/2010/08/'>August 2010</a></li>
+	<li><a href='https://6guts.wordpress.com/2010/07/'>July 2010</a></li>
+		</ul>
+		</li><li id="categories-2" class="widget-container widget_categories"><h3 class="widget-title">Categories</h3>		<ul>
+	<li class="cat-item cat-item-1"><a href="https://6guts.wordpress.com/category/uncategorized/" >Uncategorized</a>
+</li>
+		</ul>
+</li><li id="meta-2" class="widget-container widget_meta"><h3 class="widget-title">Meta</h3>			<ul>
+			<li><a href="https://wordpress.com/start?ref=wplogin">Register</a></li>			<li><a href="https://6guts.wordpress.com/wp-login.php">Log in</a></li>
+			<li><a href="https://6guts.wordpress.com/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://6guts.wordpress.com/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.com/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.com</a></li>			</ul>
+			</li>			</ul>
+		</div><!-- #primary .widget-area -->
+
+	</div><!-- #main -->
+
+	<div id="footer" role="contentinfo">
+		<div id="colophon">
+
+
+
+			<div id="site-info">
+				<a href="https://6guts.wordpress.com/" title="6guts" rel="home">
+					6guts				</a>
+			</div><!-- #site-info -->
+
+			<div id="site-generator">
+				<a href="https://wordpress.com/themes/twentyten/" title="Learn more about this theme">The Twenty Ten Theme</a>.				<a href="https://wordpress.com/?ref=footer_website">Create a free website or blog at WordPress.com.</a>
+			</div><!-- #site-generator -->
+
+		</div><!-- #colophon -->
+	</div><!-- #footer -->
+
+</div><!-- #wrapper -->
+
+<!-- wpcom_wp_footer -->
+<script type='text/javascript' src='//0.gravatar.com/js/gprofiles.js?ver=201619y'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://s1.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1380573781h'></script>
+
+	<script>
+		//initialize and attach hovercards to all gravatars
+		jQuery( document ).ready( function( $ ) {
+
+			if (typeof Gravatar === "undefined"){
+				return;
+			}
+
+			if ( typeof Gravatar.init !== "function" ) {
+				return;
+			}			
+
+			Gravatar.profile_cb = function( hash, id ) {
+				WPGroHo.syncProfileData( hash, id );
+			};
+			Gravatar.my_hash = WPGroHo.my_hash;
+			Gravatar.init( 'body', '#wp-admin-bar-my-account' );
+		});
+	</script>
+
+		<div style="display:none">
+	<div class="grofile-hash-map-81730346a1abd1b0e6e3b2798ca16c2c">
+	</div>
+	<div class="grofile-hash-map-c6b297bd0b0e9695ace8e3501aeca372">
+	</div>
+	<div class="grofile-hash-map-5999d5d26089eb4019867dc7705c41a9">
+	</div>
+	<div class="grofile-hash-map-e90908cec1a8edde6f43618be62eaf50">
+	</div>
+	</div>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var HighlanderComments = {"loggingInText":"Logging In\u2026","submittingText":"Posting Comment\u2026","postCommentText":"Post Comment","connectingToText":"Connecting to %s","commentingAsText":"%1$s: You are commenting using your %2$s account.","logoutText":"Log Out","loginText":"Log In","connectURL":"https:\/\/6guts.wordpress.com\/public.api\/connect\/?action=request","logoutURL":"https:\/\/6guts.wordpress.com\/wp-login.php?action=logout&_wpnonce=cc6477fa5b","homeURL":"https:\/\/6guts.wordpress.com\/","postID":"442","gravDefault":"identicon","enterACommentError":"Please enter a comment","enterEmailError":"Please enter your email address here","invalidEmailError":"Invalid email address","enterAuthorError":"Please enter your name here","gravatarFromEmail":"This picture will show whenever you leave a comment. Click to customize it.","logInToExternalAccount":"Log in to use details from one of these accounts.","change":"Change","changeAccount":"Change Account","comment_registration":"0","userIsLoggedIn":"","isJetpack":"0","text_direction":"ltr"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://s0.wp.com/_static/??/wp-content/js/jquery/jquery.autoresize.js,/wp-content/mu-plugins/highlander-comments/script.js?m=1462457903j'></script>
+
+	<div id="bit" class="loggedout-follow-normal">
+		<a class="bsub" href="javascript:void(0)"><span id='bsub-text'>Follow</span></a>
+		<div id="bitsubscribe">
+
+					<h3><label for="loggedout-follow-field">Follow &ldquo;6guts&rdquo;</label></h3>
+
+			<form action="https://subscribe.wordpress.com" method="post" accept-charset="utf-8" id="loggedout-follow">
+			<p>Get every new post delivered to your Inbox.</p>
+
+			<p id="loggedout-follow-error" style="display: none;"></p>
+
+						<p class="bit-follow-count">Join 35 other followers</p>
+			<p><input type="email" name="email" placeholder="Enter your email address" id="loggedout-follow-field"/></p>
+
+			<input type="hidden" name="action" value="subscribe"/>
+			<input type="hidden" name="blog_id" value="14597269"/>
+			<input type="hidden" name="source" value="https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/"/>
+			<input type="hidden" name="sub-type" value="loggedout-follow"/>
+
+			<input type="hidden" id="_wpnonce" name="_wpnonce" value="f0ce2a229b" /><input type="hidden" name="_wp_http_referer" value="/2016/04/30/refactoring-and-torture/" />
+			<p id='bsub-subscribe-button'><input type="submit" value="Sign me up" /></p>
+			</form>
+					<div id='bsub-credit'><a href="https://wordpress.com/?ref=lof">Build a website with WordPress.com</a></div>
+		</div><!-- #bitsubscribe -->
+	</div><!-- #bit -->
+
+<script type='text/javascript'>/*<![CDATA[*/if(typeof(addLoadEvent)!='undefined'){addLoadEvent(function(){if(top==self){i=document.createElement('img');i.src='https://botd2.wordpress.com/botd.gif?blog=14597269&post=442&lang=en&date=1462029299&ip=74.71.78.9&url=https://6guts.wordpress.com/2016/04/30/refactoring-and-torture/';i.id='botd2';i.style.width='0px';i.style.height='0px';i.style.overflow='hidden';document.body.appendChild(i);}});}/*]]>*/</script>
+<script type='text/javascript' src='https://s1.wp.com/wp-content/mu-plugins/akismet-3.0/_inc/form.js?m=1404442431h'></script>
+<script type='text/javascript' src='https://s0.wp.com/_static/??/wp-content/js/devicepx.js,/wp-content/mu-plugins/likes/queuehandler.js,/wp-includes/js/comment-reply.min.js?m=1448466882j'></script>
+<script type="text/javascript">
+// <![CDATA[
+(function() {
+try{
+  if ( window.external &&'msIsSiteMode' in window.external) {
+    if (window.external.msIsSiteMode()) {
+      var jl = document.createElement('script');
+      jl.type='text/javascript';
+      jl.async=true;
+      jl.src='/wp-content/plugins/ie-sitemode/custom-jumplist.php';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(jl, s);
+    }
+  }
+}catch(e){}
+})();
+// ]]>
+</script>	<script type="text/javascript">
+	var skimlinks_pub_id = "725X584219"
+	var skimlinks_sitename = "6guts.wordpress.com";
+	</script>
+	<script type="text/javascript" src="https://s.skimresources.com/js/725X1342.skimlinks.js"></script>		<iframe src='https://widgets.wp.com/likes/master.html?ver=20160429#ver=20160429' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
+		<div id='likes-other-gravatars'><div class="likes-text"><span>%d</span> bloggers like this:</div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+		<script>
+			var _comscore = _comscore || [];
+			_comscore.push({
+				c1: "2",
+				c2: "7518284"
+			});
+			(function() {
+				var s = document.createElement("script"),
+					el = document.getElementsByTagName("script")[0];
+				s.async = true;
+				s.src = (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js";
+				el.parentNode.insertBefore(s, el);
+			})();
+		</script>
+		<noscript>
+			<p class="robots-nocontent"><img src="https://sb.scorecardresearch.com/p?c1=2&c2=7518284&c3=&c4=&c5=&c6=&c15=&cv=2.0&cj=1" alt="" style="display:none;" width="1" height="1" /></p>
+		</noscript><script src="//stats.wp.com/w.js?52" type="text/javascript" async defer></script>
+<script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'14597269','blog_tz':'1','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'14597269','v':'wpcom','tz':'1','user_id':'0','post':'442','subd':'6guts'}]);
+_stq.push(['extra', {'crypt':'UE5XaGUuOTlwaD85flAmcm1mcmZsaDhkV11YdWFnNncxc1tjZG9XVXhRVz1bVXJlWWRQcV0tS0JbTXJxNVVUT0NCeDg2dFpiV21KQWE3bENwdjdDNjU3b0NZQ0s9SERaLFttTi4lQz9udUwzQVRfJmtfMUdhSFNZZD0sOXVyeXFSOSUtTSt8fl1mZ2hhU3VMUW5OYyxvb3dYb1FiSjIxN0pbLX5fZyw0LkNOeGt0ciVhJT1zWiYzVVtTeVlLQWNiemllbGRJVkd+cEtua1FzR2RkPXA4QVVYLyVGOFJMZVVjK1pJVWlPVGNmbWVbQixpLzNjZTNPfkZUSCtFMUNuOWNOWV1UJjg1bn54bkx0ZC9aNHxQbUl1dUg0NHpWaA=='}]);
+_stq.push([ 'clickTrackerInit', '14597269', '442' ]);
+	</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:0px;width:0px;overflow:hidden" alt="" /></noscript>
+<script>
+if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
+
+	wpcom_mobile_user_agent_info.init();
+	var mobileStatsQueryString = "";
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedPlatformName )
+		mobileStatsQueryString += "&x_" + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedUserAgentName )
+		mobileStatsQueryString += "&x_" + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+	
+	if( wpcom_mobile_user_agent_info.isIPad() )
+		mobileStatsQueryString += "&x_" + 'ipad_views' + '=' + 'views';
+
+	if( "" != mobileStatsQueryString ) {
+		new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+	}
+	
+}
+</script></body>
+</html>

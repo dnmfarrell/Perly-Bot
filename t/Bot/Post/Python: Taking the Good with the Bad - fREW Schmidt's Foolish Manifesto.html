@@ -1,0 +1,439 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Python: Taking the Good with the Bad - fREW Schmidt's Foolish Manifesto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+        <link href="/static/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/static/css/styles.css" rel="stylesheet"/>
+    <link href="/static/css/fonts.css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="/">fREW Schmidt&#39;s Foolish Manifesto</a>
+  </div>
+
+  
+  <div class="collapse navbar-collapse navbar-ex1-collapse">
+    <ul class="nav navbar-nav">
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a class="sigil" href="https://github.com/frioux">♑</a></li>
+      <li><a class="sigil" href="https://twitter.com/frioux">♍</a></li>
+      <li><a class="sigil" href="https://secure.flickr.com/photos/frew">♌</a></li>
+    </ul>
+  </div>
+</nav>
+
+
+    <div class="container" id="main">
+      <div class="row">
+        <div class="col-md-12">
+
+          <h1>Python: Taking the Good with the Bad</h1>
+          
+
+<p>For the past few months I&rsquo;ve been working on a side project using Python.  I&rsquo;ll
+post about that project some other time, but now that I&rsquo;ve used Python a little
+bit I think I can more reasonably consider it (so not just &ldquo;meaningful
+whitespace?!?&ldquo;)</p>
+
+<p>It&rsquo;s much too easy to write a bunch of stuff that is merely justification of the
+status quo (in my case that is the use of Perl.)  I&rsquo;m making an effort to
+consider all of the good things about Python and only mentioning Perl when there
+is a lack.  I&rsquo;d rather not compare them at all, but I don&rsquo;t see a way around
+that without silly mental trickery.</p>
+
+<p>Note that this is about Python 2.  If you want to discuss Python 3, let&rsquo;s
+compare it to Perl 6.</p>
+
+<h1 id="generally-awesome-stuff-about-python:a21e944a85227ef87f7f95cec950182e">Generally awesome stuff about Python</h1>
+
+<p>The following are my main reasons for liking Python.  They are in order of
+importance, and some have caveats.</p>
+
+<h2 id="generators:a21e944a85227ef87f7f95cec950182e">Generators</h2>
+
+<p>Generators (also known as continuations) are an awesome linguistic feature.  It
+took me a long time to understand why they are useful, but I think I can
+summarize it easily now:</p>
+
+<p>What if you wanted to have a function with an infinite loop in the middle?</p>
+
+<p>In Perl, the typical answer might be to <a href="http://hop.perl.plover.com/book/pdf/04Iterators.pdf">build an
+interator</a>.  This is fine,
+but it can be a lot of work.  In Python, you just use normal code, and a special
+keyword, <code>yield</code>.  For simple stuff, the closures you have available to you in
+Perl will likely seem less magic.  But for complicated things, like iterating
+over the nodes in a tree, Python will almost surely be easier.</p>
+
+<p>Let me be clear: in my mind, generators are an incredibly important feature and
+that Perl lacks them is significant and terrible.  There are efforts to get
+them into core, and there is a library that implements them, but it is not
+supported on the newest versions of Perl.</p>
+
+<h2 id="builtins:a21e944a85227ef87f7f95cec950182e">Builtins</h2>
+
+<p>Structured data is one of the most important parts of programming.  Arrays are
+super important; I think that&rsquo;s obvious.  Hashes are, in my opinion, equally
+useful.  There are a lot of other types of collections that could be considered
+after the point of diminishing returns once hashes are well within reach, but a
+few are included in Python and I think that&rsquo;s a good thing.  To clarify, in
+Python, one could write:</p>
+
+<pre><code>cats = set(['Dantes', 'Sunny Day', 'Wheelbarrow'])
+tools = set(['Hammer', 'Screwdriver', 'Wheelbarrow'])
+
+print cats.intersection(tools)
+</code></pre>
+
+<p>In Perl that can be done with a hash, but it&rsquo;s a hassle, so I tend to use
+<a href="https://metacpan.org/pod/Set::Scalar">Set::Scalar</a>.</p>
+
+<p>Python also ships with an OrderedDict, which is like Perl&rsquo;s
+<a href="https://metacpan.org/pod/Tie::IxHash">Tie::IxHash</a>.  But <code>Tie::IxHash</code> is sorta
+aging and weird and what&rsquo;s with that name?</p>
+
+<p>A Python programmer might also mention that the DefaultDict is cool.  I&rsquo;d argue
+that the DefaultDict merely works around Python&rsquo;s insistence that the programmer
+be explicit about a great many things.  That is: it is a workaround for Pythonic
+dogma.</p>
+
+<h2 id="rarely-need-a-compiler-for-packages:a21e944a85227ef87f7f95cec950182e">Rarely need a compiler for packages</h2>
+
+<p>In my experience, only very rarely do libraries need to be compiled in Python.
+So oviously math intensive stuff like crypto or high precision stuff will need a
+compiler, but the vast majority of other things do not.  I think part of the
+reason for this is that Python ships with an FFI library
+(<a href="https://docs.python.org/2/library/ctypes.html">ctypes</a>).  So awesome.</p>
+
+<p>In Perl, even the popular OO framework Moose requires a compiler!</p>
+
+<h2 id="protocols:a21e944a85227ef87f7f95cec950182e">&ldquo;protocols&rdquo;</h2>
+
+<p>If you want to define your own weird kind of dictionary in Python, it&rsquo;s really
+easy: you subclass <code>dict</code> and define around ten methods.  It will all just work.
+This applies to all of Python&rsquo;s builtins, I believe.</p>
+
+<p>In Perl, you have to use <code>tie</code>, which is similar but you can end up with
+oddities related to Perl&rsquo;s weird indirect method syntax.  Basically, often
+things like <code>print $fhobject $str</code> will not work as expected.  Sad camel.</p>
+
+<h2 id="interactive-python-shell:a21e944a85227ef87f7f95cec950182e">Interactive Python Shell</h2>
+
+<p>Python ships with an excellent interactive shell, which can be used by simply
+running <code>python</code>.  It has line editing, history, builtin help, and lots of other
+handy tools for testing out little bits of code.  I have lots of little tools to
+work around the lack of a good interactive shell in Perl.  This is super handy.</p>
+
+<h2 id="simple-syntax:a21e944a85227ef87f7f95cec950182e">Simple Syntax</h2>
+
+<p>The syntax of Python can be learned by a seasoned programmer in an afternoon.
+Awesome.</p>
+
+<h2 id="cool-weird-projects:a21e944a85227ef87f7f95cec950182e">Cool, weird projects</h2>
+
+<p>I&rsquo;ll happily accept more examples for this.  A few spring to mind:</p>
+
+<ol>
+<li><a href="https://github.com/iovisor/bcc">BCC</a> is sorta like a DTrace but for Linux.</li>
+<li><a href="http://gutomaia.net/pyNES/">PyNES</a> lets you run NES games written in
+Python.</li>
+<li><a href="http://biosbits.org/">BITS</a> is a Python based operating system, for doing
+weird hardware stuff without having to write C.</li>
+</ol>
+
+<h2 id="batteries-included:a21e944a85227ef87f7f95cec950182e">Batteries Included</h2>
+
+<p>Python ships with a lot of libraries, like the builtins above, that are not
+quite so generic.  Some examples that I&rsquo;ve used include a netrc parser, an IMAP
+client, some email parsing tools, and some stuff for building and working with
+iterators.  The awesome thing is that I&rsquo;ve written some fairly handy tools that
+in Perl would have certainly required me to reach for CPAN modules.</p>
+
+<p>What&rsquo;s not so awesome is that the libraries are clearly not of the high quality
+one would desire.  Here are two examples:</p>
+
+<p>First, the <a href="https://docs.python.org/2/library/netrc.html">core netrc library</a>
+can only select by host, instead of host and account.  This was causing a bug
+for me when using <a href="http://www.offlineimap.org/">OfflineIMAP</a>.  I rolled up my
+sleeves, cloned cpython, <a href="https://github.com/frioux/cpython/commit/5878f8c17944695483ff802087dc6b33ee4c10d0">fixed the
+bug</a>,
+and then found that it had been <a href="https://bugs.python.org/issue11416">reported, with a patch, five years
+ago</a>.  Not cool.</p>
+
+<p>Second, the builtin email libraries are pretty weak.  To get the content of a
+header I had to use the following code:</p>
+
+<pre><code>import email.header
+import re
+
+decoded_header = str(email.header.make_header(email.header.decode_header(header)))
+unfolded_header = re.sub('[\r\n]', '', decoded_header)
+</code></pre>
+
+<p>I&rsquo;m not impressed.</p>
+
+<p>There are more examples, but this should be sufficient.</p>
+
+<p>Now before you jump on me as a Perl programmer: Perl <em>definintely</em> has some weak
+spots in it&rsquo;s included libraries, but unlike with Python, the vast majority of
+those are actually on CPAN and can be updated without updating Perl.  Unless I
+am missing something, that is not the case with the Python core libraries.</p>
+
+<h2 id="prescriptive:a21e944a85227ef87f7f95cec950182e">Prescriptive</h2>
+
+<p>The Python community as a whole, or at least my interaction with it, seems to be
+fairly intent on defining the one-and-true way to do anything.  This is great
+for new programmers, but I find it condescending and unhelpful.  I like to say
+that the following are all the programmer&rsquo;s creed (stolen from various media):</p>
+
+<blockquote>
+<p>That which compiles is true.</p>
+
+<p>Nothing is True and Everything is Permissible</p>
+
+<p>&ldquo;Considered Harmful&rdquo; Considered Harmful</p>
+</blockquote>
+
+<h1 id="generally-not-awesome-stuff-about-python:a21e944a85227ef87f7f95cec950182e">Generally not awesome stuff about Python</h1>
+
+<p>As before, these are things that bother me about Python, in order.</p>
+
+<h2 id="variable-scope-and-declaration:a21e944a85227ef87f7f95cec950182e">Variable Scope and Declaration</h2>
+
+<p>Python seems to aim to be a boring but useful programming language.  Like Java,
+but a scripting language.  This is a laudable goal and I think Go is the newest
+in this tradition.  Why would a language that intends to be boring have any
+scoping rules that are not strictly and exclusively lexical?  If you know, tell
+me.</p>
+
+<p>In Perl, the following code would not even compile:</p>
+
+<pre><code>use strict;
+
+sub print_x { print(&quot;$x\n&quot;) }
+print_x();
+my $x = 1;
+print_x();
+</code></pre>
+
+<p>In Python, it does what a crazy person would expect:</p>
+
+<pre><code>def foo():
+   print(x)
+
+foo()
+x = 1
+foo()
+</code></pre>
+
+<p>The real problem here is that in Python, variables are never declared. It is not
+an error to set <code>x = 1</code> in Python, how else would you create the variable?  In
+Perl, you can define a variable as lexical with <code>my</code>, global with <code>our</code>, and
+dynamic with <code>local</code>.  Python is a sad mixture of lexical and global.  <a href="http://stackoverflow.com/a/292502/12448">The fact
+that anyone would ever need to explain
+scoping</a> implies that it&rsquo;s pretty
+weird.</p>
+
+<h2 id="pypi-and-the-lack-of-friends:a21e944a85227ef87f7f95cec950182e">PyPI and (the lack of) friends</h2>
+
+<p>I would argue that since the early 2000&rsquo;s, a critical part of a language is its
+ecosystem.  A language that has no libraries is lonely, dreary work.  Python has
+plenty of libraries, but the actual web presence of the ecosystem is crazily
+fractured.  Here are some things that both
+<a href="http://search.cpan.org/">search.cpan.org</a> and <a href="https://metacpan.org/">MetaCPAN</a>
+do that PyPI does not:</p>
+
+<ul>
+<li><strong>Include and render all of the documentation for all modules</strong> (<a href="https://metacpan.org/pod/DBIx::Class::Helper::ResultSet::CorrelateRelationship">example</a>)</li>
+<li>Include a web accessible version of all (or almost all) releases of the code (<a href="https://metacpan.org/source/DBIx::Class::Helper::ResultSet::Util">example</a>, <a href="https://metacpan.org/source/FREW/DBIx-Class-Helpers-0.092970/lib/DBIx/Class/Helper/JoinTable.pm">example</a>)</li>
+</ul>
+
+<p>And MetaCPAN does a ton more; here are features I often use:</p>
+
+<ul>
+<li>Parsing Changelogs (<a href="https://metacpan.org/release/FREW/DBIx-Class-Helpers-2.032001">Look at the top</a>)</li>
+<li>Linking directly to the source repository (<a href="https://metacpan.org/release/FREW/DBIx-Class-Helpers-2.032001">Look on the left</a>)</li>
+</ul>
+
+<p>And there&rsquo;s a constellation of other tools; here are my favorites:</p>
+
+<ul>
+<li><a href="http://www.cpantesters.org/">CPANTesters</a> aggregates the test results of individuals and smoke machines of huge amounts of CPAN on a ton of operating systems.  <a href="http://www.cpantesters.org/cpan/report/65619be2-03fc-11e6-a6f2-e12f13c359e3">Does your module run on Solaris?</a></li>
+<li><a href="http://rt.cpan.org/">rt.cpan.org</a> is a powerful issue tracker that creates a queue of issues for every module released on CPAN.  Nowadays with Github that&rsquo;s not as important as it used to be, but even <em>with</em> Github, RT still allows you to create issues without needing to login.</li>
+</ul>
+
+<h2 id="documentation:a21e944a85227ef87f7f95cec950182e">Documentation</h2>
+
+<p>This is related to my first complaint about PyPI above.  When I install software
+on my computer, I want to read the docs that are local to the installed version.
+There are two reasons for this:</p>
+
+<ol>
+<li>I don&rsquo;t want to accidentally read docs for a different version than what is installed.</li>
+<li>I want to be able to read documentation when the internet is out.</li>
+</ol>
+
+<p>Because the documentation of Python packages is so free form, people end up
+hosting their docs on random websites.  That&rsquo;s fine, I guess, but people end up
+<em>not</em> including the documentation in the installed module.  For example, if you
+install <a href="https://boltons.readthedocs.org/">boltons</a>, you&rsquo;ll note that while you
+can run <code>pydoc boltons</code>, there is no way to see <a href="https://boltons.readthedocs.org/en/latest/architecture.html">this
+page</a> via pydoc.
+Pretty frustrating.</p>
+
+<p>On top of that, the documentation by <em>convention</em> is
+<a href="http://docutils.sourceforge.net/rst.html">reStructuredText</a>.  rst is fine, as a
+format.  It&rsquo;s like markdown or POD (Perl&rsquo;s documentation format) or whatever.
+But there are (at least) two very frustrating issues with it:</p>
+
+<ol>
+<li>There is no general linking format.  In Perl, if I do <code>L&lt;DBIx::Class::Helpers&gt;</code>, it will link to the doc for that module.  Because of the free form documentation in Python, this is impossible.</li>
+<li>It doesn&rsquo;t render at all with pydoc; you just end up seeing all the noisy syntax.</li>
+</ol>
+
+<p>And it gets worse!  There is documentation for core Python that is stored on a
+wiki!  A good example is <a href="https://wiki.python.org/moin/TimeComplexity">the page about the time complexity of various
+builtins</a>.  There is no good reason
+for this documentation to not be bundled with the actual Python release.</p>
+
+<h2 id="matt-s-script-archive:a21e944a85227ef87f7f95cec950182e">matt&rsquo;s script archive</h2>
+
+<p>As much as the prescriptivism of Python exists to encourage the community to
+write things in a similar style; a ton of old code still exists that is just as
+crappy as all the old Perl code out there.</p>
+
+<p>I love examples, and I have a good one for this.  My little Python project
+involves parsing RSS (and Atom) feeds.  I asked around and was pointed at
+<a href="https://pythonhosted.org/feedparser/">feedparser</a>.  It&rsquo;s got a lot of
+shortcomings.  The one that comes to mind is, if you want to parse feeds without
+sanitizing the included html, you have to mutate a global.  Worse, this is only
+documented <a href="https://github.com/kurtmckee/feedparser/blob/develop/feedparser/api.py#L82-L84">in a comment in the source
+code</a>.</p>
+
+<h2 id="unicode:a21e944a85227ef87f7f95cec950182e">Unicode</h2>
+
+<p>Python has this frustrating behaviour when it comes to printing Unicode.
+Basically if the programmer is printing Unicode (the string is not bytes, but
+meaningful characters) to a console, Python assumes that it can encode as UTF8.
+If it&rsquo;s printing to anything else it defaults to ASCII and will often throw an
+exception.  This means you might have some code that works perfectly well when
+you are testing it Interactively, and when it happens to print just ASCII when
+redirected to a file, but when characters outside of ASCII show up it throws an
+exception.  (Try it and see: <code>python -c 'print(u&quot;\u0420&quot;)' | cat</code>)  (<a href="https://daveagp.wordpress.com/2010/10/26/what-a-character/">Read more
+here</a>.)</p>
+
+<p>It&rsquo;s also somewhat frustrating that the Python wiki complains that <a href="https://wiki.python.org/moin/StrIsNotAString">Python
+predates Unicode</a> and thus cannot
+be expected to support it, while Perl predates even Python, but has <em>excellent</em>
+support for Unicode built into Perl 5 (the equivalent of Python 2.x.)  A solid
+example that I can think of is that while Python encourages users to be aware of
+Unicode, it does not give users a way to compare strings ignoring case.  Here&rsquo;s
+an example of where that matters; if we are ignoring case, &ldquo;ß&rdquo; should be equal
+to &ldquo;ss&rdquo;.  In Perl you can verify this by running:
+<code>perl -Mutf8 -E'say &quot;equal&quot; if fc &quot;ß&quot; eq fc &quot;ss&quot;'</code>.  In Python one must
+download a package from PyPI which is documented as an order of magnitude slower
+than the core version from Python 3.</p>
+
+<h2 id="sigpipe:a21e944a85227ef87f7f95cec950182e">SIGPIPE</h2>
+
+<p>In Unix there is this signal, SIGPIPE, that gets sent to a process when the pipe
+it is writing to gets closed.  This can be a simple efficiency improvement, but
+even ignoring efficiency, it will get used.  Imagine you have code that reads
+from a database, then prints a line, then reads, etc.  If you wanted the first
+10 rows, you could pipe to <code>head -n10</code> and both truncate after the 10th line and
+kill the program.  In Python, this causes an exception to be thrown, so users of
+Python programs who know and love Unix will either be annoyed that they see a
+stack trace, or submit annoying patches to globally ignore SIGPIPE in your
+program.</p>
+
+<hr />
+
+<p>Overall, I think Python is a pretty great language to have available.  I still
+write Perl most of the time, but knowing Python has definitely been helpful.
+Another time I&rsquo;ll write a post about being a polyglot in general.</p>
+
+          Posted Thu, Apr 21, 2016
+
+          <div id="disqus_thread"></div>
+          <div id="disqus_loader" style="text-align: center">
+            <button style="width:100%" onclick="load_disqus()">Load Comments</button>
+            <script>
+              var disqus_loaded = false;
+              function load_disqus() {
+                  disqus_loaded = true;
+
+                  var disqus_shortname = 'afoolishmanifesto';
+                  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  var ldr = document.getElementById('disqus_loader');
+                  ldr.parentNode.removeChild(ldr);
+              }
+
+              if (window.location.hash.match(/(?:disqus_thread|comment-\d+)/)) {
+                  load_disqus();
+              }
+
+              window.onscroll = function(e) {
+                  if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                      
+                      if (disqus_loaded==false){ load_disqus() };
+                  }
+              };
+            </script>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <hr>
+      <footer id="footer">
+            <p class="pull-right"><a href="#top">Back to top</a></p>
+            <ul id="tags">
+              
+                <li><a href="/tags/python">python</a> </li>
+              
+                <li><a href="/tags/perl">perl</a> </li>
+              
+                <li><a href="/tags/generators">generators</a> </li>
+              
+                <li><a href="/tags/postmodernism">postmodernism</a> </li>
+              
+                <li><a href="/tags/prescriptivism">prescriptivism</a> </li>
+              
+            <li><a href="/tags">all tags</a></li>
+            </ul>
+      </footer>
+      </div>
+      <script src="/static/js/jquery.js"></script>
+      <script src="/static/js/bootstrap.min.js"></script>
+
+      <script>
+        $(document).ready(function() {
+            $("nav#TableOfContents a").click(function() {
+                $("html, body").animate({
+                    scrollTop: $($(this).attr("href")).offset().top-25 + "px"
+                }, {
+                    duration: 450,
+                });
+                return false;
+            });
+        });
+    </script>
+  </body>
+
+</html>
+

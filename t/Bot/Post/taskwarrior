@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>The Taskwarrior's Kusarigama - Hacking Thy Fearful Symmetry</title>    <link rel="alternate" 
+          type="application/atom+xml" 
+          title="Recent Entries" 
+          href="/feed/atom" />
+
+    <link rel="alternate" 
+          type="application/rss+xml" 
+          title="Recent Entries" 
+          href="/feed/rss" />
+<link href="/images/favicon.png" rel="shortcut icon" /><link href="/css/galuga.css" rel="stylesheet" /><script src="/javascripts/jquery.js" type="text/javascript"> </script><link href="/highlight/styles/github.css" rel="stylesheet" /><script src="/highlight/highlight.pack.js" type="text/javascript"> </script><script type="text/javascript">hljs.initHighlightingOnLoad();</script></head><body><div class="header"><div class="header-inner"><h1><a href="http://techblog.babyl.ca/">Hacking Thy Fearful Symmetry</a></h1><div class="tagline">Hacker, hacker coding bright</div></div></div><div class="main_body"><div class="left_column"><div class="widget"><h3>Recent entries</h3><ul><li><a href="/entry/groom">Groom That Yak</a></li><li><a href="/entry/taskwarrior">The Taskwarrior's Kusarigama</a></li><li><a href="/entry/dance-with-swagger">Dance With Swagger</a></li><li><a href="/entry/moosex-storage-with-roles">Making MooseX::Storage Play Nice with Runtime Roles</a></li><li><a href="/entry/json-schema-astype">Say 'Hello' to JSON::Schema::AsType</a></li></ul><div style="text-align:right;margin: 0px"><a href="/entries">all entries</a></div></div><div class="widget" style="text-align:center"><a href="http://github.com/yanick/galuga"><img alt="Powered by a Gamboling Beluga" src="/images/galuga_button.png" style="border: 0" /></a></div></div><div class="middle_column"><div class="blog_entry"><h1>The Taskwarrior's Kusarigama</h1><div class="entry_times"><span>created: March  6, 2016</span></div><p>I'm in love again. Well, okay, that's slightly inexact. Love has to do with dates. And this is more about task management.</p><p>(<em>ba bum tssssssh</em>)</p><p>Okay, seriously now. Managing my tasks is something that I tried to do for a long time, and never quite succeeded in doing in a satisfactory manner. In the days of yore, my ex-ex-company arranged for a <a href="https://franklinplanner.fcorgp.com">Franklin Planner</a> seminar, and it helped. And then I read <a href="http://gettingthingsdone.com/">Getting Things Done</a> (it helped too). But I tried to manage things on paper, and it didn't stick. And then I tried many, many software solutions across the years. Web services, shell aliases, vim plugins. A lot of them came <em>soooooo</em> close to be good solutions, but you know how particlar us hackers are about our itches; a scratchpost taking care of 90% of the itch can be just as maddening as no scratchpost at all. The offering that came the closest to make me happy was Hiveminder, by <a href="https://bestpractical.com/">Best Practical</a>. By now the service is discontinued, but if you feel brave the source code has been <a href="https://github.com/bestpractical/hiveminder/">made available on GitHub</a>.</p><p>And then, by chance I came across a (to me) new task management tool: <a href="http://taskwarrior.org">Taskwarrior</a>. It is cli-based, but comes with a daemon that makes it possible to keep tasks on several machines synchronized. It does tagging, recurrences, can hide tasks for a time, and has some inspired urgency algorithm. Even better: it supports excellent JSON exporting/importing and has a hook system <em>a la</em> Git that opens the doors wide for customization.</p><h2 id="hooksthatgetthejabdone">Hooks that get the jab done</h2><p>Taskwarrior run hooks for four types of event: when the command is launched, when a new task is added, when a task is modified, and when the command terminates. Just as for Git, the hooks are simple executables put in the <code>~/.task/hook</code> folder. The scripts are passed information about the task command being used, have access (and can alter) the tasks being created/modified, and have the capacity to abort the whole process.</p><h2 id="turningthosehooksintodeathlyweapons">Turning those hooks into deathly weapons</h2><p>This is already very good. But you know me. Leaving <em>very good</em> alone is not something I do. So I wrote a plugin system, <a href="https://github.com/yanick/Taskwarrior-Hooks">Taskwarrior::Hooks</a> to manage those hooks. It's not on CPAN yet because I still have to write the documentation, but let me give you a sneak peak.</p><h3 id="equippingthetaskwarrior">Equipping the Taskwarrior</h3><p>First thing is to drop in scripts that will invoke the <code>Taskwarrior::Hooks</code> system on all events. We can do that manually</p><pre><code>#!/usr/bin/env perl
+# file: ~/.task/hooks/on-launch-tw_hooks.pl
+
+use Taskwarrior::Hooks;
+
+Taskwarrior::Hooks-&gt;new( raw_args =&gt; \@ARGV )
+    -&gt;run_event( 'launch' ); # change event for the 4 scripts, natch
+</code></pre><p>or we can use the helper script that is included in the project, <code>twhooks</code>,</p><pre><code>$ twhooks install
+Installing hooks in /home/yanick/.task/hooks
+'/home/yanick/.task/hooks/on-exit-tw_hooks.pl' already exist, skipping
+'/home/yanick/.task/hooks/on-add-tw_hooks.pl' already exist, skipping
+'/home/yanick/.task/hooks/on-launch-tw_hooks.pl' already exist, skipping
+'/home/yanick/.task/hooks/on-modify-tw_hooks.pl' already exist, skipping
+Performing plugins setup...
+Done
+</code></pre><p>After that, we specify which plugins we want to use, and tweak the Taskwarrior configuration to accomodate them. For example</p><pre><code>$ task config twhooks.plugins Renew,Command::Before,Command::After,GitCommit
+
+# config for Renew plugin
+$ task config uda.renew.type    string
+$ task config uda.renew.label   creates a follow-up task upon closing
+$ task config uda.rdue.type     string
+$ task config uda.rdue.label    next task due date
+$ task config uda.rwait.type    string
+$ task config uda.rwait.label   next task wait period
+
+# etc
+</code></pre><p>Or, again, using <code>twhooks</code></p><pre><code>$ twhooks add Renew Command::Before Command::After GitCommit
+setting plugins to Renew, Command::Before, Command::After, GitCommit
+Config file /home/yanick/.taskrc modified.
+
+$ twhooks install
+Installing hooks in /home/yanick/.task/hooks
+'/home/yanick/.task/hooks/on-exit-tw_hooks.pl' already exist, skipping
+'/home/yanick/.task/hooks/on-add-tw_hooks.pl' already exist, skipping
+'/home/yanick/.task/hooks/on-launch-tw_hooks.pl' already exist, skipping
+'/home/yanick/.task/hooks/on-modify-tw_hooks.pl' already exist, skipping
+Performing plugins setup...
+-Taskwarrior::Hooks::Plugin::Renew
+-Taskwarrior::Hooks::Plugin::Command::Before
+creating pseudo-report 'before'
+Config file /home/yanick/.taskrc modified.
+-Taskwarrior::Hooks::Plugin::Command::After
+creating pseudo-report 'after'
+Config file /home/yanick/.taskrc modified.
+-Taskwarrior::Hooks::Plugin::GitCommit
+Done
+</code></pre><p>And that's it. Taskwarrior will now use those plugins. </p><p>Now, let's have a look at a few of those plugins, and see what the system can allow us to do.</p><h3 id="gitcommit-doingstuffenpassant">GitCommit - doing stuff <em>en passant</em></h3><p>The simplest plugins, those that don't do anything to the tasks themselves. <br></br> In the case of the <code>GitCommit</code> plugin, it turns the <code>~/.task</code> directory into a Git repository and perform a commit each time a command modify tasks. Why? Simply because, while Taskwarrior has history and an <code>undo</code> command, Git is still the ultime hackish backup mechanism for things that save their data in a text-ish format.</p><p>So, what does this plugin looks like? It looks like this:</p><pre><code>package Taskwarrior::Hooks::Plugin::GitCommit;
+
+use strict;
+use warnings;
+
+use Moo;
+
+extends 'Taskwarrior::Hooks::Hook';
+
+with 'Taskwarrior::Hooks::Hook::OnExit';
+
+use Git::Repository;
+
+sub on_exit {
+    my $self = shift;
+
+    my $dir = $self-&gt;data_dir;
+
+    unless( $dir-&gt;child('.git')-&gt;exists ) {
+        Git::Repository-&gt;command( init =&gt; $dir );
+        $self .= "initiated git repo for '$dir'";
+    }
+
+    my $git = Git::Repository-&gt;new( work_tree =&gt; $dir );
+
+    # no changes? Fine
+    return unless $git-&gt;run( 'status', '--short' );
+
+    $git-&gt;run( 'add', '.' );
+    $git-&gt;run( 'commit', '--message', 'on-exit saving' );
+};
+
+1;
+</code></pre><p>Pretty self-explanatory. Except maybe for the <code>$self .= "blah";</code> part. Taskwarrior hooks are expected to spit out optional feedback when things go well, or an error message if the hook aborts the operation. Aborting, and its error message are taken care of with issuing a <code>die</code> (we'll see an example of that in a subsequent plugin. For the feedback, it can be provided via <code>$self-&gt;add_feedback( "blah" )</code>, but I went a step cuter and overloaded the <code>.=</code> operator to do the same thing.</p><h3 id="projectalias-groomingtasks">ProjectAlias - grooming tasks</h3><p>Next step: having a plugin that modify tasks as they are created or modified. For example, with Taskwarrior you assign projects to tasks using the <code>project:foo</code> construct. That's long. I want to use <code>@</code> instead.</p><pre><code>package Taskwarrior::Hooks::Plugin::ProjectAlias
+
+use strict;
+use warnings;
+
+use Moo;
+
+extends 'Taskwarrior::Hooks::Hook';
+
+with 'Taskwarrior::Hooks::Hook::OnAdd';
+with 'Taskwarrior::Hooks::Hook::OnModify';
+
+sub on_add {
+    my( $self, $task ) = @_;
+
+    my $desc = $task-&gt;{description};
+
+    $desc =~ s/(?:^|\s)\@(\w+)// or return;
+
+    $task-&gt;{description} = $desc;
+
+    $task-&gt;{project} = $1;
+}
+
+sub on_modify { 
+    my $self = shift;
+    $self-&gt;on_add(@_);
+}
+
+1;
+</code></pre><p>Wasn't very hard to implement, was it? The tasks are passed to the <code>on_add</code> and <code>on_modify</code> as structures, and the JSON conversions are done by the plugin system for you. And while we can't see it here because it's a trivialy simple plugin, the <code>on_modify</code> method also get the old state of the task, and even provide the delta between the old structure and the new, to make detection of changes as easy as possible.</p><h3 id="renew-orchestringfollow-upactions">Renew - orchestring follow-up actions</h3><p>Okay, this is were things might get more interesting. Remember I mentioned Taskwarrior does recurrence? It does, but it only do "clockwork" recurrences. That is, if you set up a task to repeat itself every week on Monday, a new instance of the task will appear on each Monday, no matter if you complete the previous instance or not. Sometimes, that's what we want, but there are tasks -- like, say, watering the plants -- where we'd want the new task to be created when (and relative to) the previous instance is complete.</p><p>Fortunately, implementing that kind of behavior with our plugins is not too onerous. We tag those repeating tasks with a new attribute (<code>renew</code>), and will monitor when tasks get done to intervene and create their next iteration.</p><pre><code>package Taskwarrior::Hooks::Plugin::Renew;
+
+use strict;
+use warnings;
+
+use Clone 'clone';
+use List::AllUtils qw/ any /;
+
+use Moo;
+use MooseX::MungeHas;
+
+extends 'Taskwarrior::Hooks::Hook';
+
+with 'Taskwarrior::Hooks::Hook::OnExit';
+
+use experimental 'postderef';
+
+# will be used by `twhooks install`
+has custom_uda =&gt; sub{ +{
+    renew   =&gt; 'creates a follow-up task upon closing',
+    rdue    =&gt; 'next task due date',
+    rwait   =&gt; 'next task wait period',
+} };
+
+sub on_exit {
+    my( $self, @tasks ) = @_;
+
+    # only interested by closing tasks
+    return unless $self-&gt;command eq 'done';
+
+    my $renewed;
+
+    for my $task ( @tasks ) {
+        next unless any { $task-&gt;{$_} } qw/ renew rdue rwait /;
+        $renewed = 1;
+
+        my $new = clone($task);
+
+        delete $new-&gt;@{qw/ end modified entry status uuid /};
+
+        my $due = $new-&gt;{rdue};
+        $new-&gt;{due} = $self-&gt;calc($due) if $due;
+
+        my $wait = $new-&gt;{rwait};
+        $wait =~ s/due/$due/;
+        $new-&gt;{wait} = $self-&gt;calc($wait) if $wait;
+
+        $new-&gt;{status} = $wait ? 'waiting' : 'pending';
+
+        $self-&gt;import_task($new);
+    }
+
+    $self .= 'created follow-up tasks' if $renewed;
+}
+
+1;
+</code></pre><p>Still not too bad, isn't? And now we can create one of those renewing tasks via</p><pre><code>$ task add renew:1 rdue:now+1week rwait:due-3days Water plants
+</code></pre><h3 id="beforeafter-addingnewcommands">Before, After - adding new commands</h3><p>Something that I love about <code>Git</code> is how any script named <code>git-something</code> is invoked as the <code>something</code> subcommand for <code>git</code>. Taskwarrior, out of the box, doesn't do that. At least, not exactly. <strong>But</strong> it allows for custom reports. So... If we were a devious lot, we could piggyback on that feature, and use a plugin to detect if that report-cum-command is invoked, and hijack the process with it...</p><p>And, if nothing else, we <em>are</em> a devious lot... Devious, and lazy. Which is why <code>Taskwarrior::Hooks</code> implements a pseudo-event "onCommand", which intercepts those reports for us at launch-time.</p><p>For our example here, we have <code>Before</code>, which creates a new task and mark it as a depedency of an already-existing task. In other words, we'll be able to do</p><pre><code>$ task 100 before Do the thing that must come first
+</code></pre><p>instead of</p><pre><code>$ task add Do the thing that must come first
+$ task 100 mod depends:*whatever task id that new task has*
+</code></pre><p>And we do that via</p><pre><code>package Taskwarrior::Hooks::Plugin::Command::Before;
+
+use 5.10.0;
+
+use strict;
+use warnings;
+
+use Moo;
+
+extends 'Taskwarrior::Hooks::Hook';
+
+with 'Taskwarrior::Hooks::Hook::OnCommand';
+with 'Taskwarrior::Hooks::Hook::OnExit';
+
+sub on_command {
+    my $self = shift;
+
+    my $args = $self-&gt;args;
+    $args =~ s/(?&lt;=task)\s+(.*?)\s+before/ add revdepends:$1 /
+        or die "'$args' not in the expected format\n";
+
+    system $args;
+};
+
+sub on_exit {
+    my $self = shift;
+
+    for my $task ( grep { $_-&gt;{revdepends} } @_ ) {
+        for my $depending ( split ',', $task-&gt;{revdepends} ) {
+            system 'task', $depending, 'mod', 'depends:' . $task-&gt;{uuid};
+        }
+    }
+
+}
+
+1;
+</code></pre><p>Cute, eh?</p><h2 id="moretocome">More to come</h2><p>Assuming that I don't get distracted by other shinies, the cleaned-up, documented version of <code>Taskwarrior::Hooks</code> should hit CPAN at some point. Until then, there is the <a href="https://github.com/yanick/Taskwarrior-Hooks">GitHub repo</a>. I will also share my <code>fish</code> shell completion file as soon as it stabilize. And there is little doubt that a few utility scripts will pop up before long as well. So... stay tuned!</p>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE
+ * * * */
+        var disqus_shortname = 'hackingthyfearfulsymmetry'; 
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); 
+            dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] ||
+document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a
+href="http://disqus.com/?ref_noscript">comments powered by
+Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span
+class="logo-disqus">Disqus</span></a>
+    
+</div></div><div class="right_column"><div class="widget about"><h3>About the author</h3><div align="center"><div class="about_avatar"><img src="/images/dont_blink.png" style="border-radius: 50%" width="50%" /></div><div><b>Yanick Champoux</b></div><div><a href="http://metacpan.org/author/YANICK">Perl necrohacker</a>, <a href="http://academiedeschasseursdeprimes.ca">ACP writer,</a> orchid lover. Slightly bonker all around. Works at <a href="http://iinteractive.com/">Infinity Interactive</a></div></div></div><div class="widget ironman"><h3><a href="http://ironman.enlightenedperl.org/">Perl Iron Man Challenge</a></h3><div align="center"><img alt="Perl Iron Man Challenge badge" src="http://ironman.enlightenedperl.org/munger/mybadge/male/.png" /></div></div><script src="http://widgets.twimg.com/j/2/widget.js" type="text/javascript"> </script><script type="text/javascript">new TWTR.Widget({
+  version: 2,
+  type: 'profile',
+  rpp: 4,
+  interval: 6000,
+  width: 190,
+  height: 300,
+  theme: {
+    shell: {
+      background: '#333333',
+      color: '#ffffff'
+    },
+    tweets: {
+      background: '#000000',
+      color: '#ffffff',
+      links: '#4aed05'
+    }
+  },
+  features: {
+    scrollbar: true,
+    loop: false,
+    live: false,
+    hashtags: true,
+    timestamp: true,
+    avatars: false,
+    behavior: 'all'
+  }
+}).render().setUser('acp_nar').start();
+</script></div></div></body><div class="footer" style="clear: both" /></html>

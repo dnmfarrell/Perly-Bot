@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Groom That Yak - Hacking Thy Fearful Symmetry</title>    <link rel="alternate" 
+          type="application/atom+xml" 
+          title="Recent Entries" 
+          href="/feed/atom" />
+
+    <link rel="alternate" 
+          type="application/rss+xml" 
+          title="Recent Entries" 
+          href="/feed/rss" />
+<link href="/images/favicon.png" rel="shortcut icon" /><link href="/css/galuga.css" rel="stylesheet" /><script src="/javascripts/jquery.js" type="text/javascript"> </script><link href="/highlight/styles/github.css" rel="stylesheet" /><script src="/highlight/highlight.pack.js" type="text/javascript"> </script><script type="text/javascript">hljs.initHighlightingOnLoad();</script></head><body><div class="header"><div class="header-inner"><h1><a href="http://techblog.babyl.ca/">Hacking Thy Fearful Symmetry</a></h1><div class="tagline">Hacker, hacker coding bright</div></div></div><div class="main_body"><div class="left_column"><div class="widget"><h3>Recent entries</h3><ul><li><a href="/entry/groom">Groom That Yak</a></li><li><a href="/entry/taskwarrior">The Taskwarrior's Kusarigama</a></li><li><a href="/entry/dance-with-swagger">Dance With Swagger</a></li><li><a href="/entry/moosex-storage-with-roles">Making MooseX::Storage Play Nice with Runtime Roles</a></li><li><a href="/entry/json-schema-astype">Say 'Hello' to JSON::Schema::AsType</a></li></ul><div style="text-align:right;margin: 0px"><a href="/entries">all entries</a></div></div><div class="widget" style="text-align:center"><a href="http://github.com/yanick/galuga"><img alt="Powered by a Gamboling Beluga" src="/images/galuga_button.png" style="border: 0" /></a></div></div><div class="middle_column"><div class="blog_entry"><h1>Groom That Yak</h1><div class="entry_times"><span>created: April 28, 2016</span></div><p>Here's a super quick one. </p><p>So, for giggles I'm learning Swift. And for practice, I'm using <a href="http://exercism.io">exercism.io</a>. A few hours ago, I wrote my first test and stuff:</p><pre><code class="xml">
+$ swiftc *.swift; and ./main 
+Test Suite 'All tests' started at 00:22:13.561
+Test Suite 'hamming.xctest' started at 00:22:13.562
+Test Suite 'HammingTest' started at 00:22:13.562
+Test Case 'HammingTest.testNoDifferenceBetweenEmptyStrands' started at 00:22:13.562
+Test Case 'HammingTest.testNoDifferenceBetweenEmptyStrands' passed (0.0 seconds).
+Test Case 'HammingTest.testNoDifferenceBetweenIdenticalStrands' started at 00:22:13.562
+Test Case 'HammingTest.testNoDifferenceBetweenIdenticalStrands' passed (0.0 seconds).
+Test Case 'HammingTest.testCompleteHammingDistanceInSmallStrand' started at 00:22:13.563
+Test Case 'HammingTest.testCompleteHammingDistanceInSmallStrand' passed (0.0 seconds).
+Test Case 'HammingTest.testSmallHammingDistanceInMiddleSomewhere' started at 00:22:13.563
+Test Case 'HammingTest.testSmallHammingDistanceInMiddleSomewhere' passed (0.0 seconds).
+Test Case 'HammingTest.testLargerDistance' started at 00:22:13.563
+Test Case 'HammingTest.testLargerDistance' passed (0.0 seconds).
+Test Case 'HammingTest.testReturnsNilWhenOtherStrandLonger' started at 00:22:13.563
+HammingTest.swift:39: error: HammingTest.testReturnsNilWhenOtherStrandLonger : XCTAssertNil failed: "1" - Different length strands return nil
+Test Case 'HammingTest.testReturnsNilWhenOtherStrandLonger' failed (0.0 seconds).
+Test Case 'HammingTest.testReturnsNilWhenOriginalStrandLonger' started at 00:22:13.563
+HammingTest.swift:44: error: HammingTest.testReturnsNilWhenOriginalStrandLonger : XCTAssertNil failed: "1" - Different length strands return nil
+Test Case 'HammingTest.testReturnsNilWhenOriginalStrandLonger' failed (0.0 seconds).
+Test Suite 'HammingTest' failed at 00:22:13.563
+        Executed 7 tests, with 2 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'hamming.xctest' failed at 00:22:13.563
+        Executed 7 tests, with 2 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'All tests' failed at 00:22:13.563
+        Executed 7 tests, with 2 failures (0 unexpected) in 0.0 (0.0) seconds
+</code></pre><p>That's fine, but holy wall of text, Batman... It's not the worst thing I ever had to peer at (I'm looking at you, all and every java logging system ever conceived), but it's still not the most readable thing ever.</p><p>So... I'm probably re-inventing a perfectly fine wheel existing somewhere else (and if I am, please enlight me in the comment section), but I blurped a quick tool called <a href="https://github.com/yanick/environment/blob/master/bin/groom">groom</a>. The idea is to define regexes in a config file to act on lines that I have colored or altered.</p><p>For example, for those Swift test results I created the following <code>groom.yaml</code> rule file.</p><pre><code class="yaml">
+# show the testcase names in glorious green
+- 
+    "^Test Case":
+        eval: |
+            s/(?&lt;=')(+)/colored [ 'green' ], $1 /e;
+        fallthrough: 1
+# remove the 'started' lines altogether
+- started: 
+    eval: $_ = ''
+# victory or defeat, unicoded and colored
+- passed: 
+    color: blue
+    only_match: 1
+    eval: s/^/â /
+- failed: 
+    color: red
+    only_match: 1
+    eval: s/^/â /
+# final lines underlined for emphasis
+-
+    "^\s+Executed": rgb202 underline
+</code></pre><p>Which gives me</p><p><img alt="groomed screenshot" id="groomedscreenshot" src="/entry/groom/files/swift.png"></img></p><p>Purty, eh?</p>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE
+ * * * */
+        var disqus_shortname = 'hackingthyfearfulsymmetry'; 
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); 
+            dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] ||
+document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a
+href="http://disqus.com/?ref_noscript">comments powered by
+Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span
+class="logo-disqus">Disqus</span></a>
+    
+</div></div><div class="right_column"><div class="widget about"><h3>About the author</h3><div align="center"><div class="about_avatar"><img src="/images/dont_blink.png" style="border-radius: 50%" width="50%" /></div><div><b>Yanick Champoux</b></div><div><a href="http://metacpan.org/author/YANICK">Perl necrohacker</a>, <a href="http://academiedeschasseursdeprimes.ca">ACP writer,</a> orchid lover. Slightly bonker all around. Works at <a href="http://iinteractive.com/">Infinity Interactive</a></div></div></div><div class="widget ironman"><h3><a href="http://ironman.enlightenedperl.org/">Perl Iron Man Challenge</a></h3><div align="center"><img alt="Perl Iron Man Challenge badge" src="http://ironman.enlightenedperl.org/munger/mybadge/male/.png" /></div></div><script src="http://widgets.twimg.com/j/2/widget.js" type="text/javascript"> </script><script type="text/javascript">new TWTR.Widget({
+  version: 2,
+  type: 'profile',
+  rpp: 4,
+  interval: 6000,
+  width: 190,
+  height: 300,
+  theme: {
+    shell: {
+      background: '#333333',
+      color: '#ffffff'
+    },
+    tweets: {
+      background: '#000000',
+      color: '#ffffff',
+      links: '#4aed05'
+    }
+  },
+  features: {
+    scrollbar: true,
+    loop: false,
+    live: false,
+    hashtags: true,
+    timestamp: true,
+    avatars: false,
+    behavior: 'all'
+  }
+}).render().setUser('acp_nar').start();
+</script></div></div></body><div class="footer" style="clear: both" /></html>

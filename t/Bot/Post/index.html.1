@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en-US">
+	<head>
+				<link rel="profile" href="http://gmpg.org/xfn/11" />
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		
+		<title>Tech Interviewer Theory &laquo; House Absolute(ly) Pointless</title>
+		
+				<link rel="alternate" type="application/rss+xml" title="House Absolute(ly) Pointless &raquo; Feed" href="http://blog.urth.org/feed/" />
+<link rel="alternate" type="application/rss+xml" title="House Absolute(ly) Pointless &raquo; Comments Feed" href="http://blog.urth.org/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/blog.urth.org\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='openid-css'  href='http://blog.urth.org/wp-content/plugins/openid/f/openid.css?ver=519' type='text/css' media='all' />
+<link rel='stylesheet' id='crayon-css'  href='http://blog.urth.org/wp-content/plugins/crayon-syntax-highlighter/css/min/crayon.min.css?ver=_2.7.2_beta' type='text/css' media='all' />
+<link rel='stylesheet' id='gglcptch-css'  href='http://blog.urth.org/wp-content/plugins/google-captcha/css/gglcptch.css?ver=1.22' type='text/css' media='all' />
+<link rel='stylesheet' id='wpt-twitter-feed-css'  href='http://blog.urth.org/wp-content/plugins/wp-to-twitter/css/twitter-feed.css?ver=4.5' type='text/css' media='all' />
+<link rel='stylesheet' id='tw-bootstrap-css'  href='http://blog.urth.org/wp-content/themes/urth/css/bootstrap.min.css?ver=2.0.3' type='text/css' media='all' />
+<link rel='stylesheet' id='the-bootstrap-css'  href='http://blog.urth.org/wp-content/themes/urth/style.min.css?ver=1.0.0' type='text/css' media='all' />
+<link rel='stylesheet' id='urth-css'  href='http://blog.urth.org/wp-content/themes/urth/urth.css?ver=1.0.0' type='text/css' media='all' />
+<!-- This site uses the Google Analytics by MonsterInsights plugin v5.4.8.2 - Universal disabled - https://www.monsterinsights.com/ -->
+<script type="text/javascript">
+
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-1805706-3']);
+	_gaq.push(['_gat._forceSSL']);
+	_gaq.push(['_trackPageview']);
+
+	(function () {
+		var ga = document.createElement('script');
+		ga.type = 'text/javascript';
+		ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(ga, s);
+	})();
+
+</script>
+<!-- / Google Analytics by MonsterInsights -->
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/jquery/jquery.js?ver=1.12.3'></script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var quicktagsL10n = {"closeAllOpenTags":"Close all open tags","closeTags":"close tags","enterURL":"Enter the URL","enterImageURL":"Enter the URL of the image","enterImageDescription":"Enter a description of the image","textdirection":"text direction","toggleTextdirection":"Toggle Editor Text Direction","dfw":"Distraction-free writing mode","strong":"Bold","strongClose":"Close bold tag","em":"Italic","emClose":"Close italic tag","link":"Insert link","blockquote":"Blockquote","blockquoteClose":"Close blockquote tag","del":"Deleted text (strikethrough)","delClose":"Close deleted text tag","ins":"Inserted text","insClose":"Close inserted text tag","image":"Insert image","ul":"Bulleted list","ulClose":"Close bulleted list tag","ol":"Numbered list","olClose":"Close numbered list tag","li":"List item","liClose":"Close list item tag","code":"Code","codeClose":"Close code tag","more":"Insert Read More tag"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/quicktags.min.js?ver=4.5'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var CrayonSyntaxSettings = {"version":"_2.7.2_beta","is_admin":"0","ajaxurl":"http:\/\/blog.urth.org\/wp-admin\/admin-ajax.php","prefix":"crayon-","setting":"crayon-setting","selected":"crayon-setting-selected","changed":"crayon-setting-changed","special":"crayon-setting-special","orig_value":"data-orig-value","debug":""};
+var CrayonSyntaxStrings = {"copy":"Press %s to Copy, %s to Paste","minimize":"Click To Expand Code"};
+var CrayonTagEditorSettings = {"home_url":"http:\/\/blog.urth.org","css":"crayon-te","css_selected":"crayon-selected","code_css":"#crayon-code","url_css":"#crayon-url","url_info_css":"#crayon-te-url-info","lang_css":"#crayon-lang","title_css":"#crayon-title","mark_css":"#crayon-mark","range_css":"#crayon-range","inline_css":"crayon-inline","inline_hide_css":"crayon-hide-inline","inline_hide_only_css":"crayon-hide-inline-only","hl_css":"#crayon-highlight","switch_html":"#content-html","switch_tmce":"#content-tmce","tinymce_button_generic":".mce-btn","tinymce_button":"a.mce_crayon_tinymce,.mce-i-crayon_tinymce","tinymce_button_unique":"mce_crayon_tinymce","tinymce_highlight":"mce-active","submit_css":"#crayon-te-ok","cancel_css":"#crayon-te-cancel","content_css":"#crayon-te-content","dialog_title_css":"#crayon-te-title","submit_wrapper_css":"#crayon-te-submit-wrapper","data_value":"data-value","attr_sep":":","css_sep":"_","fallback_lang":"perl","add_text":"Add Code","edit_text":"Edit Code","quicktag_text":"crayon","submit_add":"Add","submit_edit":"Save","bar":"#crayon-te-bar","bar_content":"#crayon-te-bar-content","extensions":{"scpt":"applescript","applescript":"applescript","swf":"as","fla":"as","cs":"c#","h":"c++","hh":"c++","hpp":"c++","hxx":"c++","h++":"c++","cc":"c++","cpp":"c++","cxx":"c++","c++":"c++","pas":"delphi","java":"java","class":"java","jar":"java","mel":"mel","ma":"mel","mv":"miva","mvc":"miva","mvt":"miva","m":"objc","mm":"objc","psc":"papyrus","pl":"perl","py":"python","pyw":"python","pyc":"python","pyo":"python","pyd":"python","rb":"ruby","rbx":"ruby","rhtml":"ruby","vbs":"vb"}};
+var CrayonSyntaxSettings = {"version":"_2.7.2_beta","is_admin":"0","ajaxurl":"http:\/\/blog.urth.org\/wp-admin\/admin-ajax.php","prefix":"crayon-","setting":"crayon-setting","selected":"crayon-setting-selected","changed":"crayon-setting-changed","special":"crayon-setting-special","orig_value":"data-orig-value","debug":""};
+var CrayonSyntaxStrings = {"copy":"Press %s to Copy, %s to Paste","minimize":"Click To Expand Code"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://blog.urth.org/wp-content/plugins/crayon-syntax-highlighter/js/min/crayon.te.min.js?ver=_2.7.2_beta'></script>
+<link rel='https://api.w.org/' href='http://blog.urth.org/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://blog.urth.org/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://blog.urth.org/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Using Test2 to (Re-)Implement Test::Class::Moose' href='http://blog.urth.org/2016/02/25/using-test2-to-re-implement-testclassmoose/' />
+<link rel='next' title='Introduction to Moose at YAPC::NA 2016' href='http://blog.urth.org/2016/03/11/introduction-to-moose-at-yapcna-2016/' />
+<meta name="generator" content="WordPress 4.5" />
+<link rel="canonical" href="http://blog.urth.org/2016/03/08/tech-interviewer-theory/" />
+<link rel='shortlink' href='http://blog.urth.org/?p=850' />
+<link rel="alternate" type="application/json+oembed" href="http://blog.urth.org/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fblog.urth.org%2F2016%2F03%2F08%2Ftech-interviewer-theory%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://blog.urth.org/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fblog.urth.org%2F2016%2F03%2F08%2Ftech-interviewer-theory%2F&#038;format=xml" />
+
+<!-- BEGIN License added by Creative-Commons-Configurator plugin for WordPress -->
+<link rel="license" type="text/html" href="https://creativecommons.org/licenses/by-sa/4.0/" />
+<style type="text/css">
+p.cc-block { clear: both; width: 90%; margin: 8px auto; padding: 4px; text-align: center; border: 1px solid #cccccc; color: #000000; background-color: #eef6e6; }
+p.cc-block a:link, p.cc-block a:visited, p.cc-block a:hover, p.cc-block a:active { text-decoration: underline; color: #000000; border: none;}
+.cc-button { display: block; margin-left: auto; margin-right: auto; margin-top: 6px; margin-bottom: 6px; border-width: 0; }
+.wp-caption { border: 0; }
+.widget_bccl_widget { text-align: center; }
+</style>
+
+<!-- END License added by Creative-Commons-Configurator plugin for WordPress -->
+
+<meta http-equiv="X-XRDS-Location" content="http://blog.urth.org/?xrds" />
+<meta http-equiv="X-Yadis-Location" content="http://blog.urth.org/?xrds" />
+		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		<style type="text/css" media="all">
+/* <![CDATA[ */
+@import url("http://blog.urth.org/wp-content/plugins/wp-table-reloaded/css/plugin.css?ver=1.9.4");
+@import url("http://blog.urth.org/wp-content/plugins/wp-table-reloaded/css/datatables.css?ver=1.9.4");
+/* ]]> */
+</style>	<!--[if lt IE 9]>
+		<script src="http://blog.urth.org/wp-content/themes/urth/js/html5shiv.min.js" type="text/javascript"></script>
+		<script src="http://blog.urth.org/wp-content/themes/urth/js/respond.min.js" type="text/javascript"></script>
+	<![endif]-->
+		</head>
+	
+	<body class="singular single single-post postid-850 single-format-standard content-sidebar">
+		<div class="container">
+			<div id="page" class="hfeed row">
+								<header id="branding" role="banner" class="span12">
+										<hgroup>
+						<h1 id="site-title">
+							<a href="http://blog.urth.org/" title="House Absolute(ly) Pointless" rel="home">
+								<span>House Absolute(ly) Pointless</span>
+							</a>
+						</h1>
+						<h2 id="site-description">Unsubstantiated Opinions and Meaningless Blather</h2>
+					</hgroup>
+					
+					
+					<nav id="access" role="navigation">
+						<h3 class="assistive-text">Main menu</h3>
+						<div class="skip-link"><a class="assistive-text" href="#content" title="Skip to primary content">Skip to primary content</a></div>
+						<div class="skip-link"><a class="assistive-text" href="#secondary" title="Skip to secondary content">Skip to secondary content</a></div>
+												<div class="navbar">
+							<div class="navbar-inner">
+								<div class="container">
+									<!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+									<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+									</a>
+																		<div class="nav-collapse">
+											<form id="searchform" class="navbar-search pull-right" method="get" action="http://blog.urth.org/">
+						<label for="s" class="assistive-text hidden">Search</label>
+						<input type="search" class="search-query" name="s" id="s" placeholder="Search" />
+					</form>								    </div>
+								</div>
+							</div>
+						</div>
+											</nav><!-- #access -->
+									</header><!-- #branding -->
+<section id="primary" class="span9">
+	
+		<div id="content" role="main">
+		<article id="post-850" class="post-850 post type-post status-publish format-standard hentry category-uncategorized">
+		
+	<header class="page-header">
+		<h1 class="entry-title">Tech Interviewer Theory</h1>		<div class="entry-meta"><span class="sep">Posted on </span><a href="http://blog.urth.org/2016/03/08/tech-interviewer-theory/" title="18:52" rel="bookmark"><time class="entry-date" datetime="2016-03-08T18:52:10+00:00" pubdate>March 8, 2016</time></a><span class="by-author"> <span class="sep"> by </span> <span class="author vcard"><a class="url fn n" href="http://blog.urth.org/author/autarch/" title="View all posts by Dave Rolsky" rel="author">Dave Rolsky</a></span></span>		<span class="sep"> | </span>
+		<span class="comments-link">
+             <span>No replies</span>		</span>
+    </div><!-- .entry-meta -->
+	</header><!-- .entry-header -->
+
+	<div class="entry-content clearfix">
+		<p>What sort of things can you learn when interviewing someone for a technical position? What questions are useful?</p>
+<p>This is a much-discussed and sometimes hotly debated topic in the tech world. I&#8217;ve done a fair bit of interviewing for my employer over the past few years. We&#8217;ve built an excellent technical team, either because or in spite of the interviews I&#8217;ve done.</p>
+<p>Here&#8217;s my unsubstantiated theory about unstructured interviews and what they&#8217;re good for. (My <strong>personal</strong> opinion, not my employer&#8217;s!)</p>
+<p>First of all, I know all about the research that says that unstructured interviews don&#8217;t predict <strong>performance</strong> for technical positions. I agree 100%. This is why we give candidates some sort of technical homework before scheduling an interview. We expect this to take no more than a few (2-3) hours at most. We review this homework before we decide whether or not to continue with the interview process. I weight this fairly heavily in the process, and I&#8217;ve rejected candidates simply based on reviewing their homework submission.</p>
+<p>But <strong>the unstructured interview is still important</strong>. Here are some of the things I think I can learn from the iinterview, and some of the questions I use to figure those things out.</p>
+<p><strong>Does the candidate actually want this particular job?</strong> Enthusiasm matters. I&#8217;m not looking for a cheerleader, but I also don&#8217;t want someone who&#8217;d be happy with absolutely any job. One question I might ask to get a sense of this would be &#8220;What appeals to you about this position?&#8221; I can also get a sense of this based on the questions that the candidate asks me.</p>
+<p><strong>Is this position a good fit for this particular candidate?</strong> I want to make sure that the candidate has a clear understanding of the position, specifically their work duties, time requirements, expectations, etc. Some questions along these lines would be &#8220;What are the most important things for you in a position?&#8221; and &#8220;What do you need from the rest of the company in order to do your best work?&#8221; If someone says that the most important thing is working on mobile apps written in Haskell and we don&#8217;t do that (because no one does), then that&#8217;s a good reason not to hire them!</p>
+<p><strong>Can they telecommute and/or work with telecommuters effectively?</strong> Most of our team is remote, so even if a team member works at the office, they are effectively telecommuting. I just want to be sure that they either have experience with telecommuting or some idea of what this entails. If they haven&#8217;t done it before, do they have a work space that they can use? Do they have a plan for dealing with the challenges of working at home?</p>
+<p><strong>Can the candidate communicate effectively? Are they pleasant to talk to?</strong> Some people are not good communicators. Sometimes two people just don&#8217;t mesh well and rub each other the wrong way. Maybe I interview someone and just don&#8217;t enjoy talking to them. This doesn&#8217;t mean they&#8217;re a bad person or bad at their job, but it does mean that we shouldn&#8217;t work together.</p>
+<p><strong>Can they communicate effectively about technical topics?</strong> One question I&#8217;ve asked people is simply &#8220;What is OO?&#8221; There are many right answers to this question, but the real goal is to make sure that they can communicate about a technical topic clearly. If someone doesn&#8217;t know any of the terminology around OO (&#8220;class&#8221;, &#8220;instance&#8221;, &#8220;attribute/field/slot&#8221;, etc.) then it&#8217;s going to be hard to provide code review on OO code. Note that some people can write code well and still not be able to communicate about it.</p>
+<p><strong>Can they communicate effectively with non-technical people?</strong> For most positions I&#8217;ve hired for, our expectation is that the person being hired will be working not just with the engineering team, but also with a product manager, sales and marketing, support, etc. I want to make sure that the candidate can communicate with these people. We do a short role-playing exercise where one of the interviewers pretends to be a non-technical customer asking them to build a specific product. Then we have them ask the interviewer questions to get a sense of the product requirements, constraints, etc.</p>
+<p><strong>Do they care about technical stuff?</strong> I want people who actually have opinions about doing their job well. I may ask them what tools they like and dislike, what they&#8217;d change about the tools they&#8217;ve used, etc. On the flip side, I don&#8217;t want someone who&#8217;s dogmatically opinionated either. (Or at the least, no more dogmatically opinionated than I am.)</p>
+<p><strong>Do they ask good questions?</strong> I expect candidates to come to the interview with questions of their own. If they don&#8217;t ask any, that&#8217;s a red flag that makes me wonder if they don&#8217;t care about their work environment, work process, etc. This does not make for an engaged coworker.</p>
+<p>There are also things I don&#8217;t look for in an interview.</p>
+<p><strong>Cultural fit.</strong> What is this? I have no idea. It&#8217;s way too broad and an easy excuse to simply reject people for not being enough like me.</p>
+<p><strong>Code-writing skill.</strong> That was already covered by the homework. I never ask specific technical questions unless I have a good reason to believe that the candidate knows about the topic. I might think that based on something specific in their cover letter or resume, or better yet based on their homework or FOSS work.</p>
+<p><strong>Will they work out long term?</strong> You can&#8217;t really answer this confidently from a short interview. What you can do is screen for obvious red flags that indicate that this person will not work well with the team you have, or that they will not like this position. In the latter case, I hope that this is a mutual decision. In my own job searches, I&#8217;ve had interviews where I came out knowing I <strong>didn&#8217;t</strong> want the job, and I consider those interviews quite successful!</p>
+<p>Will any of this guarantee that I will always find the best people? No, obviously not. Hiring is a difficult thing to do. But if you consider the goals of the interview carefully, you can make the best use of that time to improve your chances of finding the right people.</p>
+	</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+			</footer><!-- .entry-footer -->
+	
+	</article><!-- #post-850 -->
+		<p class="nocomments">Comments are closed.</p>
+			
+		<nav id="nav-single" class="pager">
+			<h3 class="assistive-text">Post navigation</h3>
+			<span class="next"><a href="http://blog.urth.org/2016/03/11/introduction-to-moose-at-yapcna-2016/" rel="next">Next Post <span class="meta-nav">&rarr;</span></a></span>
+			<span class="previous"><a href="http://blog.urth.org/2016/02/25/using-test2-to-re-implement-testclassmoose/" rel="prev"><span class="meta-nav">&larr;</span> Previous Post</a></span>
+		</nav><!-- #nav-single -->
+		
+			</div><!-- #content -->
+	</section><!-- #primary -->
+
+<section id="secondary" class="widget-area span3" role="complementary">
+	<aside id="search-2" class="widget well widget_search"><form method="get" id="searchform" class="form-search" action="http://blog.urth.org/">
+	<label for="s" class="assistive-text hidden">Search</label>
+	<div class="input-append">
+		<input id="s" class="span2 search-query" type="search" name="s" placeholder="Search"><!--
+	 --><button class="btn btn-primary" name="submit" id="searchsubmit" type="submit">Go</button>
+   	</div>
+</form>
+</aside><aside id="text-2" class="widget well widget_text"><h2 class="widget-title">About</h2>			<div class="textwidget"><p><img src="/files/import//43-square-148x150.jpg" alt="" title="square-148x150" width="49" height="50" class="alignright size-full wp-image-136" /></p>
+<p>This is Dave Rolsky's blog. It contains blog posts. These posts contain ideas, mostly in the form of words. The words are made of letters, and each letter is made of pixels. The pixels are made of turtles.</p>
+<p>Feel free to <a href="mailto:autarch@urth.org">email me</a>.</p>
+<ul>
+<li><a href="https://github.com/autarch" onclick="_gaq.push(['_trackEvent', 'outbound-widget', 'https://github.com/autarch', 'My GitHub Profile']);" >My GitHub Profile</a></li>
+<li><a href="https://metacpan.org/author/DROLSKY" onclick="_gaq.push(['_trackEvent', 'outbound-widget', 'https://metacpan.org/author/DROLSKY', 'My CPAN modules']);" >My CPAN modules</a></li>
+<li><a href="http://www.houseabsolute.com/resume.html" onclick="_gaq.push(['_trackEvent', 'outbound-widget', 'http://www.houseabsolute.com/resume.html', 'My resume']);" >My resume</a>
+</ul>
+</div>
+		</aside><aside id="recent-comments-3" class="widget well widget_recent_comments"><h2 class="widget-title">Recent Comments</h2><ul id="recentcomments"><li class="recentcomments"><span class="comment-author-link"><a href='https://www.wumpus-cave.net' rel='external nofollow' class='url'>Timm Murray</a></span> on <a href="http://blog.urth.org/2016/02/25/using-test2-to-re-implement-testclassmoose/#comment-2745">Using Test2 to (Re-)Implement Test::Class::Moose</a></li><li class="recentcomments"><span class="comment-author-link"><a href='https://p6weekly.wordpress.com/2016/02/08/2016-56-rakudo-starring/' rel='external nofollow' class='url'>2016.5,6 Rakudo Starring | Weekly changes in and around Perl 6</a></span> on <a href="http://blog.urth.org/2016/02/07/hacking-on-perl-6-rakudo-and-roast/#comment-2693">Hacking on Perl 6 (Rakudo and Roast)</a></li><li class="recentcomments"><span class="comment-author-link"><a href='https://p6weekly.wordpress.com/2015/11/30/2015-4849-arrays-shape-up-curli-lands-and-supply-splits/' rel='external nofollow' class='url'>2015.48/49 Arrays Shape Up, Curli Lands and Supply Splits | Weekly changes in and around Perl 6</a></span> on <a href="http://blog.urth.org/2015/11/29/perl-6-is-fun/#comment-2689">Perl 6 Is Fun</a></li><li class="recentcomments"><span class="comment-author-link"><a href='http://blog.urth.org' rel='external nofollow' class='url'>Dave Rolsky</a></span> on <a href="http://blog.urth.org/2015/08/19/parallels-between-anti-sweatshop-campaigns-and-consumer-advocacy-for-animals/#comment-2682">Parallels Between Anti-Sweatshop Campaigns and Consumer Advocacy for Animals</a></li><li class="recentcomments"><span class="comment-author-link">Jacy</span> on <a href="http://blog.urth.org/2015/08/19/parallels-between-anti-sweatshop-campaigns-and-consumer-advocacy-for-animals/#comment-2681">Parallels Between Anti-Sweatshop Campaigns and Consumer Advocacy for Animals</a></li></ul></aside><aside id="archives-3" class="widget well widget_archive"><h2 class="widget-title">Archives</h2>		<label class="screen-reader-text" for="archives-dropdown-3">Archives</label>
+		<select id="archives-dropdown-3" name="archive-dropdown" onchange='document.location.href=this.options[this.selectedIndex].value;'>
+			
+			<option value="">Select Month</option>
+				<option value='http://blog.urth.org/2016/03/'> March 2016 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2016/02/'> February 2016 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2016/01/'> January 2016 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2015/12/'> December 2015 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2015/11/'> November 2015 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2015/09/'> September 2015 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2015/08/'> August 2015 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2015/07/'> July 2015 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2015/06/'> June 2015 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2015/04/'> April 2015 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2015/01/'> January 2015 &nbsp;(4)</option>
+	<option value='http://blog.urth.org/2014/12/'> December 2014 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2014/11/'> November 2014 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2014/08/'> August 2014 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2014/07/'> July 2014 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2014/06/'> June 2014 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2014/05/'> May 2014 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2013/08/'> August 2013 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2013/05/'> May 2013 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2013/02/'> February 2013 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2013/01/'> January 2013 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2012/12/'> December 2012 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2012/11/'> November 2012 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2012/10/'> October 2012 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2012/09/'> September 2012 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2012/07/'> July 2012 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2012/06/'> June 2012 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2012/05/'> May 2012 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2012/04/'> April 2012 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2012/03/'> March 2012 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2012/01/'> January 2012 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2011/12/'> December 2011 &nbsp;(4)</option>
+	<option value='http://blog.urth.org/2011/10/'> October 2011 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2011/09/'> September 2011 &nbsp;(4)</option>
+	<option value='http://blog.urth.org/2011/08/'> August 2011 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2011/07/'> July 2011 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2011/06/'> June 2011 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2011/05/'> May 2011 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2011/04/'> April 2011 &nbsp;(5)</option>
+	<option value='http://blog.urth.org/2011/03/'> March 2011 &nbsp;(4)</option>
+	<option value='http://blog.urth.org/2011/01/'> January 2011 &nbsp;(5)</option>
+	<option value='http://blog.urth.org/2010/12/'> December 2010 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2010/11/'> November 2010 &nbsp;(4)</option>
+	<option value='http://blog.urth.org/2010/10/'> October 2010 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2010/09/'> September 2010 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2010/08/'> August 2010 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2010/07/'> July 2010 &nbsp;(4)</option>
+	<option value='http://blog.urth.org/2010/06/'> June 2010 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2010/05/'> May 2010 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2010/03/'> March 2010 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2010/02/'> February 2010 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2010/01/'> January 2010 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2009/12/'> December 2009 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2009/11/'> November 2009 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2009/10/'> October 2009 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2009/09/'> September 2009 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2009/08/'> August 2009 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2009/07/'> July 2009 &nbsp;(5)</option>
+	<option value='http://blog.urth.org/2009/06/'> June 2009 &nbsp;(4)</option>
+	<option value='http://blog.urth.org/2009/05/'> May 2009 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2009/04/'> April 2009 &nbsp;(4)</option>
+	<option value='http://blog.urth.org/2009/03/'> March 2009 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2009/02/'> February 2009 &nbsp;(7)</option>
+	<option value='http://blog.urth.org/2008/12/'> December 2008 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2008/11/'> November 2008 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2008/10/'> October 2008 &nbsp;(4)</option>
+	<option value='http://blog.urth.org/2008/09/'> September 2008 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2008/08/'> August 2008 &nbsp;(2)</option>
+	<option value='http://blog.urth.org/2007/09/'> September 2007 &nbsp;(1)</option>
+	<option value='http://blog.urth.org/2007/07/'> July 2007 &nbsp;(3)</option>
+	<option value='http://blog.urth.org/2007/06/'> June 2007 &nbsp;(2)</option>
+
+		</select>
+		</aside></section><!-- #secondary .widget-area -->
+				<footer id="colophon" role="contentinfo" class="span12">
+										<div id="page-footer" class="well clearfix">
+						<div id="site-generator">
+							<a	href="http://wordpress.org/"
+								title="Semantic Personal Publishing Platform"
+								target="_blank"
+								rel="generator">Somewhat shamefully powered by WordPress</a>
+						</div>
+                        <a href="http://creativecommons.org/licenses/by-sa/4.0/"><img src="http://blog.urth.org/wp-content/plugins/creative-commons-configurator-1/media/cc/by-sa/4.0/80x15.png"></a>
+                        Copyright &copy; 2016 David Rolsky. Some rights reserved.
+                        <br>
+                        All content on this site is licensed under the<br><a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a> unless otherwise noted.
+					</div><!-- #page-footer .well .clearfix -->
+									</footer><!-- #colophon -->
+							</div><!-- #page -->
+		</div><!-- .container -->
+	<!-- 27 queries. 0.386 seconds. -->
+	<link rel='stylesheet' id='buttons-css'  href='http://blog.urth.org/wp-includes/css/buttons.min.css?ver=4.5' type='text/css' media='all' />
+<script type='text/javascript' src='http://blog.urth.org/wp-content/themes/urth/js/bootstrap.min.js?ver=2.0.3'></script>
+<script type='text/javascript' src='http://blog.urth.org/wp-content/themes/urth/js/the-bootstrap.min.js?ver=1.0.0'></script>
+<script type='text/javascript' src='http://blog.urth.org/wp-content/themes/urth/js/urth.js?ver=1.0.0'></script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/wp-embed.min.js?ver=4.5'></script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/wp-a11y.min.js?ver=4.5'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var wpLinkL10n = {"title":"Insert\/edit link","update":"Update","save":"Add Link","noTitle":"(no title)","noMatchesFound":"No results found.","linkSelected":"Link selected.","linkInserted":"Link inserted."};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/wplink.min.js?ver=4.5'></script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/jquery/ui/core.min.js?ver=1.11.4'></script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/jquery/ui/widget.min.js?ver=1.11.4'></script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/jquery/ui/position.min.js?ver=1.11.4'></script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/jquery/ui/menu.min.js?ver=1.11.4'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var uiAutocompleteL10n = {"noResults":"No search results.","oneResult":"1 result found. Use up and down arrow keys to navigate.","manyResults":"%d results found. Use up and down arrow keys to navigate."};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://blog.urth.org/wp-includes/js/jquery/ui/autocomplete.min.js?ver=1.11.4'></script>
+
+		<script type="text/javascript">
+		tinyMCEPreInit = {
+			baseURL: "",
+			suffix: ".min",
+						mceInit: {},
+			qtInit: {'comment':{id:"comment",buttons:"strong,em,link,block,del,ins,img,ul,ol,li,code,more,close"}},
+			ref: {plugins:"",theme:"modern",language:""},
+			load_ext: function(url,lang){var sl=tinymce.ScriptLoader;sl.markDone(url+'/langs/'+lang+'.js');sl.markDone(url+'/langs/'+lang+'_dlg.js');}
+		};
+		</script>
+				<script type="text/javascript">
+		var ajaxurl = "/wp-admin/admin-ajax.php";
+		( function() {
+			var init, id, $wrap;
+
+			if ( typeof tinymce !== 'undefined' ) {
+				for ( id in tinyMCEPreInit.mceInit ) {
+					init = tinyMCEPreInit.mceInit[id];
+					$wrap = tinymce.$( '#wp-' + id + '-wrap' );
+
+					if ( ( $wrap.hasClass( 'tmce-active' ) || ! tinyMCEPreInit.qtInit.hasOwnProperty( id ) ) && ! init.wp_skip_init ) {
+						tinymce.init( init );
+
+						if ( ! window.wpActiveEditor ) {
+							window.wpActiveEditor = id;
+						}
+					}
+				}
+			}
+
+			if ( typeof quicktags !== 'undefined' ) {
+				for ( id in tinyMCEPreInit.qtInit ) {
+					quicktags( tinyMCEPreInit.qtInit[id] );
+
+					if ( ! window.wpActiveEditor ) {
+						window.wpActiveEditor = id;
+					}
+				}
+			}
+		}());
+		</script>
+				<div id="wp-link-backdrop" style="display: none"></div>
+		<div id="wp-link-wrap" class="wp-core-ui" style="display: none" role="dialog" aria-labelledby="link-modal-title">
+		<form id="wp-link" tabindex="-1">
+		<input type="hidden" id="_ajax_linking_nonce" name="_ajax_linking_nonce" value="84a5a80d5f" />		<h1 id="link-modal-title">Insert/edit link</h1>
+		<button type="button" id="wp-link-close"><span class="screen-reader-text">Close</span></button>
+		<div id="link-selector">
+			<div id="link-options">
+				<p class="howto" id="wplink-enter-url">Enter the destination URL</p>
+				<div>
+					<label><span>URL</span>
+					<input id="wp-link-url" type="text" aria-describedby="wplink-enter-url" /></label>
+				</div>
+				<div class="wp-link-text-field">
+					<label><span>Link Text</span>
+					<input id="wp-link-text" type="text" /></label>
+				</div>
+				<div class="link-target">
+					<label><span></span>
+					<input type="checkbox" id="wp-link-target" /> Open link in a new tab</label>
+				</div>
+			</div>
+			<p class="howto" id="wplink-link-existing-content">Or link to existing content</p>
+			<div id="search-panel">
+				<div class="link-search-wrapper">
+					<label>
+						<span class="search-label">Search</span>
+						<input type="search" id="wp-link-search" class="link-search-field" autocomplete="off" aria-describedby="wplink-link-existing-content" />
+						<span class="spinner"></span>
+					</label>
+				</div>
+				<div id="search-results" class="query-results" tabindex="0">
+					<ul></ul>
+					<div class="river-waiting">
+						<span class="spinner"></span>
+					</div>
+				</div>
+				<div id="most-recent-results" class="query-results" tabindex="0">
+					<div class="query-notice" id="query-notice-message">
+						<em class="query-notice-default">No search term specified. Showing recent items.</em>
+						<em class="query-notice-hint screen-reader-text">Search or use up and down arrow keys to select an item.</em>
+					</div>
+					<ul></ul>
+					<div class="river-waiting">
+						<span class="spinner"></span>
+					</div>
+ 				</div>
+ 			</div>
+		</div>
+		<div class="submitbox">
+			<div id="wp-link-cancel">
+				<button type="button" class="button">Cancel</button>
+			</div>
+			<div id="wp-link-update">
+				<input type="submit" value="Add Link" class="button button-primary" id="wp-link-submit" name="wp-link-submit">
+			</div>
+		</div>
+		</form>
+		</div>
+			</body>
+</html>
+
+<!-- ZenCache is NOT caching this page, because the PHP constant `ZENCACHE_ALLOWED` has been set to a boolean-ish `FALSE` value at runtime. Perhaps by WordPress itself, or by one of your themes/plugins. This usually means that you have a theme/plugin intentionally disabling the cache on this page; and it's usually for a very good reason. -->
