@@ -208,7 +208,7 @@ sub should_emit ( $post ) {
   $post->{killed} = \@killed;
   return 0 if @killed;
 
-  my %points = map { $_, $post->$_() // 0 } $post->_content_metric_methods;
+  my %points = map { $_, $post->$_( $post->raw_content ) // 0 } $post->_content_metric_methods;
   $post->{points} = \%points;
 
   my $points = sum( values %points );
@@ -234,14 +234,14 @@ you can override this in specialized post types.
 
 =cut
 
-sub looks_perly ( $post, $scalar_ref ) {
+sub looks_perly ( $post, $text ) {
   state $looks_perly =
     qr/\b(?:perl|cpan|moose|metacpan|module|subroutine|timtowdi|yapc|\:\:)\b/i;
 
-  $scalar_ref =~ $looks_perly;
+  $text =~ $looks_perly;
 }
 
-sub body_looks_perly ($self) { $self->looks_perly($self->body) }
+sub body_looks_perly ($self, $content = undef) { $self->looks_perly($self->body($content) ) }
 
 sub has_no_perlybot_tag ( $self ) { $self->raw_content =~ /no-perly-bot/i }
 

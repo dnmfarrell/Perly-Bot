@@ -80,7 +80,11 @@ sub run ( $package, $opts ) {
 
     my $emitted = 0;
     for my $post ( $posts->@* ) {
-      next unless $post->should_emit;
+      my $emit = eval { $post->should_emit };
+      if ($@) {
+        $logger->error($@);
+      }
+      next unless !$@ && $emit;
       $emitted += emit($post);
 
       # be nice to APIs

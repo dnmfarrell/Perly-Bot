@@ -27,6 +27,8 @@ my @test_files = (
   { domain => '6guts.wordpress.com', filename => 'index.html.2', word_count => 1, looks_perly => 1 },
   { domain => 'p6weekly.wordpress.com', filename => 'index.html.3', word_count => 1, looks_perly => 1 },
   { domain => '6guts.wordpress.com', filename => 'index.html.3', word_count => 1, looks_perly => 1 },
+  { domain => 'szabgab.com', filename => 'switching-gears.html', word_count => 1, looks_perly => 1 },
+  { domain => 'szabgab.com', filename => 'youtube-channel-at-1000-subscribers.html', word_count => '', looks_perly => 1 },
 );
 
 BEGIN { use_ok 'Perly::Bot::Post' }
