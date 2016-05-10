@@ -4,15 +4,15 @@ no warnings qw(experimental::signatures experimental::postderef);
 
 package Perly::Bot::Post;
 
-use namespace::autoclean;
-use Data::Dumper;
+use Perly::Bot::UserAgent;
+use Perly::Bot::Config;
 use HTML::Entities;
 use List::Util qw(sum any);
 use Time::Piece;
 
 use base 'Class::Accessor';
 __PACKAGE__->mk_accessors(
-  qw/url title description datetime proxy delay_seconds twitter feed/);
+  qw/url title description domain datetime content_regex delay_seconds twitter feed/);
 
 my $logger = Log::Log4perl->get_logger();
 
@@ -22,10 +22,6 @@ my $logger = Log::Log4perl->get_logger();
 
 Perly::Bot::Post - process a social media post
 
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
 =head1 FUNCTIONS
 
 =head2 clean_url
@@ -34,22 +30,23 @@ Removes the query component of the url. This is to reduce the risk of posting du
 
 =cut
 
-sub clean_url ( $self, $url ) {
-  my $uri       = Mojo::URL->new($url);
+sub clean_url ( $self, $url = undef ) {
+  my $uri       = Mojo::URL->new( ($url || $self->url) );
   my $clean_url = $uri->scheme . '://' . $uri->host . $uri->path;
   $logger->logcroak("Error cleaning [$url], got back undef") unless $clean_url;
   return $clean_url;
 }
 
+sub domain ($self) { $self->{domain} //= Mojo::URL->new($self->root_url)->host }
+
+
 =head2 root_url
 
-Returns the clean url, if the blog post url is a proxy, it will follow the proxy url and return the ultimate location the URL redirects to.
+Returns the clean url, it will follow the url and return the ultimate location the URL redirects to. Sets the post's raw content.
 
 =cut
 
 sub root_url ( $self ) {
-  return $self->clean_url( $self->url ) unless $self->proxy;
-
   # if we've already retrieved the root url, don't pull it again
   return $self->{_root_url} if exists $self->{_root_url};
 
@@ -69,6 +66,9 @@ sub root_url ( $self ) {
       }
     };
 
+    # set the post content
+    $self->{raw_content} = $response->body;
+
     $self->{_root_url} = $self->clean_url($url);
     return $self->{_root_url};
   }
@@ -76,6 +76,61 @@ sub root_url ( $self ) {
     $logger->logcroak( sprintf "Error requesting [%s] [%s] [%s]",
       $response->{url}, $response->code, $response->message );
   }
+}
+
+=head2 raw_content
+
+Returns the raw HTML of the post
+
+=cut
+
+sub raw_content ($self) {
+  return $self->{raw_content} if exists $self->{raw_content};
+  $self->root_url(); # fetch the article and set the content
+  return $self->{raw_content} or die 'root_url() did not set the post content';
+}
+
+=head2 extract_body_text
+
+Extracts text from the raw body HTML
+
+=cut
+
+sub extract_body_text ($self, $content = $self->raw_content){
+  my $regex = $self->get_extraction_regex;
+  my $paragraphs = join "\n", $content =~ /$regex/g;
+  die sprintf 'failed to extract text from [%s]', $self->domain unless $paragraphs;
+  $paragraphs =~ s/<\/?.+?>//g;
+  return decode_entities( $paragraphs );
+}
+
+sub get_extraction_regex ($self, $domain = $self->domain) {
+  state $domain_regexes = {
+    'blogs.perl.org'                  => qr/<div class="entry-body">(.+?)<!-- .entry-body -->/si,
+    'blog.plover.com'                 => qr/class="mainsection"(.+?)<\/table>/si,
+    'rjbs.manxome.org'                => qr/<div class='body markup:md'>(.+?)<div id='footer'>/si,
+    'blog.afoolishmanifesto.com'      => qr/<p>(.+?)<\/p>/si,
+    'perltricks.com'                  => qr/<article>(.+?)<\/article>/si,
+    'blog.geekuni.com'                => qr/<div class='post-header'>(.+?)<div class='post-footer'>/si,
+    'www.learning-perl.com'           => qr/<div class="entry">(.+?)<!-- END entry -->/si,
+    'www.masteringperl.org'           => qr/<div class="entry">(.+?)<!-- END entry -->/si,
+    'www.intermediateperl.com'        => qr/<div class="entry">(.+?)<!-- END entry -->/si,
+    'www.effectiveperlprogramming.com'=> qr/<div class="entry">(.+?)<!-- END entry -->/si,
+    'techblog.babyl.ca'               => qr/<div class="blog_entry">(.+?)<div id="disqus_thread">/si,
+    'www.dagolden.com'                => qr/<div class="entry-content">(.+?)<!-- .entry-content -->/si,
+    'p6weekly.wordpress.com'          => qr/<div class="entry-content">(.+?)<!-- .entry-content -->/si,
+    '6guts.wordpress.com'             => qr/<div class="entry-content">(.+?)<!-- .entry-content -->/si,
+    'perlhacks.com'                   => qr/<div class="entry-content">(.+?)<!-- .entry-content -->/si,
+    'blog.urth.com'                   => qr/<div class="entry-content(.+?)<!-- .entry-content -->/si,
+    'default'                         => qr/<p>(.+?)<\/p>/si,
+  };
+  my $key = exists $domain_regexes->{$domain} ? $domain : 'default';
+  $domain_regexes->{$key};
+}
+
+
+sub body ($self, $content = undef) {
+  $self->{body} //= $self->extract_body_text( $content )
 }
 
 =head2 decoded_title
@@ -102,17 +157,12 @@ post type!
 sub _content_exclusion_methods ( $self ) {
   qw(
     has_no_perlybot_tag
-    has_no_perlybot_comment
   );
 }
 
 sub _content_metric_methods ( $self ) {
-  qw(
-    description_length
-    description_looks_perly
-    description_author
-    perly_links
-    keywords
+  qw(body_looks_perly
+     body_word_count
   );
 }
 
@@ -147,8 +197,6 @@ sub fails_by_policy ( $post ) {
 sub threshold ( $self ) { 2 }
 
 sub should_emit ( $post ) {
-  my $config = Perly::Bot::Config->get_config;
-
   $logger->debug( sprintf 'Evaluating %s for emittal', $post->title );
 
   # these checks are for non-content things we configured
@@ -160,8 +208,6 @@ sub should_emit ( $post ) {
   $post->{killed} = \@killed;
   return 0 if @killed;
 
-  # these checks are for things that absolutely exclude the post
-  # no matter what else is going on
   my %points = map { $_, $post->$_() // 0 } $post->_content_metric_methods;
   $post->{points} = \%points;
 
@@ -190,49 +236,35 @@ you can override this in specialized post types.
 
 sub looks_perly ( $post, $scalar_ref ) {
   state $looks_perly =
-    qr/\b(?:perl|perl6|cpan|cpanm|moose|metacpan|module|timtowdi|yapc|\:\:)\b/i;
+    qr/\b(?:perl|cpan|moose|metacpan|module|subroutine|timtowdi|yapc|\:\:)\b/i;
 
-  $$scalar_ref =~ $looks_perly;
+  $scalar_ref =~ $looks_perly;
 }
 
-sub has_no_perlybot_tag ( $self )     { 0 }
-sub has_no_perlybot_comment ( $self ) { 0 }
+sub body_looks_perly ($self) { $self->looks_perly($self->body) }
 
-sub description_length ( $self ) { ( length( $self->description ) / 1000 ) % 3 }
+sub has_no_perlybot_tag ( $self ) { $self->raw_content =~ /no-perly-bot/i }
 
-sub description_looks_perly ( $self ) {
-  $self->looks_perly( \$self->description );
+sub word_count ($self, $content) {
+  my @words = split /\s+/, $content;
+  return scalar @words;
 }
-sub description_author ( $self ) { 0 }
-sub perly_links ( $self )        { 0 }
-sub keywords ( $self )           { 0 }
+sub body_word_count ( $self, $content = undef ) { $self->word_count( $self->body($content) ) > 150 }
 
 sub clone ( $self ) {
   state $storable = require Storable;
   my $clone = Storable::dclone($self);
 }
 
-sub dump ( $self ) {
-  my $clone = $self->clone;
-  $clone->{description} =~ s/ \A \s+ //x;
-  $clone->{description} = substr $clone->{description}, 0, 50;
-  $clone->{description} =~ s/ \s+ \z//x;
-  $clone->{description} =~ s/ \v+ / /x;
-
-  $clone->{datetime} = '...';
-
-  Dumper($clone);
-}
-
 =head1 TO DO
 
-=head1 SEE ALSO
+add per-domain regexes for extraction
 
 =head1 SOURCE AVAILABILITY
 
 This source is part of a GitHub project.
 
-	https://github.com/dnmfarrell/Perly-Bot
+  https://github.com/dnmfarrell/Perly-Bot
 
 =head1 AUTHOR
 
@@ -248,4 +280,3 @@ it under the same terms as Perl itself.
 =cut
 
 1;
-

@@ -74,7 +74,7 @@ sub has_posted ( $self, $post ) {
     'has_posted() requires a Perly::Bot::Post object as an argument')
     unless $post && $post->isa('Perly::Bot::Post');
 
-  $self->{chi}->is_valid( $post->root_url );
+  $self->{chi}->is_valid( $post->clean_url );
 }
 
 =head2 save_post ($post)

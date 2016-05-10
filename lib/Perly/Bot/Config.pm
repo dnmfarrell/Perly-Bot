@@ -8,6 +8,7 @@ package Perly::Bot::Config;
 use namespace::autoclean;
 use File::Spec::Functions;
 use Data::Dumper;
+use Path::Tiny;
 use YAML::XS;
 
 our $VERSION = '1.001';

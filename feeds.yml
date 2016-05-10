@@ -35,7 +35,6 @@
 - 
     url: http://feeds.feedburner.com/szabgab?format=xml
     type: rdf
-    proxy: 1
     twitter: szagab
 - 
     url: http://blog.twoshortplanks.com/feed/
@@ -106,7 +105,6 @@
 - 
     url: http://feeds.feedburner.com/PerlHacks
     type: rss
-    proxy: 1
     twitter: davorg
 - 
     url: http://techblog.babyl.ca/feed/atom
