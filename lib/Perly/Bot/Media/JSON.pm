@@ -3,6 +3,7 @@ use v5.22;
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 use JSON::XS qw/decode_json encode_json/;
+use Log::Log4perl;
 
 my $logger = Log::Log4perl->get_logger();
 

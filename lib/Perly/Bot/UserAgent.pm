@@ -1,6 +1,7 @@
 use v5.22;
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
+use Log::Log4perl;
 
 package Perly::Bot::UserAgent;
 
