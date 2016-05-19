@@ -9,6 +9,7 @@ use Perly::Bot::Config;
 use HTML::Entities;
 use List::Util qw(sum any);
 use Time::Piece;
+use Log::Log4perl;
 
 use base 'Class::Accessor';
 __PACKAGE__->mk_accessors(
@@ -48,15 +49,13 @@ Returns the clean url, it will follow the url and return the ultimate location t
 
 sub root_url ( $self ) {
   # if we've already retrieved the root url, don't pull it again
-  return $self->{_root_url} if exists $self->{_root_url};
+  return $self->{_root_url} if $self->{_root_url};
 
   $logger->debug( sprintf 'Finding the root url for [%s]', $self->url );
   if ( my $response = Perly::Bot::UserAgent->get_user_agent->get( $self->url ) )
   {
-    my $location = $response->headers->header('Location');
-
     my $url = do {
-      if ( my $location = $response->headers->header('Location') ) {
+      if ( my $location = $response->headers->header('location') ) {
         $logger->debug( sprintf "Location is [%s]", $location );
         $location;
       }
