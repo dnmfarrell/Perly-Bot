@@ -155,6 +155,7 @@ post type!
 
 sub _content_exclusion_methods ( $self ) {
   qw(
+    has_short_title
     has_no_perlybot_tag
   );
 }
@@ -193,7 +194,7 @@ sub fails_by_policy ( $post ) {
   return $post->{policy}{_sum};
 }
 
-sub threshold ( $self ) { 2 }
+sub threshold ( $self ) { 3 }
 
 sub should_emit ( $post ) {
   $logger->debug( sprintf 'Evaluating %s for emittal', $post->title );
@@ -207,7 +208,7 @@ sub should_emit ( $post ) {
   $post->{killed} = \@killed;
   return 0 if @killed;
 
-  my %points = map { $_, $post->$_( $post->raw_content ) // 0 } $post->_content_metric_methods;
+  my %points = map { $_, $post->$_( $post->raw_content ) || 0 } $post->_content_metric_methods;
   $post->{points} = \%points;
 
   my $points = sum( values %points );
@@ -225,6 +226,14 @@ to decide a value based on anything you like.
 =cut
 
 sub age_threshold_secs { Perly::Bot::Config->get_config->age_threshold_secs }
+
+=head2 has_short_title
+
+Returns true if the post has a title shorter than 6 characters.
+
+=cut
+
+sub has_short_title ( $post ) { length ($post->title || '') < 6 }
 
 =head2 looks_perly( POST )
 
@@ -254,10 +263,6 @@ sub clone ( $self ) {
   state $storable = require Storable;
   my $clone = Storable::dclone($self);
 }
-
-=head1 TO DO
-
-add per-domain regexes for extraction
 
 =head1 SOURCE AVAILABILITY
 
