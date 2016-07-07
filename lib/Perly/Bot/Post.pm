@@ -194,7 +194,7 @@ sub fails_by_policy ( $post ) {
   return $post->{policy}{_sum};
 }
 
-sub threshold ( $self ) { 3 }
+sub threshold ( $self ) { 2 }
 
 sub should_emit ( $post ) {
   $logger->debug( sprintf 'Evaluating %s for emittal', $post->title );
