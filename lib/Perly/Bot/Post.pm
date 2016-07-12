@@ -35,7 +35,7 @@ sub clean_url ( $self, $url = undef ) {
   my $uri       = Mojo::URL->new( ($url || $self->url) );
   my $clean_url = $uri->scheme . '://' . $uri->host . $uri->path;
   $logger->logcroak("Error cleaning [$url], got back undef") unless $clean_url;
-  $logger->debug( sprintf 'Cleaned [%s] to [%s]', $url, $clean_url);
+  $logger->debug(sprintf 'Cleaned URL to [%s]', $clean_url);
   return $clean_url;
 }
 
