@@ -35,6 +35,7 @@ sub clean_url ( $self, $url = undef ) {
   my $uri       = Mojo::URL->new( ($url || $self->url) );
   my $clean_url = $uri->scheme . '://' . $uri->host . $uri->path;
   $logger->logcroak("Error cleaning [$url], got back undef") unless $clean_url;
+  $logger->debug( sprintf 'Cleaned [%s] to [%s]', $url, $clean_url);
   return $clean_url;
 }
 
@@ -52,18 +53,11 @@ sub root_url ( $self ) {
   return $self->{_root_url} if $self->{_root_url};
 
   $logger->debug( sprintf 'Finding the root url for [%s]', $self->url );
-  if ( my $response = Perly::Bot::UserAgent->get_user_agent->get( $self->url ) )
+  my ($request, $response) = Perly::Bot::UserAgent->get_user_agent->get( $self->url );
+  if ($response)
   {
-    my $url = do {
-      if ( my $location = $response->headers->header('location') ) {
-        $logger->debug( sprintf "Location is [%s]", $location );
-        $location;
-      }
-      else {
-        $logger->debug( sprintf "No Location header from [%s]", $self->title );
-        $self->url;
-      }
-    };
+    my $url = $request->url->to_abs();
+    $logger->debug( sprintf "URL is [%s]", $url );
 
     # set the post content
     $self->{raw_content} = $response->body;
