@@ -31,7 +31,7 @@
     url: http://perltricks.com/index.xml
     type: rss
     delay_seconds: 0
-    media_targets: ['Perly::Bot::Media::Reddit']
+    media_targets: ['Perly::Bot::Media::JSON','Perly::Bot::Media::Reddit']
 - 
     url: http://feeds.feedburner.com/szabgab?format=xml
     type: rdf
@@ -54,7 +54,6 @@
     url: http://perlmaven.com/atom
     type: atom
     date_name: updated
-    active: 0 # deactivated includes links to articles behind a paywall: Maven Pro
 - 
     url: http://neilb.org/atom.xml
     type: atom
@@ -102,10 +101,10 @@
     url: http://www.wumpus-cave.net/feed/
     type: rss
     twitter: wumpuscave
-- 
-    url: http://feeds.feedburner.com/PerlHacks
-    type: rss
-    twitter: davorg
+ 
+   url: http://feeds.feedburner.com/PerlHacks
+   type: rss
+   twitter: davorg
 - 
     url: http://techblog.babyl.ca/feed/atom
     type: atom
@@ -135,9 +134,14 @@
 - 
     url: https://www.activestate.com/blog/rss.xml
     type: rss
+    active: 0 # non perl links! need a way to restrict content checks
 - 
     url: http://blog.geekuni.com/feeds/posts/default?alt=rss
     type: rss
 - 
     url:  https://feeds.feedburner.com/techbeacon/rss
+    type: rss
+    active: 0 # non perl links! need a way to restrict content checks
+- 
+    url:  http://www.olafalders.com/feed/
     type: rss
