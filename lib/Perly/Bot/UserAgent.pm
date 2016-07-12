@@ -22,7 +22,7 @@ sub new ( $class, $args = {} ) {
 
   my $ua = Mojo::UserAgent->new;
   $ua->request_timeout(30)->connect_timeout(30)->max_redirects(3)
-    ->transactor->name( $args->{name} );
+    ->transactor->name( 'Perly_Bot' );
 
   bless $ua, $class;
 }
