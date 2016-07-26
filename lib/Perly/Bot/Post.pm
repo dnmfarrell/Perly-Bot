@@ -102,7 +102,6 @@ sub get_extraction_regex ($self, $domain = $self->domain) {
     'blogs.perl.org'                  => qr/<div class="entry-body">(.+?)<!-- .entry-body -->/si,
     'blog.plover.com'                 => qr/class="mainsection"(.+?)<\/table>/si,
     'rjbs.manxome.org'                => qr/<div class='body markup:md'>(.+?)<div id='footer'>/si,
-    'blog.afoolishmanifesto.com'      => qr/<p>(.+?)<\/p>/si,
     'perltricks.com'                  => qr/<article>(.+?)<\/article>/si,
     'blog.geekuni.com'                => qr/<div class='post-header'>(.+?)<div class='post-footer'>/si,
     'www.learning-perl.com'           => qr/<div class="entry">(.+?)<!-- END entry -->/si,
@@ -115,6 +114,7 @@ sub get_extraction_regex ($self, $domain = $self->domain) {
     '6guts.wordpress.com'             => qr/<div class="entry-content">(.+?)<!-- .entry-content -->/si,
     'perlhacks.com'                   => qr/<div class="entry-content">(.+?)<!-- .entry-content -->/si,
     'blog.urth.com'                   => qr/<div class="entry-content(.+?)<!-- .entry-content -->/si,
+    'perlmaven.com'                   => qr/<div role="main" id="main">(.+?)<div class="prev-next">/si,
     'default'                         => qr/<p>(.+?)<\/p>/si,
   };
   my $key = exists $domain_regexes->{$domain} ? $domain : 'default';
