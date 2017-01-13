@@ -145,4 +145,7 @@
 - 
     url:  http://www.olafalders.com/feed/
     type: rss
+- 
+    url:  https://leonerds-code.blogspot.com/feeds/posts/default
+    type: atom
 

@@ -115,6 +115,7 @@ sub get_extraction_regex ($self, $domain = $self->domain) {
     'perlhacks.com'                   => qr/<div class="entry-content">(.+?)<!-- .entry-content -->/si,
     'blog.urth.com'                   => qr/<div class="entry-content(.+?)<!-- .entry-content -->/si,
     'perlmaven.com'                   => qr/<div role="main" id="main">(.+?)<div class="prev-next">/si,
+    'leonerds-code.blogspot.com'      => qr/articleBody(.+?)<div style="clear: both;">/si,
     'default'                         => qr/<p>(.+?)<\/p>/si,
   };
   my $key = exists $domain_regexes->{$domain} ? $domain : 'default';
