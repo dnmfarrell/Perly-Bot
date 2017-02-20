@@ -1,0 +1,13 @@
+#!/bin/sh
+HOME=/home/dfarrell
+
+diff=$(diff $HOME/.perly_bot/links.json $HOME/dnmfarrell.github.io/perlybot/links.json);
+if [ -n "$diff" ];then
+  eval `keychain --eval github`
+  cp $HOME/.perly_bot/links.json $HOME/dnmfarrell.github.io/perlybot/links.json
+  cd $HOME/dnmfarrell.github.io
+  git commit -am 'new links'
+  git fetch -p
+  git rebase origin master
+  git push origin master
+fi
