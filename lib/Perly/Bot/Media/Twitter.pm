@@ -48,7 +48,7 @@ sub _build_tweet ( $self, $blog_post ) {
   my $title   = $blog_post->decoded_title;
   my $url     = $blog_post->root_url;
   my $via     = $blog_post->twitter ? 'via @' . $blog_post->twitter : '';
-  my $hashtag = $self->{hashtag};
+  my $hashtag = "#$self->{hashtag}";
 
   my $char_count = 140;
   $char_count -= $url =~ /^https/ ? 23 : 22;
