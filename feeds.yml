@@ -28,7 +28,11 @@
     type: rss
     twitter: briandfoy_perl
 - 
-    url: http://perltricks.com/index.xml
+    url: https://www.learningperl6.com/feed/
+    type: rss
+    twitter: LearningPerl6
+- 
+    url: http://perl.com/index.xml
     type: rss
     delay_seconds: 0
     media_targets: ['Perly::Bot::Media::JSON','Perly::Bot::Media::Reddit']
@@ -49,11 +53,11 @@
 - 
     url: https://p6weekly.wordpress.com/feed/
     type: rss
-    twitter: loltimo
 - 
     url: http://perlmaven.com/atom
     type: atom
     date_name: updated
+    twitter: PerlMaven
 - 
     url: http://neilb.org/atom.xml
     type: atom
@@ -102,9 +106,9 @@
     type: rss
     twitter: wumpuscave
 - 
-   url: http://feeds.feedburner.com/PerlHacks
-   type: rss
-   twitter: davorg
+    url: http://feeds.feedburner.com/PerlHacks
+    type: rss
+    twitter: davorg
 - 
     url: http://techblog.babyl.ca/feed/atom
     type: atom
@@ -148,4 +152,3 @@
 - 
     url:  https://leonerds-code.blogspot.com/feeds/posts/default
     type: atom
-
