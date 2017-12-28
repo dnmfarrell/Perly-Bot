@@ -152,3 +152,6 @@
 - 
     url:  https://leonerds-code.blogspot.com/feeds/posts/default
     type: atom
+- 
+    url:  https://mojolicious.io/blog/index.rss
+    type: rss
