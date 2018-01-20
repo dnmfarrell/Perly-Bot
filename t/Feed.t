@@ -1,15 +1,12 @@
 use v5.22;
-use lib qw(t/lib);
+use lib qw(t/lib); # disable logging
 use Test::More 0.95;
-
-
 use YAML::XS 'LoadFile';
 
 my $feeds = LoadFile('t/test_feeds.yml');
 
 my $class = 'Perly::Bot::Feed';
 use_ok($class) or BAIL_OUT( "$class did not load" );
-
 
 for my $args (@$feeds)
 {
