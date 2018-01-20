@@ -55,7 +55,7 @@ sub load_config ( $self, $file ) {
   my $file_hash = YAML::XS::LoadFile( Path::Tiny->new($file)->canonpath );
   %$self = ( $self->%*, $file_hash->%* );
 
-  $self->{perlybot_path} = catfile( $ENV{HOME}, '.perly_bot' );
+  $self->{perlybot_path} //= catfile( $ENV{HOME}, '.perly_bot' );
 }
 
 sub remake_config ( $class, @args ) {
