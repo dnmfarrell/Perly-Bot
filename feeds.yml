@@ -8,50 +8,51 @@
     type: rdf
     twitter: rjbs
 - 
-    url: http://www.dagolden.com/index.php/feed/
+    url: http://www.dagolden.com/index.php/feed
     type: rss
     twitter: xdg
 - 
-    url: http://www.learning-perl.com/feed/
+    url: http://www.learning-perl.com/feed
     type: rss
     twitter: briandfoy_perl
 - 
-    url: http://www.intermediateperl.com/feed/
+    url: http://www.intermediateperl.com/feed
     type: rss
     twitter: briandfoy_perl
 - 
-    url: http://www.masteringperl.org/feed/
+    url: http://www.masteringperl.org/feed
     type: rss
     twitter: briandfoy_perl
 - 
-    url: http://www.effectiveperlprogramming.com/feed/
+    url: http://www.effectiveperlprogramming.com/feed
     type: rss
     twitter: briandfoy_perl
 - 
-    url: https://www.learningperl6.com/feed/
+    url: https://www.learningperl6.com/feed
     type: rss
     twitter: LearningPerl6
 - 
     url: http://perl.com/index.xml
     type: rss
     delay_seconds: 0
-    media_targets: ['Perly::Bot::Media::JSON','Perly::Bot::Media::Reddit']
+    twitter: PerlFoundation
 - 
     url: http://feeds.feedburner.com/szabgab?format=xml
     type: rdf
     twitter: szagab
 - 
-    url: http://blog.twoshortplanks.com/feed/
+    url: http://blog.twoshortplanks.com/feed
+    type: rss
+    active: 0
+- 
+    url: http://blog.laufeyjarson.com/feed
     type: rss
 - 
-    url: http://blog.laufeyjarson.com/feed/
-    type: rss
-- 
-    url: https://andreeapirvulescu.wordpress.com/feed/
+    url: https://andreeapirvulescu.wordpress.com/feed
     type: rss
     active: 0 # deactivated as blog is marked as private
 - 
-    url: https://p6weekly.wordpress.com/feed/
+    url: https://p6weekly.wordpress.com/feed
     type: rss
 - 
     url: http://perlmaven.com/atom
@@ -75,6 +76,7 @@
     type: atom
     date_name: published
     date_format: '%Y-%m-%dT%T%ms%z'
+    active: 0
 - 
     url: http://reneeb-perlblog.blogspot.com/atom.xml
     type: atom
@@ -93,7 +95,7 @@
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%SZ'
 - 
-    url: https://perlancar.wordpress.com/feed/
+    url: https://perlancar.wordpress.com/feed
     type: rss
 - 
     url: https://www.nu42.com/nu42.atom.xml
@@ -102,7 +104,7 @@
     date_format: '%Y-%m-%dT%T%z'
     twitter: sinan_unur
 - 
-    url: http://www.wumpus-cave.net/feed/
+    url: http://www.wumpus-cave.net/feed
     type: rss
     twitter: wumpuscave
 - 
@@ -121,20 +123,21 @@
     date_name: published
     twitter: mjdominus
 - 
-    url: http://blog.urth.org/feed/
+    url: http://blog.urth.org/feed
     type: rss
     twitter: houseabsolute
 - 
-    url: https://6guts.wordpress.com/feed/
+    url: https://6guts.wordpress.com/feed
     type: rss
     twitter: jnthnwrthngtn
 - 
-    url: https://perl6advent.wordpress.com/feed/atom/
+    url: https://perl6advent.wordpress.com/feed/atom
     type: atom
     date_name: published
 - 
     url: http://perlmodulesnet.tumblr.com/rss
     type: rss
+    active: 0
 - 
     url: https://www.activestate.com/blog/rss.xml
     type: rss
@@ -147,11 +150,12 @@
     type: rss
     active: 0 # non perl links! need a way to restrict content checks
 - 
-    url:  http://www.olafalders.com/feed/
+    url:  http://www.olafalders.com/feed
     type: rss
 - 
     url:  https://leonerds-code.blogspot.com/feeds/posts/default
     type: atom
 - 
     url:  https://mojolicious.io/blog/index.rss
-    type: rss
+    type: atom
+
