@@ -155,7 +155,8 @@
 - 
     url:  https://leonerds-code.blogspot.com/feeds/posts/default
     type: atom
-    date_format: '%Y-%m-%dT%T%z'
+    date_format: '%Y-%m-%dT%T%ms%z'
+    date_name: published
 - 
     url:  https://mojolicious.io/blog/index.rss
     type: atom
