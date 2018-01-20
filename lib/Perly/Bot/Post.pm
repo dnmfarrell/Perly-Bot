@@ -65,10 +65,6 @@ sub root_url ( $self ) {
     $self->{_root_url} = $self->clean_url($url);
     return $self->{_root_url};
   }
-  else {
-    $logger->logcroak( sprintf "Error requesting [%s] [%s] [%s]",
-      $response->{url}, $response->code, $response->message );
-  }
 }
 
 =head2 raw_content
