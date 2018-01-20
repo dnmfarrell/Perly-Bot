@@ -8,6 +8,7 @@ package Perly::Bot::Config;
 use namespace::autoclean;
 use File::Spec::Functions;
 use Data::Dumper;
+use Log::Log4perl;
 use Path::Tiny;
 use YAML::XS;
 
