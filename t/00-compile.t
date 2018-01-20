@@ -2,11 +2,14 @@ use Test::More;
 
 my @classes = qw(
   Perly::Bot
-  Perly::Bot::Feed
   Perly::Bot::Cache
-  Perly::Bot::Media::Twitter
+  Perly::Bot::Config
+  Perly::Bot::Feed
+  Perly::Bot::Media::JSON
   Perly::Bot::Media::Reddit
+  Perly::Bot::Media::Twitter
   Perly::Bot::Post
+  Perly::Bot::UserAgent
   );
 
 foreach my $class ( @classes )
