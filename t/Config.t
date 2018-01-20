@@ -20,8 +20,6 @@ subtest setup => sub {
 subtest new => sub {
 	my @args   = $config_file;
 	my $config = new_ok( $class, \@args );
-	can_ok( $config, '_config_setup' );
-	ok( $config->_config_setup, "_config_setup returns true" );
 	};
 
 subtest get_config => sub {
@@ -34,7 +32,6 @@ subtest get_config => sub {
 	};
 
 subtest media_objects => sub {
-	ok( $class->_config_setup, "_config_setup returns true" );
 	my $config = $class->get_config;
 	isa_ok( $config, $class );
 
