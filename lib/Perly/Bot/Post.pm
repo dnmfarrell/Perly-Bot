@@ -197,7 +197,10 @@ sub should_emit ( $post ) {
   # no matter what else is going on
   my @killed = grep { $post->$_() } $post->_content_exclusion_methods;
   $post->{killed} = \@killed;
-  return 0 if @killed;
+  if (@killed) {
+    $logger->trace( sprintf 'Failed content exclusion checks: [%s]. %s', join(',',@killed), $post->title );
+    return 0;
+  }
 
   my %points = map { $_, $post->$_( $post->raw_content ) || 0 } $post->_content_metric_methods;
   $post->{points} = \%points;
