@@ -161,3 +161,7 @@
     url:  https://mojolicious.io/blog/index.rss
     type: atom
 
+- 
+    url:  http://blog.kablamo.org/categories/perl/feed.xml
+    type: atom
+
