@@ -94,6 +94,7 @@
     type: atom
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%SZ'
+    media_targets: ['Perly::Bot::Media::JSON','Perly::Bot::Media::Twitter']
 - 
     url: https://perlancar.wordpress.com/feed
     type: rss
