@@ -159,8 +159,8 @@
     date_name: published
 - 
     url:  https://mojolicious.io/blog/index.rss
-    type: atom
+    type: rss
 - 
     url:  http://blog.kablamo.org/categories/perl/feed.xml
-    type: atom
+    type: rss
 
