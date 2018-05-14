@@ -164,6 +164,3 @@
 - 
     url:  http://blog.kablamo.org/categories/perl/feed.xml
     type: rss
-- 
-    url:  https://p6weekly.wordpress.com/feed
-    type: atom
