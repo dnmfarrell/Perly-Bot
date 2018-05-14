@@ -148,6 +148,7 @@ sub _content_exclusion_methods ( $self ) {
   qw(
     has_short_title
     has_no_perlybot_tag
+    no_byterock
   );
 }
 
@@ -246,6 +247,9 @@ sub looks_perly ( $post, $text ) {
 sub body_looks_perly ($self, $content = undef) { $self->looks_perly($self->body($content) ) }
 
 sub has_no_perlybot_tag ( $self ) { $self->raw_content =~ /no-perly-bot/i }
+
+# this user writes a lot of posts we don't want to share
+sub no_byterock ( $self ) { $self->raw_content =~ /byterock/i }
 
 sub word_count ($self, $content) {
   my @words = split /\s+/, $content;
