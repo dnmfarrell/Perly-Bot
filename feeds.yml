@@ -164,3 +164,6 @@
 - 
     url:  http://blog.kablamo.org/categories/perl/feed.xml
     type: rss
+-
+    url:  http://perlenespanol.com/foro/rss/news/digest/rss.xml.gz
+    type: rss
