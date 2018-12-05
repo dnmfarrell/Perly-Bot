@@ -211,6 +211,9 @@ sub extract_posts ( $self, $xml ) {
     $datetime_clean =~ s/([+\-][0-9][0-9]):([0-9][0-9]$)/$1$2/
       if $date_format =~ /\%z/;
 
+    # trim whitespace
+    $datetime_clean =~ s/\A\s+|\s+\Z//gm;
+
     # time::piece struggles with milliseconds
     if ( $self->date_format =~ /%ms/ ) {
       $datetime_clean =~ s/\.[0-9][0-9][0-9]//;
