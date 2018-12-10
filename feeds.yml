@@ -132,6 +132,11 @@
     type: rss
     twitter: jnthnwrthngtn
 - 
+    url: http://www.perladvent.org/2018/atom.xml
+    type: atom
+    date_name: updated
+    date_format: '%Y-%m-%dT%H:%M:%S%Z'
+- 
     url: https://perl6advent.wordpress.com/feed/atom
     type: atom
     date_name: published
