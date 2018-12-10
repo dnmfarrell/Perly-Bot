@@ -222,7 +222,7 @@ sub extract_posts ( $self, $xml ) {
     }
 
     # save some useful debugging info, datetimes are weird
-    if ( 0 && $logger->is_debug ) {
+    if ($logger->is_debug ) {
       $logger->debug( sprintf 'Parsing %s changed to %s using format %s',
         $datetime_raw, $datetime_clean, $date_format );
     }
