@@ -89,6 +89,8 @@
     type: rss
     date_format: '%a, %d %b %Y %T %Z'
     twitter: frioux
+    active: 0
+    # mostly Go programming now
 - 
     url: http://blogs.perl.org/atom.xml
     type: atom
