@@ -29,16 +29,17 @@ sub new ( $class, $args = {} ) {
 
 sub get ( $self, $url ) {
   my $tx = $self->SUPER::get($url);
-  unless ( $tx->success ) {
+  my $res = $tx->result;
+  unless ( $res->is_success ) {
     $logger->error(
       sprintf
         "Could not fetch [%s] Got a [%d]\n------\n%s\n------\n%s\n------\n",
-      $url, $tx->res->code, $tx->req->to_string, $tx->res->to_string );
+      $url, $res->code, $tx->req->to_string, $res->to_string );
     return;
   }
 
   if (wantarray) {
-    ( $tx->req, $tx->res, $tx );
+    ( $tx->req, $res, $tx );
   }
   else {
     $tx->res;
