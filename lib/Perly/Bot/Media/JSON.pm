@@ -59,7 +59,7 @@ sub send ( $self, $blog_post ) {
   @links = @links[ 0 .. $limit ];
 
   open my $fh_w, '>', $self->{filepath};
-  print $fh_w encode_json( \@links );
+  print $fh_w encode_json( \@links ), "\n";
 
   return 1;
 }
