@@ -2,22 +2,27 @@
 use strict;
 use warnings;
 use Getopt::Long 'GetOptions';
+use File::MimeInfo::Magic 'mimetype';
 use Path::Tiny 'path';
 use Paws;
 
 GetOptions(
-  'bucket=s' => \my $bucket,
+  'bucket=s' => \ my $bucket,
+  'prefix=s' => \ my $prefix,
   'region=s' => \(my $region = 'us-east-1'),
-  'file=s'   => \my $file,
+  'acl=s'    => \(my $acl    = 'public-read'),
 ) or die 'unrecognized options: ' . join ' ', @ARGV;
 
-my $pt  = path($file);
-my $s3  = Paws->service('S3', region => $region);
+my $s3 = Paws->service('S3', region => $region);
 
-$s3->PutObject(
-  ContentType => 'application/json',
-  Bucket      => $bucket,
-  Body        => $pt->slurp,
-  Key         => $pt->basename,
-  ACL         => 'public-read',
-);
+for my $file (@ARGV) {
+  my $pt  = path($file);
+  my $key = $prefix ? join('/',$prefix,$pt->basename) : $pt->basename;
+  $s3->PutObject(
+    ContentType => mimetype($file),
+    Bucket      => $bucket,
+    Body        => $pt->slurp,
+    Key         => $key,
+    ACL         => $acl,
+  );
+}
