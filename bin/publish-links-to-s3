@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use autodie;
+use strict;
+use warnings;
+use Getopt::Long 'GetOptions';
+use Path::Tiny 'path';
+use Paws;
+
+GetOptions(
+  'bucket=s' => \my $bucket,
+  'region=s' => \(my $region = 'us-east-1'),
+  'file=s'   => \my $file,
+) or die 'unrecognized options: ' . join ' ', @ARGV;
+
+my $pt  = path($file);
+my $s3  = Paws->service('S3', region => $region);
+
+$s3->PutObject(
+  ContentType => 'application/json',
+  Bucket      => $bucket,
+  Body        => $pt->slurp,
+  Key         => $pt->basename,
+  ACL         => 'public-read',
+);
