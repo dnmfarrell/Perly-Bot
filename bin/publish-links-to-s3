@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-use autodie;
 use strict;
 use warnings;
 use Getopt::Long 'GetOptions';
