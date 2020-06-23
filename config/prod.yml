@@ -1,0 +1,79 @@
+agent_string: 'Perly_Bot/v'
+should_emit: {
+  age_threshold_secs: 10000000
+}
+media: {
+  'Perly::Bot::Media::JSON': {
+    link_limit: 100,
+    filepath: /tmp/links.json
+  }
+}
+feeds:
+  - url: https://www.perl.com/article/index.xml
+    type: rss
+  - url: https://rjbs.manxome.org/rubric/entries/tags/perl?format=rss
+    type: rdf
+    active: 1
+  - url: https://xdg.me/blog/index.xml
+    type: rss
+  - url: http://www.learning-perl.com/feed
+    type: rss
+  - url: http://www.intermediateperl.com/feed
+    type: rss
+  - url: http://www.masteringperl.org/feed
+    type: rss
+  - url: http://www.effectiveperlprogramming.com/feed
+    type: rss
+  - url: https://www.learningraku.com/feed
+    type: rss
+  - url: http://perl.com/article/index.xml
+    type: rss
+  - url: http://blog.twoshortplanks.com/feed
+    type: rss
+    active: 0
+  - url: https://rakudoweekly.wordpress.com/feed
+    type: rss
+  - url: http://perlmaven.com/atom
+    type: atom
+    date_name: updated
+  - url: http://neilb.org/atom.xml
+    type: atom
+    date_name: published
+  - url: http://blogs.perl.org/atom.xml
+    type: atom
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%SZ'
+    media_targets: ['Perly::Bot::Media::JSON','Perly::Bot::Media::Twitter']
+  - url: https://perlancar.wordpress.com/feed
+    type: rss
+  - url: http://www.wumpus-cave.net/feed
+    type: rss
+  - url: http://feeds.feedburner.com/PerlHacks
+    type: rss
+  - url: http://techblog.babyl.ca/feed/atom
+    type: atom
+    date_name: published
+    date_format: '%Y-%m-%dT%H:%M:%SZ'
+    active: 0 # returns error
+  - url: http://blog.plover.com/prog/index.atom
+    type: atom
+    date_name: published
+  - url: http://blog.urth.org/feed
+    type: rss
+  - url: https://6guts.wordpress.com/feed
+    type: rss
+  - url: http://www.perladvent.org/2019/atom.xml
+    type: atom
+    date_name: updated
+    date_format: '%Y-%m-%dT%H:%M:%S%z'
+  - url: https://perl6advent.wordpress.com/feed/atom
+    type: atom
+    date_name: published
+  - url: http://blog.geekuni.com/feeds/posts/default?alt=rss
+    type: rss
+  - url:  http://www.olafalders.com/feed
+    type: rss
+  - url:  https://leonerds-code.blogspot.com/feeds/posts/default
+    type: atom
+    date_format: '%Y-%m-%dT%T%ms%z'
+    date_name: published

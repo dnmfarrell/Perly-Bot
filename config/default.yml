@@ -1,0 +1,13 @@
+agent_string: 'Perly_Bot/v'
+should_emit: {
+  age_threshold_secs: 10000000
+}
+media: {
+  'Perly::Bot::Media::JSON': {
+    link_limit: 100,
+    filepath: /tmp/links.json
+  }
+}
+feeds:
+  - url: https://www.perl.com/article/index.xml
+    type: rss

@@ -13,9 +13,7 @@ use Log::Log4perl;
 
 use base 'Class::Accessor';
 __PACKAGE__->mk_accessors(
-  qw/url title description domain datetime content_regex delay_seconds twitter feed/);
-
-my $logger = Log::Log4perl->get_logger();
+  qw/url title description domain datetime content_regex twitter feed/);
 
 =encoding utf8
 
@@ -31,11 +29,10 @@ Removes the query component of the url. This is to reduce the risk of posting du
 
 =cut
 
-sub clean_url ( $self, $url = undef ) {
-  my $uri       = Mojo::URL->new( ($url || $self->url) );
+sub clean_url ($self, $url = undef) {
+  my $uri       = Mojo::URL->new(($url || $self->url));
   my $clean_url = $uri->scheme . '://' . $uri->host . $uri->path;
-  $logger->logcroak("Error cleaning [$url], got back undef") unless $clean_url;
-  $logger->debug(sprintf 'Cleaned URL to [%s]', $clean_url);
+  printf STDERR "Cleaned URL to [%s]\n", $clean_url;
   return $clean_url;
 }
 
@@ -48,16 +45,15 @@ Returns the clean url, it will follow the url and return the ultimate location t
 
 =cut
 
-sub root_url ( $self ) {
+sub root_url ($self) {
   # if we've already retrieved the root url, don't pull it again
   return $self->{_root_url} if $self->{_root_url};
 
-  $logger->debug( sprintf 'Finding the root url for [%s]', $self->url );
-  my ($request, $response) = Perly::Bot::UserAgent->get_user_agent->get( $self->url );
+  my ($request, $response) = Perly::Bot::UserAgent->instance->get($self->url);
   if ($response)
   {
     my $url = $request->url->to_abs();
-    $logger->debug( sprintf "URL is [%s]", $url );
+    printf STDERR "URL is [%s]\n", $url;
 
     # set the post content
     $self->{raw_content} = $response->body;
@@ -90,7 +86,7 @@ sub extract_body_text ($self, $content = $self->raw_content){
   my $paragraphs = join "\n", $content =~ /$regex/g;
   die sprintf 'failed to extract text from [%s]', $self->domain unless $paragraphs;
   $paragraphs =~ s/<\/?.+?>//g;
-  return decode_entities( $paragraphs );
+  return decode_entities($paragraphs);
 }
 
 sub get_extraction_regex ($self, $domain = $self->domain) {
@@ -120,7 +116,7 @@ sub get_extraction_regex ($self, $domain = $self->domain) {
 
 
 sub body ($self, $content = undef) {
-  $self->{body} //= $self->extract_body_text( $content )
+  $self->{body} //= $self->extract_body_text($content)
 }
 
 =head2 decoded_title
@@ -129,7 +125,7 @@ Returns the blog post title decoded from html using L<HTML::Entities>. This is r
 
 =cut
 
-sub decoded_title ( $self ) { decode_entities( $self->title ) }
+sub decoded_title ($self) { decode_entities($self->title) }
 
 =head2 should_emit
 
@@ -144,52 +140,44 @@ post type!
 
 =cut
 
-sub _content_exclusion_methods ( $self ) {
+sub _content_exclusion_methods ($self) {
   qw(
     has_short_title
     has_no_perlybot_tag
     no_byterock
-  );
+ );
 }
 
-sub _content_metric_methods ( $self ) {
+sub _content_metric_methods ($self) {
   qw(body_looks_perly
      body_word_count
-  );
+ );
 }
 
-sub fails_by_policy ( $post ) {
-  my $config   = Perly::Bot::Config->get_config;
-  my $cache    = $config->cache;
+sub fails_by_policy ($post) {
   my $time_now = gmtime;
 
-  $logger->trace(
-    sprintf 'Fresh calculaton post age %d threshold %d',
-    $time_now - $post->datetime,
-    $post->age_threshold_secs
-  );
+  printf STDERR "Fresh calculaton post age %d threshold %d\n", 
+    $time_now - $post->datetime, $post->age_threshold_secs;
 
   my $policy = {
-    stale => ( $time_now - $post->datetime > $post->age_threshold_secs )
+    stale => ($time_now - $post->datetime > $post->age_threshold_secs)
     ? 1
     : 0,
-    embargo => ( $time_now - $post->datetime < $post->delay_seconds ) ? 2 : 0,
-    cached => $cache->has_posted($post) ? 4 : 0,
+    embargo => 0,
+    cached => 0,
   };
 
-  $logger->trace( 'Policy results: ' . join ',',
-    map { "$_=>$policy->{$_}" } sort keys %$policy );
-
   $post->{policy} = $policy;
-  $post->{policy}{_sum} = sum( values %$policy );
+  $post->{policy}{_sum} = sum(values %$policy);
 
   return $post->{policy}{_sum};
 }
 
-sub threshold ( $self ) { 2 }
+sub threshold ($self) { 2 }
 
-sub should_emit ( $post ) {
-  $logger->debug( sprintf 'Evaluating %s for emittal', $post->title );
+sub should_emit ($post) {
+  printf STDERR "Evaluating %s for emittal\n", $post->title;
 
   # these checks are for non-content things we configured
   return 0 if $post->fails_by_policy;
@@ -199,14 +187,16 @@ sub should_emit ( $post ) {
   my @killed = grep { $post->$_() } $post->_content_exclusion_methods;
   $post->{killed} = \@killed;
   if (@killed) {
-    $logger->trace( sprintf 'Failed content exclusion checks: [%s]. %s', join(',',@killed), $post->title );
+    printf STDERR "Failed content exclusion checks: [%s]. %s\n",
+      join(',',@killed), $post->title;
+
     return 0;
   }
 
-  my %points = map { $_, $post->$_( $post->raw_content ) || 0 } $post->_content_metric_methods;
+  my %points = map { $_, $post->$_($post->raw_content) || 0 } $post->_content_metric_methods;
   $post->{points} = \%points;
 
-  my $points = sum( values %points );
+  my $points = sum(values %points);
 
   return 1 if $points >= $post->threshold;
 
@@ -220,7 +210,7 @@ to decide a value based on anything you like.
 
 =cut
 
-sub age_threshold_secs { Perly::Bot::Config->get_config->age_threshold_secs }
+sub age_threshold_secs { Perly::Bot::Config->instance->age_threshold_secs }
 
 =head2 has_short_title
 
@@ -228,57 +218,38 @@ Returns true if the post has a title shorter than 6 characters.
 
 =cut
 
-sub has_short_title ( $post ) { length ($post->title || '') < 6 }
+sub has_short_title ($post) { length ($post->title || '') < 6 }
 
-=head2 looks_perly( POST )
+=head2 looks_perly(POST)
 
 Returns true if the post looks like it's about Perl. Since it's a method
 you can override this in specialized post types.
 
 =cut
 
-sub looks_perly ( $post, $text ) {
+sub looks_perly ($post, $text) {
   state $looks_perly =
     qr/\b(?:perl|cpan|moose|metacpan|module|subroutine|timtowdi|yapc|\:\:)\b/i;
 
   $text =~ $looks_perly;
 }
 
-sub body_looks_perly ($self, $content = undef) { $self->looks_perly($self->body($content) ) }
+sub body_looks_perly ($self, $content = undef) { $self->looks_perly($self->body($content)) }
 
-sub has_no_perlybot_tag ( $self ) { $self->raw_content =~ /no-perly-bot/i }
+sub has_no_perlybot_tag ($self) { $self->raw_content =~ /no-perly-bot/i }
 
 # this user writes a lot of posts we don't want to share
-sub no_byterock ( $self ) { $self->raw_content =~ /byterock/i }
+sub no_byterock ($self) { $self->raw_content =~ /byterock/i }
 
 sub word_count ($self, $content) {
   my @words = split /\s+/, $content;
   return scalar @words;
 }
-sub body_word_count ( $self, $content = undef ) { $self->word_count( $self->body($content) ) > 150 }
+sub body_word_count ($self, $content = undef) { $self->word_count($self->body($content)) > 150 }
 
-sub clone ( $self ) {
+sub clone ($self) {
   state $storable = require Storable;
   my $clone = Storable::dclone($self);
 }
-
-=head1 SOURCE AVAILABILITY
-
-This source is part of a GitHub project.
-
-  https://github.com/dnmfarrell/Perly-Bot
-
-=head1 AUTHOR
-
-David Farrell C<< <dfarrell@cpan.org> >>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright © 2015, David Farrell C<< <dfarrell@cpan.org> >>. All rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 1;

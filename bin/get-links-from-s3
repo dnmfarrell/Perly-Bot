@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long 'GetOptions';
+use File::MimeInfo::Magic 'mimetype';
+use Path::Tiny 'path';
+use Paws;
+
+GetOptions(
+  'out-dir=s' =>\(my $out_dir = '.'),
+  'bucket=s'  => \ my $bucket,
+  'region=s'  => \(my $region = 'us-east-1'),
+) or die 'unrecognized options: ' . join ' ', @ARGV;
+
+my $s3 = Paws->service('S3', region => $region);
+
+for my $file (@ARGV) {
+  my $res = $s3->GetObject(
+    Bucket => $bucket,
+    Key    => $file,
+  );
+  my $pt = path(join '/', $out_dir, $file);
+  $pt->spew($res->Body);
+}

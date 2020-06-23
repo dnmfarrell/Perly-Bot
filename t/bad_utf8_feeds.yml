@@ -1,4 +1,0 @@
--
-    url: http://www.pair.com/~comdog/atom.xml
-    type: atom
-    media_targets: ['Perly::Bot::Media::Reddit']

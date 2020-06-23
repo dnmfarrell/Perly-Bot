@@ -1,55 +1,40 @@
 package Perly::Bot::Media::JSON;
-use v5.22;
-use feature qw(signatures postderef);
-no warnings qw(experimental::signatures experimental::postderef);
-use JSON::XS qw/decode_json encode_json/;
-use Log::Log4perl;
+use autodie;
+use strict;
+use warnings;
+use Mojo::JSON qw/decode_json encode_json/;
 
-my $logger = Log::Log4perl->get_logger();
-
-=encoding utf8
-
-=head1 NAME
-
-Perly::Bot::Media::JSON - prepend links to a JSON file
-
-=head2 new ($args)
-
-Constructor, returns a new C<Perly::Bot::Media::JSON> object.
-
-Requires a hashref containing these key values:
-
-  link_limit => '...',
-  filepath   => '...',
-
-=cut
-
-sub new ( $class, $args ) {
-  my @missing = grep { !( exists $args->{$_} && defined $args->{$_} ) }
+sub new {
+  my ($class, $args) = @_;
+  my @missing = grep { !(exists $args->{$_} && defined $args->{$_}) }
     qw(filepath link_limit);
 
-  if (@missing) {
-    $logger->logcroak("Missing required parameters (@missing) for $class");
-  }
+  die "Missing required parameters (@missing) for $class" if @missing;
 
   return bless $args, $class;
 }
 
-sub send ( $self, $blog_post ) {
-  open my $fh_r, '<', $self->{filepath};
-  my $json = do { local $/; <$fh_r>; };
-  close $fh_r;
+sub emit {
+  my ($self, $blog_post) = @_;
 
-  # handle new file
-  $json ||= '[]';
+  my $json = '[]';
+  if (-e $self->{filepath}) {
+    open my $fh_r, '<', $self->{filepath};
+    $json = do { local $/; <$fh_r>; };
+    close $fh_r;
+  }
 
   my @links = @{ decode_json($json) };
-  unshift @links, {
-    url   => $blog_post->root_url,
-    title => $blog_post->decoded_title,
 
-    #YYYY-MM-DDT00:00:00
-    posted => $blog_post->datetime->datetime,
+  if (grep { $blog_post->root_url eq $_->{url} } @links) {
+    printf STDERR "already emitted %s, skipping\n", $blog_post->root_url;
+    return 1;
+  }
+
+  unshift @links, {
+    posted => $blog_post->datetime->datetime, #YYYY-MM-DDT00:00:00
+    title  => $blog_post->decoded_title,
+    url    => $blog_post->root_url,
   };
 
   # don't slice larger than our data or link limit
@@ -59,28 +44,9 @@ sub send ( $self, $blog_post ) {
   @links = @links[ 0 .. $limit ];
 
   open my $fh_w, '>', $self->{filepath};
-  print $fh_w encode_json( \@links ), "\n";
+  print $fh_w encode_json(\@links), "\n";
 
   return 1;
 }
-
-=head1 SOURCE AVAILABILITY
-
-This source is part of a GitHub project.
-
-  https://github.com/dnmfarrell/Perly-Bot
-
-=head1 AUTHOR
-
-David Farrell C<< <dfarrell@cpan.org> >>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright © 2015, David Farrell C<< <dfarrell@cpan.org> >>. All rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
 
 1;
