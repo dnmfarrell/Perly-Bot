@@ -1,6 +1,6 @@
 agent_string: 'Perly_Bot/v'
 should_emit: {
-  age_threshold_secs: 10000000
+  age_threshold_secs: 100000000
 }
 media: {
   'Perly::Bot::Media::JSON': {

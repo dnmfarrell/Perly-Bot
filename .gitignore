@@ -8,3 +8,5 @@ Makefile.old
 *.log
 cache
 t/cache
+credentials
+links.json

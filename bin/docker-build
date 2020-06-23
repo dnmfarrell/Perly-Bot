@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+set -x
+tar cvzf perly-bot.tar.gz bin lib config cpanfile credentials
+docker build -t perly-bot/app .
+rm perly-bot.tar.gz

@@ -9,7 +9,6 @@ use Perly::Bot::Config;
 use HTML::Entities;
 use List::Util qw(sum any);
 use Time::Piece;
-use Log::Log4perl;
 
 use base 'Class::Accessor';
 __PACKAGE__->mk_accessors(

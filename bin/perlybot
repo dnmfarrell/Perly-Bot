@@ -2,11 +2,8 @@
 use lib 'lib';
 use Perly::Bot;
 use Perly::Bot::Config;
-use Getopt::Long 'GetOptions';
 
-GetOptions(
-  'prod' => \my $prod,
-);
+my $prod = $ENV{PERLYBOT_PROD};
 
 Perly::Bot::Config->instance(tier => $prod ? 'prod' : 'default');
 Perly::Bot->new->run;

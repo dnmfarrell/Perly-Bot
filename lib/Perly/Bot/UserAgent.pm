@@ -33,7 +33,7 @@ sub get {
   unless ($res->is_success) {
     warn sprintf
         "Could not fetch [%s] Got a [%d]\n------\n%s\n------\n%s\n------\n",
-      $url, $res->code, $tx->req->to_string, $res->to_string);
+      $url, $res->code, $tx->req->to_string, $res->to_string;
     return;
   }
 
@@ -44,3 +44,5 @@ sub get {
     $tx->res;
   }
 }
+
+1;

@@ -1,6 +1,6 @@
 agent_string: 'Perly_Bot/v'
 should_emit: {
-  age_threshold_secs: 10000000
+  age_threshold_secs: 86400 # one day
 }
 media: {
   'Perly::Bot::Media::JSON': {
@@ -43,7 +43,6 @@ feeds:
     type: atom
     date_name: published
     date_format: '%Y-%m-%dT%H:%M:%SZ'
-    media_targets: ['Perly::Bot::Media::JSON','Perly::Bot::Media::Twitter']
   - url: https://perlancar.wordpress.com/feed
     type: rss
   - url: http://www.wumpus-cave.net/feed
