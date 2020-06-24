@@ -13,7 +13,8 @@ feeds:
     type: rss
   - url: https://rjbs.manxome.org/rubric/entries/tags/perl?format=rss
     type: rdf
-    active: 1
+  - url: https://github.polettix.it/ETOOBUSY/feed.xml
+    type: rss
   - url: https://xdg.me/blog/index.xml
     type: rss
   - url: http://www.learning-perl.com/feed
@@ -25,8 +26,6 @@ feeds:
   - url: http://www.effectiveperlprogramming.com/feed
     type: rss
   - url: https://www.learningraku.com/feed
-    type: rss
-  - url: http://perl.com/article/index.xml
     type: rss
   - url: http://blog.twoshortplanks.com/feed
     type: rss
