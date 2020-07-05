@@ -75,3 +75,5 @@ feeds:
     type: atom
     date_format: '%Y-%m-%dT%T%ms%z'
     date_name: published
+  - url: https://fedoramagazine.org/feed/
+    type: rss
