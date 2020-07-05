@@ -10,3 +10,4 @@ cache
 t/cache
 credentials
 links.json
+bin/image-to-ecr
