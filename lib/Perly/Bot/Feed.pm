@@ -15,7 +15,7 @@ use XML::FeedPP;
 use base 'Class::Accessor';
 __PACKAGE__->mk_accessors(
   qw/url type date_name date_format active
-    proxy media_targets twitter post_class/
+    proxy media_targets post_class/
 );
 
 =encoding utf8
@@ -210,12 +210,10 @@ sub extract_posts ($self, $xml) {
       my $datetime = Time::Piece->strptime($datetime_clean, $date_format);
       $self->post_class->new({
         description   => $i->description,
-        datetime      => $datetime,
+        epoch         => $datetime->epoch,
         title         => $i->title,
         url           => $i->link,
         proxy         => $self->proxy,
-        twitter       => $self->twitter,
-        feed => $weak_self,    # we have a reference to the feed
       });
     };
 

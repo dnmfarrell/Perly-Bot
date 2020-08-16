@@ -7,12 +7,12 @@ package Perly::Bot::Post;
 use Perly::Bot::UserAgent;
 use Perly::Bot::Config;
 use HTML::Entities;
-use List::Util qw(sum any);
+use List::Util qw(sum0 any);
 use Time::Piece;
 
 use base 'Class::Accessor';
 __PACKAGE__->mk_accessors(
-  qw/url title description domain datetime content_regex twitter feed/);
+  qw/url title description domain epoch content_regex/);
 
 =encoding utf8
 
@@ -153,53 +153,24 @@ sub _content_metric_methods ($self) {
  );
 }
 
-sub fails_by_policy ($post) {
-  my $time_now = gmtime;
-
-  printf STDERR "Fresh calculaton post age %d threshold %d\n", 
-    $time_now - $post->datetime, $post->age_threshold_secs;
-
-  my $policy = {
-    stale => ($time_now - $post->datetime > $post->age_threshold_secs)
-    ? 1
-    : 0,
-    embargo => 0,
-    cached => 0,
-  };
-
-  $post->{policy} = $policy;
-  $post->{policy}{_sum} = sum(values %$policy);
-
-  return $post->{policy}{_sum};
+sub too_old ($post) {
+  my $elapsed = time - $post->epoch;
+  return $elapsed > $post->age_threshold_secs;
 }
 
 sub threshold ($self) { 2 }
 
 sub should_emit ($post) {
-  printf STDERR "Evaluating %s for emittal\n", $post->title;
+  my $too_old = $post->too_old || 0;
+  my $exclusion = sum0(map { $post->$_() || 0 } $post->_content_exclusion_methods);
+  my $metric = sum0(map { !$post->$_($post->raw_content) || 0 }
+    $post->_content_metric_methods);
 
-  # these checks are for non-content things we configured
-  return 0 if $post->fails_by_policy;
+  my $emit = !($too_old + $exclusion + $metric);
+  printf STDERR "%s failed emit check: too old:%s, exclude:%s, metric:%s\n",
+    $post->title, $too_old, $exclusion, $metric unless $emit;
 
-  # these checks are for things that absolutely exclude the post
-  # no matter what else is going on
-  my @killed = grep { $post->$_() } $post->_content_exclusion_methods;
-  $post->{killed} = \@killed;
-  if (@killed) {
-    printf STDERR "Failed content exclusion checks: [%s]. %s\n",
-      join(',',@killed), $post->title;
-
-    return 0;
-  }
-
-  my %points = map { $_, $post->$_($post->raw_content) || 0 } $post->_content_metric_methods;
-  $post->{points} = \%points;
-
-  my $points = sum(values %points);
-
-  return 1 if $points >= $post->threshold;
-
-  return 0;
+  return $emit;
 }
 
 =head2 age_threshold_secs
@@ -227,8 +198,7 @@ you can override this in specialized post types.
 =cut
 
 sub looks_perly ($post, $text) {
-  state $looks_perly =
-    qr/\b(?:perl|cpan|moose|metacpan|module|subroutine|timtowdi|yapc|\:\:)\b/i;
+  state $looks_perly = qr/\b(?:perl|cpan)\b/i;
 
   $text =~ $looks_perly;
 }

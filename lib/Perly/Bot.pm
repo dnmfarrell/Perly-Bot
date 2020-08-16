@@ -32,10 +32,7 @@ sub run {
         warn $@;
       }
       next unless !$@ && $emit;
-      $emitted += $self->emit($post);
-
-      # be nice to APIs
-      sleep(2);
+      $emitted += $self->emit($feed, $post);
     }
 
     $total_emitted += $emitted;
@@ -45,14 +42,14 @@ sub run {
 }
 
 sub emit {
-  my ($self, $post) = @_;
+  my ($self, $feed, $post) = @_;
   printf "Emitting [%s]\n", $post->title;
 
   my $config  = Perly::Bot::Config->instance;
   my @errors  = ();
   my $emitted = 0;
 
-  for my $media_target ( $post->feed->media_targets->@* ) {
+  for my $media_target ( $feed->media_targets->@* ) {
     printf "Media target is [%s]\n", $media_target;
     my $media = $media_target->new($config->media->{$media_target});
     my $res = eval { $media->emit($post) };
