@@ -45,4 +45,10 @@ sub age_threshold_secs {
   return $self->{config}{should_emit}{age_threshold_secs};
 }
 
+sub feed_data {
+  my ($self) = @_;
+  my $filepath = $self->feeds->{filepath};
+  return YAML::XS::LoadFile( Path::Tiny->new($filepath)->canonpath );
+}
+
 1;

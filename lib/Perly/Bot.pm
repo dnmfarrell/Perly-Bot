@@ -5,6 +5,7 @@ use Path::Tiny;
 use Perly::Bot::Config;
 use Perly::Bot::Feed;
 use Perly::Bot::Media::JSON;
+use YAML;
 
 sub new {
   my ($class) = @_;
@@ -17,7 +18,7 @@ sub run {
   my $feeds         = 0;
   my $config        = Perly::Bot::Config->instance;
 
-  for my $feed_data ( $config->feeds->@* ) {
+  for my $feed_data ( $config->feed_data->@* ) {
     $feeds++;
     my $feed = Perly::Bot::Feed->new($feed_data);
     printf STDERR "Processing feed [%s]\n", $feed->url;

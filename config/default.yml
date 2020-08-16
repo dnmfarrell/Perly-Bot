@@ -1,4 +1,4 @@
-agent_string: 'Perly_Bot/v'
+agent_string: 'Perly_Bot/v2'
 should_emit: {
   age_threshold_secs: 100000000
 }
@@ -8,6 +8,6 @@ media: {
     filepath: /tmp/links.json
   }
 }
-feeds:
-  - url: https://www.perl.com/article/index.xml
-    type: rss
+feeds: {
+  filepath: /tmp/feeds.yml
+}
