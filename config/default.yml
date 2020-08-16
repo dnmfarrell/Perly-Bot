@@ -9,5 +9,5 @@ media: {
   }
 }
 feeds: {
-  filepath: /tmp/feeds-dev.yml
+  filepath: feeds-dev.yml
 }
