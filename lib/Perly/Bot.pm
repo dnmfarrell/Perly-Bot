@@ -5,7 +5,6 @@ use Path::Tiny;
 use Perly::Bot::Config;
 use Perly::Bot::Feed;
 use Perly::Bot::Media::JSON;
-use YAML;
 
 sub new {
   my ($class) = @_;
