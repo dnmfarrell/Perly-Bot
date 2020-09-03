@@ -12,7 +12,7 @@ use Time::Piece;
 
 use base 'Class::Accessor';
 __PACKAGE__->mk_accessors(
-  qw/url title description domain epoch content_regex/);
+  qw/url title datetime description domain epoch content_regex/);
 
 =encoding utf8
 

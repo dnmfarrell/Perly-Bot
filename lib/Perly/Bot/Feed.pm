@@ -210,10 +210,11 @@ sub extract_posts ($self, $xml) {
       my $datetime = Time::Piece->strptime($datetime_clean, $date_format);
       $self->post_class->new({
         description   => $i->description,
-        epoch         => $datetime->epoch,
-        title         => $i->title,
-        url           => $i->link,
+        datetime      => $datetime,
         proxy         => $self->proxy,
+        title         => $i->title,
+        epoch         => $datetime->epoch,
+        url           => $i->link,
       });
     };
 
