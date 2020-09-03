@@ -17,6 +17,9 @@ sub run {
   my $feeds         = 0;
   my $config        = Perly::Bot::Config->instance;
 
+  binmode STDOUT, ':utf8';
+  binmode STDERR, ':utf8';
+
   for my $feed_data ( $config->feed_data->@* ) {
     $feeds++;
     my $feed = Perly::Bot::Feed->new($feed_data);
