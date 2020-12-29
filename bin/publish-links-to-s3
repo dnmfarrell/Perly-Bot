@@ -25,4 +25,6 @@ for my $file (@ARGV) {
     Key         => $key,
     ACL         => $acl,
   );
+  print "uploaded $file to $key\n";
 }
+

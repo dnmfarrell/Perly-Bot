@@ -1,8 +1,8 @@
 #!/bin/sh
 while :
 do
-  bin/get-links-from-s3 --bucket perly-bot.org --out-dir /tmp links.json feeds.yml && \
-  bin/perlybot && \
-  bin/publish-links-to-s3 --bucket perly-bot.org /tmp/links.json
+  bin/get-links-from-s3 --bucket perly-bot.org --out-dir /tmp links.json feeds.yml 2>&1 && \
+  bin/perlybot 2>&1 && \
+  bin/publish-links-to-s3 --bucket perly-bot.org /tmp/links.json 2>&1
   sleep 3600
 done
