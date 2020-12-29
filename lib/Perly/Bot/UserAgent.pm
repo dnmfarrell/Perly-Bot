@@ -23,7 +23,12 @@ sub new {
   $ua->request_timeout(30)->connect_timeout(30)->max_redirects(3)
     ->transactor->name('Perly_Bot');
 
-  bless $ua, $class;
+  my $obj = bless $ua, $class;
+
+  # tolerate invalid certs and slow websites
+  $obj->insecure(1);
+  $obj->connect_timeout(5);
+  $obj->request_timeout(5);
 }
 
 sub get {
